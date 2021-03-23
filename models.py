@@ -10,7 +10,6 @@ from otree.api import (
     ExtraModel
 )
 
-
 author = 'LeepsLab'
 
 doc = """
@@ -31,16 +30,17 @@ class Subsession(BaseSubsession):
 
 class Group(BaseGroup):
     def live_method(self, id_in_group, data):
+        print(data)
         player = self.get_player_by_id(id_in_group)
-        player.set_order(data)
+        player.new_order(data)
 
-        payload = {
-
-        }
-        return {id_in_group: payload}
+        print(data)
+        return {id_in_group: "Success"}
 
 
 class Player(BasePlayer):
+    cash = models.FloatField()
+    inventory = models.FloatField()
     # Order states
     direction = models.StringField() # 'buy', 'sell'
     max_quantity = models.IntegerField()
@@ -57,24 +57,26 @@ class Player(BasePlayer):
         self.p_max = order['p_max']
         self.status = order['status']
 
-        Order.create(player=self,
+        Order.objects.create(player=self,
                     group = self.group,
-                    order_timestamp = order['timestamp'],
+                    timestamp = order['timestamp'],
                     direction = order['direction'],
                     max_quantity = order['max_quantity'],
                     max_rate = order['max_rate'],
                     p_min = order['p_min'],
                     p_max = order['p_max'],
                     status = order['status'])
+        
+        print(self.orders())
     
-    def order_book(self):
-        return Order.filter(player=self)
+    def orders(self):
+        return Order.objects.filter(player=self)
 
 
 class Order(ExtraModel):
     player = models.Link(Player)
     group = models.Link(Group)
-    order_timestamp = models.FloatField()
+    timestamp = models.FloatField()
     direction = models.StringField() # 'buy', 'sell'
     max_quantity = models.IntegerField()
     max_rate = models.FloatField()
