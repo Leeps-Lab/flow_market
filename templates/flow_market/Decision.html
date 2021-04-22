@@ -44,10 +44,13 @@
 <script src="{% static 'otree/js/live.js' %}" id="otree-live" data-socket-url="{{ view.live_url }}"></script>
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script>
+    let order_id = 1;
 
     function liveRecv(data){
         console.log(data);
+        order_id += 1;
     };
+    
     
     /*
     function new_order(){
@@ -59,6 +62,7 @@
         
         liveSend({
             'direction': direction,
+            'order_id': order_id,
             'max_quantity': max_q,
             'max_rate': max_r,
             'p_min':p_min,

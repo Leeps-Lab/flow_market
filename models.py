@@ -41,7 +41,9 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     cash = models.FloatField()
     inventory = models.FloatField()
-    # Order states
+    num_buys = models.IntegerField(initial=0)
+    num_sells = models.IntegerField(initial=0)
+    # Current order states
     direction = models.StringField() # 'buy', 'sell'
     max_quantity = models.IntegerField()
     max_rate = models.FloatField()
@@ -57,6 +59,11 @@ class Player(BasePlayer):
         self.p_max = order['p_max']
         self.status = order['status']
 
+        if order['direction'] == 'buy':
+            self.num_buys += 1
+        if order['direction'] == 'sell':
+            self.num_sells += 1
+
         Order.objects.create(player=self,
                     group = self.group,
                     timestamp = order['timestamp'],
@@ -71,6 +78,13 @@ class Player(BasePlayer):
     
     def orders(self):
         return Order.objects.filter(player=self)
+    
+    def buys(self):
+        return Order.objects.filter(player=self,direction='buy')
+    
+    def sells(self):
+        return Order.objects.filter(player=self,direction='sell')
+
 
 
 class Order(ExtraModel):
