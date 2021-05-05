@@ -21,7 +21,6 @@ class Decision(Page):
 class ResultsWaitPage(WaitPage):
     body_text = 'Waiting for all players to be ready'
     wait_for_all_groups = True
-    #after_all_players_arrive = 
 
 
 class Results(Page):
