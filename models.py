@@ -43,20 +43,6 @@ class Group(BaseGroup):
 	clearing_price = models.FloatField(initial=0)
 	clearing_rate = models.FloatField(initial=0)
 
-	async def periodic(self):
-		while True:
-			print('periodic')
-			await asyncio.sleep(1)
-	
-	def schedule(self):
-		loop = asyncio.new_event_loop()
-		task = loop.create_task(self.periodic())
-		loop.call_later(5, task.cancel)
-		try:
-			loop.run_until_complete(task)
-		except asyncio.CancelledError:
-			pass
-
 	def buys(self):
 		buys_list = []
 		buys = Order.filter(group=self,direction='buy',status='active')
@@ -166,9 +152,7 @@ class Group(BaseGroup):
 			clearing_price = self.clearingPrice(buys, sells)
 			print("Clearing Price: " + str(clearing_price))
 			#Graph the clearing price
-			#graphClearingPrice(klf_line, clearing_price, buys, sells)
 			#ReGraph KLF market since order expired
-			#graphKLF(klf_line, buys, sells)
 
 			#Update the traders' profits and orders
 			for sell in sells:
@@ -177,15 +161,12 @@ class Group(BaseGroup):
 				trader_vol = self.calcSupply(sell, clearing_price)
 				sell_model_ref.q_max -= trader_vol
 
-				#Update the history
-				#addKLFHistory(clearing_price, trader_vol, ask.trader, false)
 				
 				# remove the order if q_max <= 0
 				if sell['q_max'] <= 0.0:
 					sell_model_ref.status = 'expired'
 					sell['status'] = 'expired'
 					#ReGraph KLF market since order expired
-					#graphKLF(klf_line, buys, sells)
 
 				seller.updateProfit(trader_vol * clearing_price)
 				seller.updateVolume(-trader_vol)
@@ -199,15 +180,11 @@ class Group(BaseGroup):
 				trader_vol = self.calcDemand(buy, clearing_price)
 				buy_model_ref.q_max -= trader_vol
 
-				# Update the history
-				#addKLFHistory(clearing_price, trader_vol, buy.trader, true)
-
 				#remove the order if q_max <= 0
 				if (buy['q_max'] <= 0.0):
 					buy_model_ref.status = 'expired'
 					buy['status'] = 'expired'
 					# ReGraph KLF market since order expired
-					#graphKLF(klf_line, buys, sells)
 
 				buyer.updateProfit(trader_vol * clearing_price)
 				buyer.updateVolume(-trader_vol)
