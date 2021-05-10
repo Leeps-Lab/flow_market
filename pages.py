@@ -6,25 +6,26 @@ from .models import Constants
 class DecisionWaitPage(WaitPage):
     body_text = 'Waiting for all players to be ready'
     wait_for_all_groups = True
-    after_all_players_arrive = ''
+    #after_all_players_arrive = 'schedule'
 
     def is_displayed(self):
-        return self.subsession.config is not None
+        return True
 
 class Decision(Page):
+    live_method = "live_method"
+
     def is_displayed(self):
-        return self.subsession.config is not None
+        return True
 
 
 class ResultsWaitPage(WaitPage):
     body_text = 'Waiting for all players to be ready'
     wait_for_all_groups = True
-    after_all_players_arrive = ''
 
 
 class Results(Page):
     def is_displayed(self):
-        return self.subsession.config is not None
+        return True
 
 
 page_sequence = [DecisionWaitPage, Decision, ResultsWaitPage, Results]

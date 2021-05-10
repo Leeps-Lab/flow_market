@@ -1,12 +1,78 @@
 {% extends "global/Page.html" %}
-{% load otree static %}
+{% load staticfiles otree_tags %}
 
 {% block title %}
-    Page title
+    Flow Market
 {% endblock %}
 
 {% block content %}
+    <leeps-market>
+        
+    </leeps-market>
+    <!--
 
-    {% next_button %}
+    
+    <label for="direction">Buy or Sell</label>
+    <select id="direction" name="direection">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+    </select>
+    <br><br>
 
+    <label for="max_q">Max Quantity</label>
+    <input id="max_q" type="number"></input>
+    <br><br>
+
+    <label for="max_r">Max Rate</label>
+    <input id="max_r" type="number"></input>
+    <br><br>
+
+    <label for="p_min">P Min</label>
+    <input id="p_min" type="number"></input>
+    <br><br>
+
+    <label for="p_max">P Max</label>
+    <input id="p_max" type="number"></input>
+    <br><br>
+
+    <button type="button" id="order_button" onclick="new_order()">Send Order</button>
+    -->
+
+    
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'otree/js/live.js' %}" id="otree-live" data-socket-url="{{ view.live_url }}"></script>
+<script type="module" src="{% static 'flow_market/market.js' %}"></script>
+<script>
+    let order_id = 1;
+
+    function liveRecv(data){
+        console.log(data);
+        order_id += 1;
+    };
+    
+    
+    /*
+    function new_order(){
+        let direction = document.getElementById("direction").value;
+        let max_q = parseFloat(document.getElementById("max_q").value);
+        let max_r = parseFloat(document.getElementById("max_r").value);
+        let p_min = parseFloat(document.getElementById("p_min").value);
+        let p_max = parseFloat(document.getElementById("p_max").value);
+        
+        liveSend({
+            'direction': direction,
+            'order_id': order_id,
+            'max_quantity': max_q,
+            'max_rate': max_r,
+            'p_min':p_min,
+            'p_max':p_max,
+            'status': 'active',
+            'timestamp':performance.now()
+        });
+
+    };*/
+    
+
+</script>
 {% endblock %}
