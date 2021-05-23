@@ -6,72 +6,468 @@
 {% endblock %}
 
 {% block content %}
-    <leeps-market>
-        
-    </leeps-market>
-    <!--
-
+    <div class="graphs" style="display:flex;">
+        <div style="flex:50%;padding:5px;width:50%;"class="wrapper"><canvas id="klf-line"></canvas></div>
+        <div style="flex:50%;padding:5px;width:50%;"class="wrapper"><canvas id="cda-line"></canvas></div>
+    </div>
     
-    <label for="direction">Buy or Sell</label>
-    <select id="direction" name="direection">
-        <option value="buy">Buy</option>
-        <option value="sell">Sell</option>
-    </select>
     <br><br>
 
-    <label for="max_q">Max Quantity</label>
-    <input id="max_q" type="number"></input>
+    <div>
+        <input type="range" min="5" max="15" value="10" class="slider" id="priceSlider"> 
+            <span id="priceValue" style="float: left; width: 100px;"></span>
+        <input type="range" min="1" max="100" value="50" class="slider" id="volSlider">
+            <span id="volValue"></span><br><br>
+        <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
+            <span id="rateValue" style="float: left; width: 100px;"></span>
+        <input type="range" min="1" max="4" value="3" class="slider" id="offsetSlider">
+            <span id="offsetValue"></span><br><br>
+        <input type="range" min="0" max="10000" value="5000" class="slider" id="balanceSlider">
+            <span id="balanceValue" style="float: left; width: 100px;"></span>
+        <input type="range" min="0" max="1000" value="500" class="slider" id="initVolSlider">
+            <span id="initVolValue" style="width: 50px;"></span><br><br>
+    </div>
     <br><br>
 
-    <label for="max_r">Max Rate</label>
-    <input id="max_r" type="number"></input>
+    <button type="button" id="sendBid" onclick="new_buy()" style="background-color: #008CBA;">Send Buy</button>
+	<button type="button" id="sendAsk" onclick="new_sell()" style="background-color: #f44336;">Send Sell</button>
+
     <br><br>
 
-    <label for="p_min">P Min</label>
-    <input id="p_min" type="number"></input>
-    <br><br>
-
-    <label for="p_max">P Max</label>
-    <input id="p_max" type="number"></input>
-    <br><br>
-
-    <button type="button" id="order_button" onclick="new_order()">Send Order</button>
-    -->
+    <div class="traders" style="flex:60%;display:flex;">
+        <div class="wrapper" style="flex:50%"><canvas id="cash-bar" width=""></canvas></div>
+        <div class="wrapper" style="flex:50%"><canvas id="inv-bar" width=""></canvas></div>
+    </div>
 
     
 {% endblock %}
 {% block scripts %}
-<script src="{% static 'otree/js/live.js' %}" id="otree-live" data-socket-url="{{ view.live_url }}"></script>
+<!--
+    Code heavily adopted from Jason Vranek (github.com/JasonVranek)
+-->
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script>
+    function init_graphs() {
+        var cash_ctx = document.getElementById('cash-bar');	
+        var cash_bar = new Chart(cash_ctx, {
+            type: 'bar',
+            options: {
+                scales: {
+                    yAxes: [{
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                    }, {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        gridLines: {
+                            drawOnChartArea: false
+                        }
+                    }]
+                },
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Trader Cash'
+                },
+                legend: {
+                    display: false,	
+                }
+            },
+            data: {
+                labels: ['Trader'],
+                datasets: [{
+                    label: 'Cash',
+                    backgroundColor: "#14b10c",
+                    borderWidth: 1,
+                    data: [5000],
+                }]
+            },
+        });
+
+        var inv_ctx = document.getElementById('inv-bar');	
+        var inventory_bar = new Chart(inv_ctx, {
+            type: 'bar',
+            options: {
+                scales: {
+                    yAxes: [{
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                    }, {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        gridLines: {
+                            drawOnChartArea: false
+                        }
+                    }]
+                },
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Trader Inventory'
+                },
+                legend: {
+                    display: false,	
+                }
+            },
+            data: {
+                labels: ['Trader'],
+                datasets: [{
+                    label: 'Inventory',
+                    backgroundColor: "#2f9bde",
+                    borderWidth: 1,
+                    data: [500],
+                }]
+            },
+        });
+
+        var klf_line_ctx = document.getElementById('klf-line');	
+        var klf_line = new Chart(klf_line_ctx, {
+            type: 'scatter',
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            // beginAtZero: true,
+                        },
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'KLF Market',
+                }, 
+                elements: {
+                    point: {
+                        radius: 3,
+                        pointStyle: 'dash',
+                    },
+                },
+            },
+            data: {
+                datasets: [{
+                    label: 'Bids',
+                    borderColor: "#0000fe",
+                    backgroundColor: 'rgba(0, 0, 0, 0)',	
+                    fill: false,
+                    showLine: true,
+                    lineTension: 0,
+                    data: [],
+                }, {
+                    label: 'Asks',
+                    borderColor: "#fb0009",
+                    backgroundColor: 'rgba(0, 0, 0, 0)',	
+                    fill: false,
+                    showLine: true,
+                    lineTension: 0,
+                    data: [],
+                }, {
+                    label: 'Clearing Price',
+                    borderColor: "#55d22e",
+                    backgroundColor: 'rgba(0, 0, 0, 0)',	
+                    fill: false,
+                    showLine: true,
+                    lineTension: 0,
+                    data: [],
+                }]
+            },
+        });
+
+        var cda_line_ctx = document.getElementById('cda-line');	
+        var cda_line = new Chart(cda_line_ctx, {
+            type: 'scatter',
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                    title: {
+                        display: true,
+                        text: 'CDA Market',
+                },
+            },
+            data: {
+                datasets: [{
+                    label: 'Bids',
+                    borderColor: "#0000fe",
+                    backgroundColor: 'rgba(0, 0, 0, 0)',	
+                    fill: false,
+                    showLine: true,
+                    lineTension: 0,
+                    data: [],
+                }, {
+                    label: 'Asks',
+                    borderColor: "#fb0009",
+                    backgroundColor: 'rgba(0, 0, 0, 0)',	
+                    fill: false,
+                    showLine: true,
+                    lineTension: 0,
+                    data: [],
+                }]
+            },
+        });
+
+        return [cash_bar, inventory_bar, klf_line];
+    }
+    let graphs = init_graphs();
+    let klf_line = graphs[2];
+    let cash_bar = graphs[0];
+    let inventory_bar = graphs[1];
+
+    // Initialize the UI elements
+    var priceSlider = document.getElementById("priceSlider");
+    var priceValue = document.getElementById("priceValue");
+    var volSlider = document.getElementById("volSlider");
+    var volValue = document.getElementById("volValue");
+    var rateSlider = document.getElementById("rateSlider");
+    var rateValue = document.getElementById("rateValue");
+    var offsetSlider = document.getElementById("offsetSlider");
+    var offsetValue = document.getElementById("offsetValue");
+    var balanceSlider = document.getElementById("balanceSlider");
+    var balanceValue = document.getElementById("balanceValue");
+    var initVolSlider = document.getElementById("initVolSlider");
+    var initVolValue = document.getElementById("initVolValue");
+
+    priceSlider.value = 10;
+    priceValue.innerHTML = "Price: " + priceSlider.value;
+
+    volSlider.value = 50;
+    volValue.innerHTML = "Max Volume: " + volSlider.value;
+
+    rateSlider.value = 3;
+    rateValue.innerHTML = "Max Rate: " + rateSlider.value;
+
+    offsetSlider.value = 4;
+    offsetValue.innerHTML = "Flow Offset: " + offsetSlider.value;
+
+    balanceSlider.value = 5000;
+    balanceSlider.step = "500";
+    balanceValue.innerHTML = "Initial Balances: " + balanceSlider.value;
+
+    initVolSlider.value = 500;
+    initVolSlider.step = "50";
+    initVolValue.innerHTML = "Initial Volumes: " + initVolSlider.value;
+
+    priceSlider.oninput = function() {
+        priceValue.innerHTML = "Price: " + this.value;
+    }
+
+    volSlider.oninput = function() {
+        volValue.innerHTML = "Max Volume: " + this.value;
+    }
+
+    rateSlider.oninput = function() {
+        rateValue.innerHTML = "Max Rate: " + this.value;
+    }
+
+    offsetSlider.oninput = function() {
+        offsetValue.innerHTML = "Flow Offset: " + this.value;
+    }
+
+    balanceSlider.oninput = function() {
+        balanceValue.innerHTML = "Initial Balances: " + this.value;
+    }
+
+    initVolSlider.oninput = function() {
+        initVolValue.innerHTML = "Initial Volumes: " + this.value;
+    }
+
+    function calcDemand(buy, price) {
+        if (price <= buy.p_min) {
+            if (buy.q_max < buy.u_max) {
+                // Don't trade more than q_max
+                return buy.q_max;
+            }
+            // Trade at max rate if p <= p_min
+            return buy.u_max;
+        } else if (price > buy.p_max) {
+            // Don't trade if price is higher than max willingness to buy
+            return 0.0;
+        } else {
+            // The price fell p_min < price < p_max
+            let trade_vol = buy.u_max * ((buy.p_max - price) / (buy.p_max - buy.p_min));
+            if (trade_vol > buy.q_max) {
+                // Saturate to q_max if trade_vol will exceed q_max
+                return buy.q_max;
+            }
+            return trade_vol;
+        }
+    }
+
+    function calcSupply(sell, price) {
+        if (price < sell.p_min) {
+            // Don't trade if price is lower than min willingness to sell
+            return 0.0;
+        } else if (price >= sell.p_max) {
+            if (sell.q_max < sell.u_max) {
+                // Don't trade more than q_max 
+                return sell.q_max;
+            } 
+            // Trade at max rate if p >= p_max
+            return sell.u_max;
+        } else {
+            // The price fell p_min < price < p_max
+            let trade_vol = sell.u_max + ((price - sell.p_max) / (sell.p_max - sell.p_min)) * sell.u_max;
+            if (trade_vol > sell.q_max) {
+                // Saturate to q_max if trade_vol will exceed q_max
+                return sell.q_max;
+            }
+            return trade_vol;
+        }
+    }
+
+    function graphClearingPrice(chart, price, buys, sells) {
+        buys = buys.filter(buy => buy['status'] == 'active');
+        sells = sells.filter(sell => sell['status'] == 'active');
+        var agg_supply = 0.0; // agg_supply will be equal to agg_demand
+        sells.forEach(function (sell, _index, _array) { 	
+                agg_supply += calcSupply(sell, price);
+        });
+        var points = [];
+        
+
+        points.push({x: 0.0, y: agg_supply});
+        points.push({x: price, y: agg_supply});
+        points.push({x: price, y: 0.0});
+
+        chart.data.datasets[2].data = points;
+        chart.update();
+
+    }
+
+    
+    function graphKlfBids(chart, buys) {
+        buys = buys.filter(buy => buy['status'] == 'active');
+        if (buys.length == 0) {
+            chart.data.datasets[0].data = [];
+            chart.update();
+            return;
+        }
+
+        var points = [];
+
+        // Generate range(70, 130) the domain based on sliders values
+        // var prices = Array.from(new Array(0), (x,i) => i + 20);
+        var prices = [...Array(20).keys()];
+        prices.forEach(function (price, _index, _array) {
+            var agg_supply = 0.0;
+            buys.forEach(function (buy, _index, _array) { 	
+                agg_supply += calcDemand(buy, price);
+            });
+            points.push({x: price, y: agg_supply});
+        });
+
+        chart.data.datasets[0].data = points;
+        chart.update();
+    }
+
+    function graphKlfAsks(chart, sells) {
+        sells = sells.filter(sell => sell['status'] == 'active');
+        if (sells.length == 0) {
+            chart.data.datasets[1].data = [];
+            chart.update();
+            return;
+        }
+            
+        var points = [];
+        var prices = [...Array(20).keys()];
+        prices.forEach(function (price, _index, _array) {
+            var agg_supply = 0.0;
+            sells.forEach(function (sell, _index, _array) { 	
+                agg_supply += calcSupply(sell, price);
+            });
+            points.push({x: price, y: agg_supply});
+        });
+
+        chart.data.datasets[1].data = points;
+        chart.update();
+    }
+
+    // adds to the player's profit
+    function updateProfit(chart, profit) {
+        chart.data.datasets[0].data[0] = profit;
+        chart.update();
+    }
+
+    // Adds or subtracts volume to trader
+    function updateVolume(chart, volume) {
+        chart.data.datasets[0].data[0] = volume;
+        chart.update();
+    }
+
+
     let order_id = 1;
 
     function liveRecv(data){
+        if(data['type'] == 'clear'){
+            klf_line.data.datasets[2].data = [];
+			klf_line.update();
+        }
+        if(data['type'] == 'buy' || data['type'] == 'sell' || data['regraph'] == 'sell'){
+            graphKlfBids(klf_line, data['buys']);
+			graphKlfAsks(klf_line, data['sells']);
+        }
+        if(data['type'] == 'clearing_price'){
+            graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']);
+            graphKlfBids(klf_line, data['buys']);
+			graphKlfAsks(klf_line, data['sells']);
+        }
+        if(data['type'] == 'update'){
+            updateProfit(cash_bar, data['cash']);
+			updateVolume(inventory_bar, data['inventory']);
+        }
         console.log(data);
-        order_id += 1;
     };
     
     
-    /*
-    function new_order(){
-        let direction = document.getElementById("direction").value;
-        let max_q = parseFloat(document.getElementById("max_q").value);
-        let max_r = parseFloat(document.getElementById("max_r").value);
-        let p_min = parseFloat(document.getElementById("p_min").value);
-        let p_max = parseFloat(document.getElementById("p_max").value);
+    
+    function new_buy(){
+        var price = parseInt(document.getElementById("priceSlider").value);
+        var volume = parseInt(document.getElementById("volSlider").value);
+        var flow_offset = parseInt(document.getElementById("offsetSlider").value);
+        var u_max = parseInt(document.getElementById("rateSlider").value);
         
         liveSend({
-            'direction': direction,
-            'order_id': order_id,
-            'max_quantity': max_q,
-            'max_rate': max_r,
-            'p_min':p_min,
-            'p_max':p_max,
+            'p_min': price - flow_offset / 2.0,
+            'p_max': price + flow_offset / 2.0,
+            'q_max': volume,
+            'u_max': u_max,
+            'direction': 'buy',
+            'status': 'active',
+            'timestamp':performance.now()
+        });
+        order_id += 1;
+    };
+
+    function new_sell(){
+        var price = parseInt(document.getElementById("priceSlider").value);
+        var volume = parseInt(document.getElementById("volSlider").value);
+        var flow_offset = parseInt(document.getElementById("offsetSlider").value);
+        var u_max = parseInt(document.getElementById("rateSlider").value);
+        
+        liveSend({
+            'p_min': price - flow_offset / 2.0,
+            'p_max': price + flow_offset / 2.0,
+            'q_max': volume,
+            'u_max': u_max,
+            'direction': 'sell',
             'status': 'active',
             'timestamp':performance.now()
         });
 
-    };*/
+    };
     
 
 </script>
