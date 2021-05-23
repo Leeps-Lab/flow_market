@@ -1,26 +1,19 @@
 from otree.api import (
     models,
-    widgets,
     BaseConstants,
     BaseSubsession,
     BaseGroup,
     BasePlayer,
-    Currency as c,
-    currency_range,
     ExtraModel,
 )
 from otree import live
-import asyncio
-import json
-import time
-import threading
+from delayedFunct import call_with_delay
 
 author = 'LeepsLab'
 
 doc = """
 This is a continuous flow market game
 """
-
 
 class Constants(BaseConstants):
     name_in_url = 'flow_market'
@@ -32,46 +25,54 @@ class Subsession(BaseSubsession):
 	def creating_session(self):
 		self.group_randomly()
 
-	def schedule(self):
-		print("calling")
-		groups = self.get_groups()
-		for group in groups:
-			group.schedule()
-
 
 class Group(BaseGroup):
-	clearing_price = models.FloatField(initial=0)
-	clearing_rate = models.FloatField(initial=0)
+	started_timer = models.BooleanField(initial=False)	
+
+	def start_timer(self):
+		self.start_timer = True
 
 	def buys(self):
 		buys_list = []
-		buys = Order.filter(group=self,direction='buy',status='active')
+		buys = Order.objects.filter(group=self,direction='buy',status='active')
+		buys = [buy for buy in buys if len(Expired.objects.filter(group=self,orderID=buy.orderID)) == 0]
 		for buy in buys:
+			q_max = buy.q_max
+			q_max_list = QState.objects.filter(player=buy.player,orderID=buy.orderID)
+			if len(q_max_list) >= 1:
+				q_max = q_max_list[len(q_max_list) - 1].q_max
+
 			buys_list.append({
 				'player': buy.player.id_in_group,
 				'p_min': buy.p_min,
 				'p_max': buy.p_max,
-				'q_max': buy.q_max,
+				'q_max': q_max,
 				'u_max': buy.u_max,
 				'direction': buy.direction,
 				'status': buy.status,
-				'timestamp':buy.timestamp
+				'orderID':buy.orderID
 			})
 		return buys_list
 
 	def sells(self):
 		sells_list = []
-		sells = Order.filter(group=self,direction='sell',status='active')
+		sells = Order.objects.filter(group=self,direction='sell',status='active')
+		sells = [sell for sell in sells if len(Expired.objects.filter(group=self,orderID=sell.orderID)) == 0]
 		for sell in sells:
+			q_max = sell.q_max
+			q_max_list = QState.objects.filter(player=sell.player,orderID=sell.orderID)
+			if len(q_max_list) >= 1:
+				q_max = q_max_list[len(q_max_list) - 1].q_max
+
 			sells_list.append({
 				'player': sell.player.id_in_group,
 				'p_min': sell.p_min,
 				'p_max': sell.p_max,
-				'q_max': sell.q_max,
+				'q_max': q_max,
 				'u_max': sell.u_max,
 				'direction': sell.direction,
 				'status': sell.status,
-				'timestamp':sell.timestamp
+				'orderID':sell.orderID
 			})
 		return sells_list
 
@@ -147,54 +148,114 @@ class Group(BaseGroup):
 	def update(self):
 		buys = self.buys()
 		sells = self.sells()
+		payloads = {}
 		if len(buys) > 0 and len(sells) > 0:
 			#Calculate the clearing price
 			clearing_price = self.clearingPrice(buys, sells)
 			print("Clearing Price: " + str(clearing_price))
 			#Graph the clearing price
-			#ReGraph KLF market since order expired
+			
+			for player in self.get_players():
+				payloads[player.participant.code] = {"type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells}
+			
+			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 
 			#Update the traders' profits and orders
+			print("----Sells in Update--------------------")
 			for sell in sells:
 				seller = self.get_player_by_id(sell['player'])
-				sell_model_ref = Order.filter(player=seller,direction='sell',status='active',timestamp=sell['timestamp'])[0]
+				sell_model_ref = Order.objects.filter(player=seller,direction='sell',status='active',orderID=sell['orderID'])[0]
+				print(sell_model_ref.q_max)
 				trader_vol = self.calcSupply(sell, clearing_price)
 				sell_model_ref.q_max -= trader_vol
+				sell['q_max'] -= trader_vol
+				QState.objects.create(
+						player=seller,
+						group=self,
+						q_max = sell['q_max'],
+						orderID=sell['orderID'])
 
 				
 				# remove the order if q_max <= 0
 				if sell['q_max'] <= 0.0:
 					sell_model_ref.status = 'expired'
+					Expired.objects.create(
+						player=seller,
+						group=self,
+						orderID=sell['orderID'])
 					sell['status'] = 'expired'
 					#ReGraph KLF market since order expired
+					for player in self.get_players():
+						payloads[player.participant.code] = {"type": 'regraph', "buys": buys, "sells": sells}
+					
+					live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+
 
 				seller.updateProfit(trader_vol * clearing_price)
 				seller.updateVolume(-trader_vol)
-				print("Trader " + sell['player'] + " Cash: " + str(seller.cash))
-				print("Trader " + sell['player'] + " Inventory: " + str(seller.inventory))
+				print("Trader " + str(sell['player']) + " Cash: " + str(seller.cash))
+				print("Trader " + str(sell['player']) + " Inventory: " + str(seller.inventory))
 				# Use live send back to update seller's frontend
+				for player in self.get_players():
+					payloads[player.participant.code] = {"type": 'none'}
+				
+				payloads[seller.participant.code] = {"type": 'update', "cash": seller.cash, "inventory": seller.inventory}
 
+				print(sell_model_ref.q_max)
+				sell_model_ref = Order.objects.filter(player=seller,direction='sell',status='active',orderID=sell['orderID'])[0]
+				print(sell_model_ref.q_max)
+				
+				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+
+			print("----Buys in Update--------------------")
 			for buy in buys:
 				buyer = self.get_player_by_id(buy['player'])
-				buy_model_ref = Order.filter(player=buyer,direction='buy',status='active',timestamp=buy['timestamp'])[0]
+				buy_model_ref = Order.objects.filter(player=buyer,direction='buy',status='active',orderID=buy['orderID'])[0]
 				trader_vol = self.calcDemand(buy, clearing_price)
+				print(buy_model_ref.q_max)
 				buy_model_ref.q_max -= trader_vol
+				buy['q_max'] -= trader_vol
+				QState.objects.create(
+						player=seller,
+						group=self,
+						q_max = sell['q_max'],
+						orderID=sell['orderID'])
 
 				#remove the order if q_max <= 0
 				if (buy['q_max'] <= 0.0):
 					buy_model_ref.status = 'expired'
+					Expired.objects.create(
+						player=buyer,
+						group=self,
+						orderID=buy['orderID'])
 					buy['status'] = 'expired'
 					# ReGraph KLF market since order expired
+					for player in self.get_players():
+						payloads[player.participant.code] = {"type": 'regraph', "buys": buys, "sells": sells}
+					
+					live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 
 				buyer.updateProfit(trader_vol * clearing_price)
 				buyer.updateVolume(-trader_vol)
-				print("Trader " + buy['player'] + " Cash: " + str(buyer.cash))
-				print("Trader " + buy['player'] +" Inventory: " + str(buyer.inventory))
+				print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
+				print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
 				# Use live send back to update buyer's frontend
+				for player in self.get_players():
+					payloads[player.participant.code] = {"type": 'none'}
+				
+				payloads[buyer.participant.code] = {"type": 'update', "cash": buyer.cash, "inventory": buyer.inventory}
+
+				print(buy_model_ref.q_max)
+				buy_model_ref = Order.objects.filter(player=buyer,direction='buy',status='active',orderID=buy['orderID'])[0]
+				print(buy_model_ref.q_max)
+				
+				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 		else:
 			#Clear the clearing price graph
-			#live send
-			return {'type': 'clear'}
+			for player in self.get_players():
+				payloads[player.participant.code] = {"type": 'clear'}
+			
+			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 
 class Player(BasePlayer):
 	cash = models.FloatField(initial=5000)
@@ -207,21 +268,21 @@ class Player(BasePlayer):
 	u_max = models.FloatField()
 	p_min = models.FloatField()
 	p_max = models.FloatField()
-	status = models.StringField() #
+	status = models.StringField()
+	updateRunning = models.BooleanField(initial=False)
+
+	currentID = models.IntegerField(initial=0)
+
+	def setUpdateRunning(self):
+		self.updateRunning = True
 
 	def live_method(self, data):
 		self.new_order(data)
 
-		self.group.update()
-
-		loop = asyncio.new_event_loop()
-		task = loop.create_task(self.live_send())
-		try:
-			loop.run_until_complete(task)
-		except asyncio.CancelledError:
-			pass	
-
-		#live._live_send_back(self.participant._session_code, self.participant._index_in_pages, {1: "hello world",2: "hello world",3: "hello world",4: "hello world"})
+		if not self.updateRunning:
+			for p in self.group.get_players():
+				p.setUpdateRunning()
+			call_with_delay(5, self.group.update)	
 
 		if(data['direction'] == 'buy'):
 			return_data = {'type': 'buy', 'buys': self.group.buys(), 'sells': self.group.sells()}
@@ -243,21 +304,22 @@ class Player(BasePlayer):
 		if order['direction'] == 'sell':
 			self.num_sells += 1
 
-		Order.create(player=self,
+		Order.objects.create(player=self,
 					group = self.group,
-					timestamp = order['timestamp'],
+					orderID = self.currentID,
 					direction = order['direction'],
 					q_max = order['q_max'],
 					u_max = order['u_max'],
 					p_min = order['p_min'],
 					p_max = order['p_max'],
 					status = order['status'])
-		#print(self.orders())
+		self.currentID += 1
 
 	# might need to use Order.objects in older otree versions
 	def orders(self):
 		order_list = []
-		orders = Order.filter(player=self,direction='buy',status='active')
+		orders = Order.objects.filter(player=self,direction='buy',status='active')
+		orders = [order for order in orders if len(Expired.objects.filter(player=self,orderID=order.orderID)) == 0]
 		for order in orders:
 			order_list.append({
 				'player': order.player.id_in_group,
@@ -267,39 +329,41 @@ class Player(BasePlayer):
 				'u_max': order.u_max,
 				'direction': order.direction,
 				'status': order.status,
-				'timestamp':order.timestamp
+				'orderID':order.orderID
 			})
 		return order_list
 
 	def buys(self):
 		buys_list = []
-		buys = Order.filter(player=self,direction='buy',status='active')
+		buys = Order.objects.filter(player=self,direction='buy',status='active')
+		buys = [buy for buy in buys if len(Expired.objects.filter(player=self,orderID=buy.orderID)) == 0]
 		for buy in buys:
 			buys_list.append({
-				'player': order.player.id_in_group,
+				'player': buy.player.id_in_group,
 				'p_min': buy.p_min,
 				'p_max': buy.p_max,
 				'q_max': buy.q_max,
 				'u_max': buy.u_max,
 				'direction': buy.direction,
 				'status': buy.status,
-				'timestamp':buy.timestamp
+				'orderID':buy.orderID
 			})
 		return buys_list
 
 	def sells(self):
 		sells_list = []
-		sells = Order.filter(player=self,direction='sell',status='active')
+		sells = Order.objects.filter(player=self,direction='sell',status='active')
+		sells = [sell for sell in sells if len(Expired.objects.filter(player=self,orderID=sell.orderID)) == 0]
 		for sell in sells:
 			sells_list.append({
-				'player': order.player,
+				'player': sell.player,
 				'p_min': sell.p_min,
 				'p_max': sell.p_max,
 				'q_max': sell.q_max,
 				'u_max': sell.u_max,
 				'direction': sell.direction,
 				'status': sell.status,
-				'timestamp':sell.timestamp
+				'orderID':sell.orderID
 			})
 		return sells_list
 	
@@ -312,10 +376,21 @@ class Player(BasePlayer):
 class Order(ExtraModel):
 	player = models.Link(Player)
 	group = models.Link(Group)
-	timestamp = models.FloatField()
+	orderID = models.IntegerField()
 	direction = models.StringField() # 'buy', 'sell'
-	q_max = models.IntegerField()
+	q_max = models.FloatField()
 	u_max = models.FloatField()
 	p_min = models.FloatField()
 	p_max = models.FloatField()
 	status = models.StringField()
+
+class Expired(ExtraModel):
+	player = models.Link(Player)
+	group = models.Link(Group)
+	orderID = models.IntegerField()
+
+class QState(ExtraModel):
+	player = models.Link(Player)
+	group = models.Link(Group)
+	orderID = models.IntegerField()
+	q_max = models.FloatField()
