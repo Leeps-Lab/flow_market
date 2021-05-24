@@ -438,6 +438,11 @@
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max = parseInt(document.getElementById("rateSlider").value);
+
+        if(minprice >= maxprice){
+            alert("Minimum Price should be less than Maximum Price")
+            return;
+        }
         
         liveSend({
             'p_min': minprice,
@@ -458,7 +463,7 @@
         var u_max = parseInt(document.getElementById("rateSlider").value);
 
         if(minprice >= maxprice){
-            alert("Minimum Price shouldbe less than Maximum Price")
+            alert("Minimum Price should be less than Maximum Price")
             return;
         }
         
