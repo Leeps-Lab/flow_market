@@ -14,14 +14,14 @@
     <br><br>
 
     <div>
-        <input type="range" min="5" max="15" value="10" class="slider" id="priceSlider"> 
-            <span id="priceValue" style="float: left; width: 100px;"></span>
+        <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
+            <span id="minpriceValue" style="float: left; width: 100px;"></span>
+        <input type="range" min="5" max="15" value="10" class="slider" id="maxpriceSlider">
+            <span id="maxpriceValue"></span><br><br>
         <input type="range" min="1" max="100" value="50" class="slider" id="volSlider">
-            <span id="volValue"></span><br><br>
+            <span id="volValue" style="float: left; width: 100px;"></span>
         <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
-            <span id="rateValue" style="float: left; width: 100px;"></span>
-        <input type="range" min="1" max="4" value="3" class="slider" id="offsetSlider">
-            <span id="offsetValue"></span><br><br>
+            <span id="rateValue" ></span><br><br>
         <input type="range" min="0" max="10000" value="5000" class="slider" id="balanceSlider">
             <span id="balanceValue" style="float: left; width: 100px;"></span>
         <input type="range" min="0" max="1000" value="500" class="slider" id="initVolSlider">
@@ -227,21 +227,21 @@
     let inventory_bar = graphs[1];
 
     // Initialize the UI elements
-    var priceSlider = document.getElementById("priceSlider");
-    var priceValue = document.getElementById("priceValue");
+    var minpriceSlider = document.getElementById("minpriceSlider");
+    var minpriceValue = document.getElementById("minpriceValue");
     var volSlider = document.getElementById("volSlider");
     var volValue = document.getElementById("volValue");
     var rateSlider = document.getElementById("rateSlider");
     var rateValue = document.getElementById("rateValue");
-    var offsetSlider = document.getElementById("offsetSlider");
-    var offsetValue = document.getElementById("offsetValue");
+    var maxpriceSlider = document.getElementById("maxpriceSlider");
+    var maxpriceValue = document.getElementById("maxpriceValue");
     var balanceSlider = document.getElementById("balanceSlider");
     var balanceValue = document.getElementById("balanceValue");
     var initVolSlider = document.getElementById("initVolSlider");
     var initVolValue = document.getElementById("initVolValue");
 
-    priceSlider.value = 10;
-    priceValue.innerHTML = "Price: " + priceSlider.value;
+    minpriceSlider.value = 10;
+    minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
 
     volSlider.value = 50;
     volValue.innerHTML = "Max Volume: " + volSlider.value;
@@ -249,8 +249,8 @@
     rateSlider.value = 3;
     rateValue.innerHTML = "Max Rate: " + rateSlider.value;
 
-    offsetSlider.value = 4;
-    offsetValue.innerHTML = "Flow Offset: " + offsetSlider.value;
+    maxpriceSlider.value = 10;
+    maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
 
     balanceSlider.value = 5000;
     balanceSlider.step = "500";
@@ -260,8 +260,8 @@
     initVolSlider.step = "50";
     initVolValue.innerHTML = "Initial Volumes: " + initVolSlider.value;
 
-    priceSlider.oninput = function() {
-        priceValue.innerHTML = "Price: " + this.value;
+    minpriceSlider.oninput = function() {
+        minpriceValue.innerHTML = "Min Price: " + this.value;
     }
 
     volSlider.oninput = function() {
@@ -272,8 +272,8 @@
         rateValue.innerHTML = "Max Rate: " + this.value;
     }
 
-    offsetSlider.oninput = function() {
-        offsetValue.innerHTML = "Flow Offset: " + this.value;
+    maxpriceSlider.oninput = function() {
+        maxpriceValue.innerHTML = "Max Price: " + this.value;
     }
 
     balanceSlider.oninput = function() {
@@ -434,14 +434,14 @@
     
     
     function new_buy(){
-        var price = parseInt(document.getElementById("priceSlider").value);
+        var minprice = parseInt(document.getElementById("minpriceSlider").value);
         var volume = parseInt(document.getElementById("volSlider").value);
-        var flow_offset = parseInt(document.getElementById("offsetSlider").value);
+        var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max = parseInt(document.getElementById("rateSlider").value);
         
         liveSend({
-            'p_min': price - flow_offset / 2.0,
-            'p_max': price + flow_offset / 2.0,
+            'p_min': minprice,
+            'p_max': maxprice,
             'q_max': volume,
             'u_max': u_max,
             'direction': 'buy',
@@ -452,14 +452,19 @@
     };
 
     function new_sell(){
-        var price = parseInt(document.getElementById("priceSlider").value);
+        var minprice = parseInt(document.getElementById("minpriceSlider").value);
         var volume = parseInt(document.getElementById("volSlider").value);
-        var flow_offset = parseInt(document.getElementById("offsetSlider").value);
+        var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max = parseInt(document.getElementById("rateSlider").value);
+
+        if(minprice >= maxprice){
+            alert("Minimum Price shouldbe less than Maximum Price")
+            return;
+        }
         
         liveSend({
-            'p_min': price - flow_offset / 2.0,
-            'p_max': price + flow_offset / 2.0,
+            'p_min': minprice,
+            'p_max': maxprice,
             'q_max': volume,
             'u_max': u_max,
             'direction': 'sell',

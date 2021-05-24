@@ -259,7 +259,7 @@ class Player(BasePlayer):
 		if not self.updateRunning:
 			for p in self.group.get_players():
 				p.setUpdateRunning()
-			call_with_delay(2, self.group.update)	
+			call_with_delay(1, self.group.update)	
 
 		if(data['direction'] == 'buy'):
 			return_data = {'type': 'buy', 'buys': self.group.buys(), 'sells': self.group.sells()}
