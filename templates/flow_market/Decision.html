@@ -8,7 +8,6 @@
 {% block content %}
     <div class="graphs" style="display:flex;">
         <div style="flex:50%;padding:5px;width:50%;"class="wrapper"><canvas id="klf-line"></canvas></div>
-        <div style="flex:50%;padding:5px;width:50%;"class="wrapper"><canvas id="cda-line"></canvas></div>
     </div>
     
     <br><br>
@@ -173,43 +172,6 @@
                 }, {
                     label: 'Clearing Price',
                     borderColor: "#55d22e",
-                    backgroundColor: 'rgba(0, 0, 0, 0)',	
-                    fill: false,
-                    showLine: true,
-                    lineTension: 0,
-                    data: [],
-                }]
-            },
-        });
-
-        var cda_line_ctx = document.getElementById('cda-line');	
-        var cda_line = new Chart(cda_line_ctx, {
-            type: 'scatter',
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
-                    title: {
-                        display: true,
-                        text: 'CDA Market',
-                },
-            },
-            data: {
-                datasets: [{
-                    label: 'Bids',
-                    borderColor: "#0000fe",
-                    backgroundColor: 'rgba(0, 0, 0, 0)',	
-                    fill: false,
-                    showLine: true,
-                    lineTension: 0,
-                    data: [],
-                }, {
-                    label: 'Asks',
-                    borderColor: "#fb0009",
                     backgroundColor: 'rgba(0, 0, 0, 0)',	
                     fill: false,
                     showLine: true,
