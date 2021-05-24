@@ -12,6 +12,7 @@ class DecisionWaitPage(WaitPage):
         return True
 
 class Decision(Page):
+    timeout_seconds = 60
     live_method = "live_method"
 
     def is_displayed(self):
@@ -26,6 +27,8 @@ class ResultsWaitPage(WaitPage):
 class Results(Page):
     def is_displayed(self):
         return True
+    
+    
 
 
 page_sequence = [DecisionWaitPage, Decision, ResultsWaitPage, Results]

@@ -2,11 +2,13 @@
 {% load otree static %}
 
 {% block title %}
-    Page title
+    Results
 {% endblock %}
 
 {% block content %}
-
+    <p>Cash: {{ player.cash | floatformat:3 }} </p>
+    <br> <br>
+    <p>Inventory: {{ player.inventory | floatformat:3 }}</p>
     {% next_button %}
 {% endblock %}
 
