@@ -1,4 +1,4 @@
-from infiniteTimer import InfiniteTimer
+from .infiniteTimer import InfiniteTimer
 from otree.db import idmap
 
 def call_with_delay(delay: float, callback, *args, **kwargs):
