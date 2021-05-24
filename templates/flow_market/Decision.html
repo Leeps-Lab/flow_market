@@ -415,7 +415,7 @@
             klf_line.data.datasets[2].data = [];
 			klf_line.update();
         }
-        if(data['type'] == 'buy' || data['type'] == 'sell' || data['regraph'] == 'sell'){
+        if(data['type'] == 'buy' || data['type'] == 'sell' || data['type'] == 'regraph'){
             graphKlfBids(klf_line, data['buys']);
 			graphKlfAsks(klf_line, data['sells']);
         }
