@@ -11,6 +11,9 @@
     </div>
     
     <br><br>
+    <p>Input Orders through a file</p>
+    <input type="file" name="file" id="file">
+    <br><br>
 
     <div>
         <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
@@ -21,10 +24,6 @@
             <span id="volValue" style="float: left; width: 100px;"></span>
         <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
             <span id="rateValue" ></span><br><br>
-        <input type="range" min="0" max="10000" value="5000" class="slider" id="balanceSlider">
-            <span id="balanceValue" style="float: left; width: 100px;"></span>
-        <input type="range" min="0" max="1000" value="500" class="slider" id="initVolSlider">
-            <span id="initVolValue" style="width: 50px;"></span><br><br>
     </div>
     <br><br>
 
@@ -47,6 +46,7 @@
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script>
+
     function init_graphs() {
         var cash_ctx = document.getElementById('cash-bar');	
         var cash_bar = new Chart(cash_ctx, {
@@ -197,10 +197,6 @@
     var rateValue = document.getElementById("rateValue");
     var maxpriceSlider = document.getElementById("maxpriceSlider");
     var maxpriceValue = document.getElementById("maxpriceValue");
-    var balanceSlider = document.getElementById("balanceSlider");
-    var balanceValue = document.getElementById("balanceValue");
-    var initVolSlider = document.getElementById("initVolSlider");
-    var initVolValue = document.getElementById("initVolValue");
 
     minpriceSlider.value = 10;
     minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
@@ -213,14 +209,6 @@
 
     maxpriceSlider.value = 10;
     maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
-
-    balanceSlider.value = 5000;
-    balanceSlider.step = "500";
-    balanceValue.innerHTML = "Initial Balances: " + balanceSlider.value;
-
-    initVolSlider.value = 500;
-    initVolSlider.step = "50";
-    initVolValue.innerHTML = "Initial Volumes: " + initVolSlider.value;
 
     minpriceSlider.oninput = function() {
         minpriceValue.innerHTML = "Min Price: " + this.value;
@@ -236,14 +224,6 @@
 
     maxpriceSlider.oninput = function() {
         maxpriceValue.innerHTML = "Max Price: " + this.value;
-    }
-
-    balanceSlider.oninput = function() {
-        balanceValue.innerHTML = "Initial Balances: " + this.value;
-    }
-
-    initVolSlider.oninput = function() {
-        initVolValue.innerHTML = "Initial Volumes: " + this.value;
     }
 
     function calcDemand(buy, price) {
@@ -441,6 +421,50 @@
 
     };
     
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    document.getElementById("file").onchange = async () => {
+
+        var file = document.getElementById("file").files[0];
+        const reader = new FileReader();
+
+        reader.onload = async (event) => {
+            const file = event.target.result;
+            const allLines = file.split(/\r\n|\n/);
+            // Reading line by line
+            allLines.forEach(async (line) => {
+                if(line.length < 1) return;
+                console.log(line);
+                var data = line.split(",");
+                
+                var time = parseFloat(data[0]);
+                var direction = data[1];
+                var p_min = parseFloat(data[2]);
+                var p_max = parseFloat(data[3]);
+                var q_max = parseFloat(data[4]);
+                var u_max = parseFloat(data[5]);
+
+                await sleep(time);
+
+                liveSend({
+                    'p_min': p_min,
+                    'p_max': p_max,
+                    'q_max': q_max,
+                    'u_max': u_max,
+                    'direction': direction,
+                    'status': 'active',
+                    'timestamp':performance.now()
+                });
+            });
+        };
+
+        reader.onerror = (event) => {
+            alert(event.target.error.name);
+        };
+
+        reader.readAsText(file);
+    }
 
 </script>
 {% endblock %}
