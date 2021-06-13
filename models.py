@@ -6,9 +6,11 @@ from otree.api import (
     BasePlayer,
     ExtraModel,
 )
+import csv
 from otree import live
-from .delayedFunct import call_with_delay
+from .delayedFunct import call_with_delay_infinite,call_with_delay
 from jsonfield import JSONField
+import time
 
 author = 'LeepsLab'
 
@@ -21,6 +23,19 @@ class Constants(BaseConstants):
     players_per_group = 4
     num_rounds = 1
 
+def parse_config(config_file):
+    with open('flow_market/configs/' + config_file) as f:
+        rows = list(csv.DictReader(f))
+
+    rounds = []
+    for row in rows:
+        rounds.append({
+            'round': int(row['round']),
+			'bet_file': str(row['bet_file']),
+			'order_file': str(row['order_file']),
+			'treatment': str(row['treatment'])
+        })
+    return rounds
 
 class Subsession(BaseSubsession):
 	def creating_session(self):
@@ -36,6 +51,63 @@ class Group(BaseGroup):
 	# order_copies[player_id_in_group][order_id]
 	order_copies = JSONField(null=True, default=init_copies)
 
+	def bet_file(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['bet_file']
+
+	def order_file(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['order_file']
+
+	def set_bets(self):
+		print("setting up bets")
+		bet_file = self.bet_file()
+		with open('flow_market/bets/' + bet_file) as f:
+			rows = list(csv.DictReader(f))
+
+		for row in rows:
+			data = {
+				'trader_id': int(row['trader_id']),
+				'direction': str(row['direction']),
+				'limit_price': int(row['limit_price']),
+				'quantity': int(row['quantity']),
+				'deadline': int(row['deadline'])
+			}
+			call_with_delay((int(row['timestamp'])/1000),self.execute_bet,)
+		return
+	
+	def execute_bet(self, data):
+		player = self.get_player_by_id(data['trader_id'])
+		player.updateProfit()
+		player.updateVolume()
+		# Use live send back to update seller's frontend
+		for player in self.get_players():
+			payloads[player.participant.code] = {"type": 'none'}
+		
+		payloads[seller.participant.code] = {"type": 'update', "cash": seller.cash, "inventory": seller.inventory}
+	
+	def input_order_file(self):
+		print("setting up order")
+		order_file = self.bet_file()
+		with open('flow_market/orders/' + order_file) as f:
+			rows = list(csv.DictReader(f))
+		payloads = {}
+		last_timestamp = 0
+		for row in rows:
+			time.sleep((int(row['timestamp']) - last_timestamp)/1000)
+			last_timestamp = int(row['timestamp'])
+			self.get_player_by_id().new_order({
+				'p_min': int(row['p_min']),
+				'p_max': int(row['p_max']),
+				'q_max': int(row['q_max']),
+				'u_max': int(row['u_max']),
+				'direction': str(row['direction']),
+				'status': 'active',
+				'timestamp': int(row['timestamp'])
+			})
+			for player in self.get_players():
+				payloads[player.participant.code] = {'type': str(row['direction']), 'buys': self.group.buys(), 'sells': self.group.sells()}
+			
+			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+		return
 	
 	def new_order(self, order,playerID, currentID):
 		print(self.order_copies)
@@ -254,17 +326,21 @@ class Player(BasePlayer):
 		self.updateRunning = True
 
 	def live_method(self, data):
+		# First Live message from user is to begin intialization
+		if data['direction'] == 'begin':
+			if not self.updateRunning:
+				for p in self.group.get_players():
+					p.setUpdateRunning()
+				# Setup Bets and File input
+				call_with_delay(0, self.group.set_bets)
+				call_with_delay(0, self.group.input_order_file)
+				# Begin Continuously Updating function
+				call_with_delay_infinite(1, self.group.update)
+			return {0: {'type':'begin'}}	
+
+		#Input new order
 		self.new_order(data)
-
-		if not self.updateRunning:
-			for p in self.group.get_players():
-				p.setUpdateRunning()
-			call_with_delay(1, self.group.update)	
-
-		if(data['direction'] == 'buy'):
-			return_data = {'type': 'buy', 'buys': self.group.buys(), 'sells': self.group.sells()}
-		elif (data['direction'] == 'sell'):
-			return_data = {'type': 'sell', 'buys': self.group.buys(), 'sells': self.group.sells()}
+		return_data = {'type': data['direction'], 'buys': self.group.buys(), 'sells': self.group.sells()}
 		
 		return {0: return_data}
 

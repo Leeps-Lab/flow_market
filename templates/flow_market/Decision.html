@@ -79,6 +79,14 @@
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if({{player.id_in_group}} == 1){
+            liveSend({'direction': 'begin'});
+            console.log("begin round");
+        }
+        
+    }, false);
+
 
     function init_graphs() {
         var cash_ctx = document.getElementById('cash-bar');	
@@ -386,6 +394,9 @@
     let order_id = 1;
 
     function liveRecv(data){
+        if(data['type'] == 'begin'){
+            console.log("Round begin");
+        }
         if(data['type'] == 'clear'){
             klf_line.data.datasets[2].data = [];
 			klf_line.update();
