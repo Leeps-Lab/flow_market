@@ -6,35 +6,68 @@
 {% endblock %}
 
 {% block content %}
-    <div class="graphs" style="display:flex;">
-        <div style="flex:50%;padding:5px;width:50%;"class="wrapper"><canvas id="klf-line"></canvas></div>
-    </div>
-    
-    <br><br>
-    <h2>Input Orders through a file</h2>
-    <input type="file" name="file" id="file">
-    <br><br>
-    <h2>Input Orders manually</h2>
-    <div>
-        <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
-            <span id="minpriceValue" style="float: left; width: 100px;"></span>
-        <input type="range" min="5" max="15" value="10" class="slider" id="maxpriceSlider">
-            <span id="maxpriceValue"></span><br><br>
-        <input type="range" min="1" max="100" value="50" class="slider" id="volSlider">
-            <span id="volValue" style="float: left; width: 100px;"></span>
-        <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
-            <span id="rateValue" ></span><br><br>
-    </div>
-    <br><br>
+<style>
+	table {
+		border-collapse: collapse;
+		width: 90%;
+	}
+	td, th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+	}
+</style>
+    <div id="container" style="display:flex;">
+        <div id="left" style="display:flex;flex-direction:column;width:500px;">
+            <div >
+                <h1>Info</h1>
+                <h3>Round {{subsession.round_number}}</h3>
+                <h3>Bets </h3>
+                <table>
+                    <tr> 
+                        <th>Direction </th>
+                        <th>Price </th>
+                        <th>Quantity </th>
+                        <th>Deadline </th>
+                    </tr>
+                        <tr> 
+                            <td>Sell </td>
+                            <td>10 </td>
+                            <td>10 </td>
+                            <td>10 </td>
+                        </tr>
+                </table>
+                <div style="display:flex;flex-direction: row;">
+                    <P >Cash: <span id="cashInfo">5000</span></P>
+                    <P style="padding-left:50px;">Inventory: <span id="invInfo">500</span></P>
+                </div>
+                
+            </div>
+            <br><br>
+            <div>
+                <h3>Input Orders manually</h3>
+                <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
+                    <span id="minpriceValue" style="float: left; width: 100px;"></span><br><br>
 
-    <button type="button" id="sendBid" onclick="new_buy()" style="background-color: #008CBA;">Send Buy</button>
-	<button type="button" id="sendAsk" onclick="new_sell()" style="background-color: #f44336;">Send Sell</button>
+                <input type="range" min="5" max="15" value="10" class="slider" id="maxpriceSlider">
+                    <span id="maxpriceValue" style="float: left; width: 100px;"></span><br><br>
 
-    <br><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="volSlider">
+                    <span id="volValue" style="float: left; width: 100px;"></span><br><br>
 
-    <div class="traders" style="flex:60%;display:flex;">
-        <div class="wrapper" style="flex:50%"><canvas id="cash-bar" width=""></canvas></div>
-        <div class="wrapper" style="flex:50%"><canvas id="inv-bar" width=""></canvas></div>
+                <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
+                    <span id="rateValue" style="float: left; width: 100px;"></span><br><br>
+
+                <button type="button" id="sendBid" onclick="new_buy()" style="background-color: #008CBA;">Send Buy</button>
+                <button type="button" id="sendAsk" onclick="new_sell()" style="background-color: #f44336;">Send Sell</button>
+            </div>
+        </div>
+
+        <div id="right" style="display:flex;flex-direction:column;width:500px;">
+                <div class="wrapper"><canvas id="klf-line"></canvas></div>    
+                <div class="wrapper" style="flex:50%"><canvas id="cash-bar" width=""></canvas></div>
+                <div class="wrapper" style="flex:50%"><canvas id="inv-bar" width=""></canvas></div>
+        </div>
     </div>
 
     
@@ -210,6 +243,7 @@
     maxpriceSlider.value = 10;
     maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
 
+
     minpriceSlider.oninput = function() {
         minpriceValue.innerHTML = "Min Price: " + this.value;
     }
@@ -278,7 +312,6 @@
                 agg_supply += calcSupply(sell, price);
         });
         var points = [];
-        
 
         points.push({x: 0.0, y: agg_supply});
         points.push({x: price, y: agg_supply});
@@ -336,7 +369,7 @@
         chart.data.datasets[1].data = points;
         chart.update();
     }
-
+    
     // adds to the player's profit
     function updateProfit(chart, profit) {
         chart.data.datasets[0].data[0] = profit;
@@ -358,19 +391,24 @@
 			klf_line.update();
         }
         if(data['type'] == 'buy' || data['type'] == 'sell' || data['type'] == 'regraph'){
+            console.log(data);
             graphKlfBids(klf_line, data['buys']);
 			graphKlfAsks(klf_line, data['sells']);
         }
         if(data['type'] == 'clearing_price'){
+            console.log(data);
+            global_clearing_price = data['clearing_price'];
             graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']);
             graphKlfBids(klf_line, data['buys']);
 			graphKlfAsks(klf_line, data['sells']);
         }
         if(data['type'] == 'update'){
+            console.log(data);
+            document.getElementById("cashInfo").innerHTML = data['cash'];
+            document.getElementById("invInfo").innerHTML = data['inventory'];
             updateProfit(cash_bar, data['cash']);
 			updateVolume(inventory_bar, data['inventory']);
         }
-        console.log(data);
     };
     
     
@@ -421,50 +459,5 @@
 
     };
     
-    async function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    document.getElementById("file").onchange = async () => {
-
-        var file = document.getElementById("file").files[0];
-        const reader = new FileReader();
-
-        reader.onload = async (event) => {
-            const file = event.target.result;
-            const allLines = file.split(/\r\n|\n/);
-            // Reading line by line
-            allLines.forEach(async (line) => {
-                if(line.length < 1) return;
-                console.log(line);
-                var data = line.split(",");
-                
-                var time = parseFloat(data[0]);
-                var direction = data[1];
-                var p_min = parseFloat(data[2]);
-                var p_max = parseFloat(data[3]);
-                var q_max = parseFloat(data[4]);
-                var u_max = parseFloat(data[5]);
-
-                await sleep(time);
-
-                liveSend({
-                    'p_min': p_min,
-                    'p_max': p_max,
-                    'q_max': q_max,
-                    'u_max': u_max,
-                    'direction': direction,
-                    'status': 'active',
-                    'timestamp':performance.now()
-                });
-            });
-        };
-
-        reader.onerror = (event) => {
-            alert(event.target.error.name);
-        };
-
-        reader.readAsText(file);
-    }
-
 </script>
 {% endblock %}
