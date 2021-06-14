@@ -30,12 +30,14 @@
                         <th>Quantity </th>
                         <th>Deadline </th>
                     </tr>
+                    {% for bet in bets %}
                         <tr> 
-                            <td>Sell </td>
-                            <td>10 </td>
-                            <td>10 </td>
-                            <td>10 </td>
+                            <td>{{bet.direction}} </td>
+                            <td>{{bet.limit_price}} </td>
+                            <td>{{bet.quantity}} </td>
+                            <td>{{bet.deadline}} ms</td>
                         </tr>
+                    {% endfor %}
                 </table>
                 <div style="display:flex;flex-direction: row;">
                     <P >Cash: <span id="cashInfo">5000</span></P>
@@ -45,7 +47,7 @@
             </div>
             <br><br>
             <div>
-                <h3>Input Orders manually</h3>
+                <h2>Manual Input</h2>
                 <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
                     <span id="minpriceValue" style="float: left; width: 100px;"></span><br><br>
 

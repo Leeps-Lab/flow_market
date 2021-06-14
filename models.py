@@ -20,7 +20,7 @@ This is a continuous flow market game
 
 class Constants(BaseConstants):
     name_in_url = 'flow_market'
-    players_per_group = 4
+    players_per_group = None
     num_rounds = 1
 
 def parse_config(config_file):
@@ -33,7 +33,8 @@ def parse_config(config_file):
             'round': int(row['round']),
 			'bet_file': str(row['bet_file']),
 			'order_file': str(row['order_file']),
-			'treatment': str(row['treatment'])
+			'treatment': str(row['treatment']),
+			'num_players': int(row['num_players'])
         })
     return rounds
 
@@ -45,17 +46,23 @@ class Subsession(BaseSubsession):
 		#	print(g.order_copies)
 
 def init_copies():
-	return {1: {}, 2: {}, 3: {}, 4: {}}
+	return {'1': {}, '2': {}, '3': {}, '4': {}}
 
 class Group(BaseGroup):
 	# order_copies[player_id_in_group][order_id]
 	order_copies = JSONField(null=True, default=init_copies)
+
+	def init_order_copies(self):
+		self.order_copies = {str(i):{} for i in range(1,self.num_players()+1)}
 
 	def bet_file(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['bet_file']
 
 	def order_file(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['order_file']
+	
+	def num_players(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['num_players']
 
 	def set_bets(self):
 		print("setting up bets")
@@ -71,22 +78,28 @@ class Group(BaseGroup):
 				'quantity': int(row['quantity']),
 				'deadline': int(row['deadline'])
 			}
-			call_with_delay((int(row['timestamp'])/1000),self.execute_bet,)
+			call_with_delay((int(row['deadline'])/1000),self.execute_bet,data)
 		return
 	
 	def execute_bet(self, data):
 		player = self.get_player_by_id(data['trader_id'])
-		player.updateProfit()
-		player.updateVolume()
+		if data['direction'] == 'buy':
+			player.updateProfit(data['quantity']*data['limit_price'])
+			player.updateVolume(-data['quantity'])
+		else:
+			player.updateProfit(-data['quantity']*data['limit_price'])
+			player.updateVolume(data['quantity'])
+		payloads = {}
 		# Use live send back to update seller's frontend
-		for player in self.get_players():
-			payloads[player.participant.code] = {"type": 'none'}
+		for player_ref in self.get_players():
+			payloads[player_ref.participant.code] = {"type": 'none'}
 		
-		payloads[seller.participant.code] = {"type": 'update', "cash": seller.cash, "inventory": seller.inventory}
-	
+		payloads[player.participant.code] = {"type": 'update', "cash": player.cash, "inventory": player.inventory}
+		live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+
 	def input_order_file(self):
 		print("setting up order")
-		order_file = self.bet_file()
+		order_file = self.order_file()
 		with open('flow_market/orders/' + order_file) as f:
 			rows = list(csv.DictReader(f))
 		payloads = {}
@@ -94,7 +107,7 @@ class Group(BaseGroup):
 		for row in rows:
 			time.sleep((int(row['timestamp']) - last_timestamp)/1000)
 			last_timestamp = int(row['timestamp'])
-			self.get_player_by_id().new_order({
+			self.get_player_by_id(int(row['trader_id'])).new_order({
 				'p_min': int(row['p_min']),
 				'p_max': int(row['p_max']),
 				'q_max': int(row['q_max']),
@@ -103,11 +116,11 @@ class Group(BaseGroup):
 				'status': 'active',
 				'timestamp': int(row['timestamp'])
 			})
+			
 			for player in self.get_players():
-				payloads[player.participant.code] = {'type': str(row['direction']), 'buys': self.group.buys(), 'sells': self.group.sells()}
+				payloads[player.participant.code] = {'type': str(row['direction']), 'buys': self.buys(), 'sells': self.sells()}
 			
 			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
-		return
 	
 	def new_order(self, order,playerID, currentID):
 		print(self.order_copies)
@@ -332,6 +345,7 @@ class Player(BasePlayer):
 				for p in self.group.get_players():
 					p.setUpdateRunning()
 				# Setup Bets and File input
+				self.group.init_order_copies()
 				call_with_delay(0, self.group.set_bets)
 				call_with_delay(0, self.group.input_order_file)
 				# Begin Continuously Updating function
