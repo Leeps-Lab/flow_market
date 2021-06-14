@@ -34,7 +34,12 @@ def parse_config(config_file):
 			'bet_file': str(row['bet_file']),
 			'order_file': str(row['order_file']),
 			'treatment': str(row['treatment']),
-			'num_players': int(row['num_players'])
+			'num_players': int(row['num_players']),
+			'update_freq': float(row['update_freq']),
+			'max_price': int(row['max_price']),
+			'max_u_max': int(row['max_u_max']),
+			'max_q_max': int(row['max_q_max'])
+
         })
     return rounds
 
@@ -54,6 +59,18 @@ class Group(BaseGroup):
 
 	def init_order_copies(self):
 		self.order_copies = {str(i):{} for i in range(1,self.num_players()+1)}
+	
+	def update_freq(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['update_freq']
+	
+	def max_price(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['max_price']
+	
+	def max_u_max(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['max_u_max']
+	
+	def max_q_max(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['max_q_max']
 
 	def bet_file(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['bet_file']

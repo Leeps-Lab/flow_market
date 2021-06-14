@@ -27,7 +27,7 @@ class Decision(Page):
         for row in rows:
             if (int(row['trader_id']) == self.player.id_in_group):
                 bets.append({
-                    'direction': str(row['direction']),
+                    'direction': str(row['direction']).upper(),
                     'limit_price': int(row['limit_price']),
                     'quantity': int(row['quantity']),
                     'deadline': int(row['deadline'])

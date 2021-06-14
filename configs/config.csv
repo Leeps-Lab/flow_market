@@ -1,2 +1,2 @@
-round,bet_file,order_file,treatment,num_players
-1,bets.csv,orders.csv,klf,6
+round,bet_file,order_file,treatment,num_players,update_freq,max_price,max_u_max,max_q_max
+1,bets.csv,orders.csv,klf,6,0.02,200,1000000,1000
