@@ -16,10 +16,16 @@
 		text-align: left;
 		padding: 8px;
 	}
+	.border {
+	  border-radius: 25px;
+	  border: 2px solid;
+	  padding: 20px;
+      margin: 5px;
+	}
 </style>
     <div id="container" style="display:flex;">
         <div id="left" style="display:flex;flex-direction:column;width:500px;">
-            <div >
+            <div class="border">
                 <h1>Info</h1>
                 <h3>Round {{subsession.round_number}}</h3>
                 <h3>Bets </h3>
@@ -45,19 +51,18 @@
                 </div>
                 
             </div>
-            <br><br>
-            <div>
+            <div class="border">
                 <h2>Manual Input</h2>
-                <input type="range" min="5" max="15" value="10" class="slider" id="minpriceSlider"> 
+                <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="minpriceSlider"> 
                     <span id="minpriceValue" style="float: left; width: 100px;"></span><br><br>
 
-                <input type="range" min="5" max="15" value="10" class="slider" id="maxpriceSlider">
+                <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="maxpriceSlider">
                     <span id="maxpriceValue" style="float: left; width: 100px;"></span><br><br>
 
-                <input type="range" min="1" max="100" value="50" class="slider" id="volSlider">
+                <input type="range" min="1" max="{{max_q_max}}" value="50" class="slider" id="volSlider">
                     <span id="volValue" style="float: left; width: 100px;"></span><br><br>
 
-                <input type="range" min="1.0" max="5.0" value="2.50" class="slider" id="rateSlider"> 
+                <input type="range" min="1.0" max="{{max_u_max}}" value="2.50" class="slider" id="rateSlider"> 
                     <span id="rateValue" style="float: left; width: 100px;"></span><br><br>
 
                 <button type="button" id="sendBid" onclick="new_buy()" style="background-color: #008CBA;">Send Buy</button>
@@ -103,13 +108,6 @@
                         ticks: {
                             beginAtZero: true,
                         },
-                    }, {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        gridLines: {
-                            drawOnChartArea: false
-                        }
                     }]
                 },
                 responsive: true,
@@ -144,13 +142,6 @@
                         ticks: {
                             beginAtZero: true,
                         },
-                    }, {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        gridLines: {
-                            drawOnChartArea: false
-                        }
                     }]
                 },
                 responsive: true,

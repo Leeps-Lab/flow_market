@@ -38,7 +38,8 @@ def parse_config(config_file):
 			'update_freq': float(row['update_freq']),
 			'max_price': int(row['max_price']),
 			'max_u_max': int(row['max_u_max']),
-			'max_q_max': int(row['max_q_max'])
+			'max_q_max': int(row['max_q_max']),
+			'round_length': int(row['round_length'])
 
         })
     return rounds
@@ -60,6 +61,9 @@ class Group(BaseGroup):
 	def init_order_copies(self):
 		self.order_copies = {str(i):{} for i in range(1,self.num_players()+1)}
 	
+	def round_length(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['round_length']
+
 	def update_freq(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['update_freq']
 	
@@ -140,7 +144,7 @@ class Group(BaseGroup):
 			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 	
 	def new_order(self, order,playerID, currentID):
-		print(self.order_copies)
+		#print(self.order_copies)
 		cache = self.order_copies
 		cache[str(playerID)][str(currentID)] = {
 				'player': playerID,
@@ -210,7 +214,8 @@ class Group(BaseGroup):
 	def clearingPrice(self, buys, sells):
 		# Get lowest and highest prices in books
 		left = 0.0
-		right = 200.0
+		#right = 200.0
+		right = self.max_price()
 		curr_iter = 0
 		MAX_ITERS = 1000
 		while (left < right):
@@ -233,11 +238,11 @@ class Group(BaseGroup):
 				# We are right of the crossing point
 				right = index
 			else:
-				print("Found cross: " + str(index))
+				#print("Found cross: " + str(index))
 				return index
 
 			if (curr_iter == MAX_ITERS):
-				print("Trouble finding cross in max iterations, got: " + str(index))
+				#print("Trouble finding cross in max iterations, got: " + str(index))
 				return index
 
 	def update(self):
@@ -247,7 +252,7 @@ class Group(BaseGroup):
 		if len(buys) > 0 and len(sells) > 0:
 			#Calculate the clearing price
 			clearing_price = self.clearingPrice(buys, sells)
-			print("Clearing Price: " + str(clearing_price))
+			#print("Clearing Price: " + str(clearing_price))
 			#Graph the clearing price
 			
 			for player in self.get_players():
@@ -256,10 +261,10 @@ class Group(BaseGroup):
 			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 
 			#Update the traders' profits and orders
-			print("----Sells in Update--------------------")
+			#print("----Sells in Update--------------------")
 			for sell in sells:
 				seller = self.get_player_by_id(sell['player'])
-				print(self.order_copies[str(seller.id_in_group)][str(sell['orderID'])])
+				#print(self.order_copies[str(seller.id_in_group)][str(sell['orderID'])])
 				trader_vol = self.calcSupply(sell, clearing_price)
 				sell['q_max'] -= trader_vol
 				cache = self.order_copies
@@ -284,8 +289,8 @@ class Group(BaseGroup):
 
 				seller.updateProfit(trader_vol * clearing_price)
 				seller.updateVolume(-trader_vol)
-				print("Trader " + str(sell['player']) + " Cash: " + str(seller.cash))
-				print("Trader " + str(sell['player']) + " Inventory: " + str(seller.inventory))
+				#print("Trader " + str(sell['player']) + " Cash: " + str(seller.cash))
+				#print("Trader " + str(sell['player']) + " Inventory: " + str(seller.inventory))
 				# Use live send back to update seller's frontend
 				for player in self.get_players():
 					payloads[player.participant.code] = {"type": 'none'}
@@ -320,8 +325,8 @@ class Group(BaseGroup):
 
 				buyer.updateProfit(trader_vol * clearing_price)
 				buyer.updateVolume(-trader_vol)
-				print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
-				print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
+				#print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
+				#print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
 				# Use live send back to update buyer's frontend
 				for player in self.get_players():
 					payloads[player.participant.code] = {"type": 'none'}
@@ -366,7 +371,7 @@ class Player(BasePlayer):
 				call_with_delay(0, self.group.set_bets)
 				call_with_delay(0, self.group.input_order_file)
 				# Begin Continuously Updating function
-				call_with_delay_infinite(1, self.group.update)
+				call_with_delay_infinite(self.group.update_freq(), self.group.update)
 			return {0: {'type':'begin'}}	
 
 		#Input new order

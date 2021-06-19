@@ -12,7 +12,7 @@ class DecisionWaitPage(WaitPage):
         return True
 
 class Decision(Page):
-    #timeout_seconds = 180
+    #timeout_seconds = self.group.round_length()
     live_method = "live_method"
 
     def is_displayed(self):
@@ -33,7 +33,10 @@ class Decision(Page):
                     'deadline': int(row['deadline'])
                 })
         return {
-            'bets': bets
+            'bets': bets,
+            'max_price': self.group.max_price(),
+            'max_u_max': self.group.max_u_max(),
+            'max_q_max': self.group.max_q_max(),
         }
 
 
