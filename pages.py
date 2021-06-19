@@ -34,6 +34,7 @@ class Decision(Page):
                 })
         return {
             'bets': bets,
+            'treatment': self.group.treatment(),
             'max_price': self.group.max_price(),
             'max_u_max': self.group.max_u_max(),
             'max_q_max': self.group.max_q_max(),
