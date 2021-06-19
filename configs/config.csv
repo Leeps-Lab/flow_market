@@ -1,3 +1,3 @@
-round,bet_file,order_file,treatment,num_players,update_freq,max_price,max_u_max,max_q_max,round_length
-1,bets.csv,orders.csv,flo,6,2,15,5,100,180
-2,bets.csv,orders.csv,flo,6,0.02,200000,1000000,1000,180
+round,bet_file,order_file,treatment,num_players,update_freq,max_price,max_u_max,max_q_max,round_length,start_inv,start_cash
+1,bets.csv,orders.csv,flo,6,2,15,5,100,180,500,5000
+2,bets.csv,orders.csv,flo,6,0.02,200000,1000000,1000,180,1000000,500000000

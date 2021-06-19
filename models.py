@@ -39,17 +39,17 @@ def parse_config(config_file):
 			'max_price': int(row['max_price']),
 			'max_u_max': int(row['max_u_max']),
 			'max_q_max': int(row['max_q_max']),
-			'round_length': int(row['round_length'])
-
+			'round_length': int(row['round_length']),
+			'start_inv': int(row['start_inv']),
+			'start_cash': int(row['start_cash'])
         })
     return rounds
 
 class Subsession(BaseSubsession):
 	def creating_session(self):
 		self.group_randomly()
-		#for g in self.get_groups():
-		#	g.init_copies()
-		#	print(g.order_copies)
+		for p in self.get_players():
+			p.init_cash_inv()
 
 def init_copies():
 	return {'1': {}, '2': {}, '3': {}, '4': {}}
@@ -61,6 +61,12 @@ class Group(BaseGroup):
 	def init_order_copies(self):
 		self.order_copies = {str(i):{} for i in range(1,self.num_players()+1)}
 	
+	def start_inv(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['start_inv']
+	
+	def start_cash(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['start_cash']
+
 	def treatment(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['treatment']
 	
@@ -359,6 +365,10 @@ class Player(BasePlayer):
 	updateRunning = models.BooleanField(initial=False)
 
 	currentID = models.IntegerField(initial=0)
+
+	def init_cash_inv(self):
+		self.cash = self.group.start_cash()
+		self.inventory = self.group.start_inv()
 
 	def setUpdateRunning(self):
 		self.updateRunning = True

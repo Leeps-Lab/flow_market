@@ -46,8 +46,8 @@
                     {% endfor %}
                 </table>
                 <div style="display:flex;flex-direction: row;">
-                    <P >Cash: <span id="cashInfo">5000</span></P>
-                    <P style="padding-left:50px;">Inventory: <span id="invInfo">500</span></P>
+                    <P >Cash: <span id="cashInfo">{{player.cash}}</span></P>
+                    <P style="padding-left:50px;">Inventory: <span id="invInfo">{{player.inventory}}</span></P>
                 </div>
                 
             </div>
@@ -72,8 +72,8 @@
 
         <div id="right" style="display:flex;flex-direction:column;width:500px;">
                 <div class="wrapper"><canvas id="klf-line"></canvas></div>    
-                <div class="wrapper" style="flex:50%"><canvas id="cash-bar" width=""></canvas></div>
-                <div class="wrapper" style="flex:50%"><canvas id="inv-bar" width=""></canvas></div>
+                <div class="wrapper" style="flex:50%"><div id="cash-bar" width=""></div></div>
+                <div class="wrapper" style="flex:50%"><div id="inv-bar" width=""></div></div>
         </div>
     </div>
 
@@ -85,6 +85,7 @@
 -->
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if({{player.id_in_group}} == 1){
@@ -96,8 +97,9 @@
 
 
     function init_graphs() {
-        var cash_ctx = document.getElementById('cash-bar');	
-        var cash_bar = new Chart(cash_ctx, {
+        var cash_ctx = document.getElementById('cash-bar');
+        
+        /*var cash_bar = new Chart(cash_ctx, {
             type: 'bar',
             options: {
                 scales: {
@@ -128,9 +130,57 @@
                     data: [5000],
                 }]
             },
-        });
+        });*/
+        var cash_bar = Highcharts.chart('cash-bar', {
 
-        var inv_ctx = document.getElementById('inv-bar');	
+            title: {
+                text: 'Cash'
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Cash'
+                }
+            },
+
+            xAxis: {
+                title: {
+                    text: 'Units'
+                }
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    }
+                }
+            },
+
+            series: [{
+                name: 'Cash',
+                data: [{{player.cash}}]
+            }],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    }
+                }]
+            }
+
+        });
+        
+
+        var inv_ctx = document.getElementById('inv-bar');
+        /*
         var inventory_bar = new Chart(inv_ctx, {
             type: 'bar',
             options: {
@@ -162,6 +212,51 @@
                     data: [500],
                 }]
             },
+        });
+        */
+        var inventory_bar = Highcharts.chart('inv-bar', {
+
+            title: {
+                text: 'Inventory'
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Units'
+                }
+            },
+
+            xAxis: {
+
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    }
+                }
+            },
+
+            series: [{
+                name: 'Inventory',
+                data: [{{player.inventory}}]
+            }],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    }
+                }]
+            }
+
         });
 
         var klf_line_ctx = document.getElementById('klf-line');	
@@ -261,7 +356,7 @@
         maxpriceValue.innerHTML = "Max Price: " + this.value;
     }
 
-    if({{treatment}} != 'flo'){
+    if('{{treatment}}' != 'flo'){
         rateSlider.remove();
         rateValue.remove();
     }
@@ -378,14 +473,18 @@
     
     // adds to the player's profit
     function updateProfit(chart, profit) {
-        chart.data.datasets[0].data[0] = profit;
-        chart.update();
+        //chart.data.datasets[0].data[0] = profit;
+        let dataset = chart.series[0];
+        dataset.addPoint(profit);
+        //chart.update();
     }
 
     // Adds or subtracts volume to trader
     function updateVolume(chart, volume) {
-        chart.data.datasets[0].data[0] = volume;
-        chart.update();
+        //chart.data.datasets[0].data[0] = volume;
+        let dataset = chart.series[0];
+        dataset.addPoint(volume);
+        //chart.update();
     }
 
 
@@ -427,7 +526,7 @@
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max;
-        if({{treatment}} != 'flo'){
+        if('{{treatment}}' != 'flo'){
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("rateSlider").value);
@@ -456,7 +555,7 @@
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max;
-        if({{treatment}} != 'flo'){
+        if('{{treatment}}' != 'flo'){
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("rateSlider").value);
