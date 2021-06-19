@@ -177,7 +177,7 @@
                 },
                 title: {
                     display: true,
-                    text: 'KLF Market',
+                    text: 'Market',
                 }, 
                 elements: {
                     point: {
@@ -259,6 +259,11 @@
 
     maxpriceSlider.oninput = function() {
         maxpriceValue.innerHTML = "Max Price: " + this.value;
+    }
+
+    if({{treatment}} != 'flo'){
+        rateSlider.remove();
+        rateValue.remove();
     }
 
     function calcDemand(buy, price) {
@@ -421,7 +426,13 @@
         var minprice = parseInt(document.getElementById("minpriceSlider").value);
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
-        var u_max = parseInt(document.getElementById("rateSlider").value);
+        var u_max;
+        if({{treatment}} != 'flo'){
+            u_max = parseInt({{max_u_max}});
+        } else{
+            u_max = parseInt(document.getElementById("rateSlider").value);
+        }
+        
 
         if(minprice >= maxprice){
             alert("Minimum Price should be less than Maximum Price")
@@ -444,7 +455,12 @@
         var minprice = parseInt(document.getElementById("minpriceSlider").value);
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
-        var u_max = parseInt(document.getElementById("rateSlider").value);
+        var u_max;
+        if({{treatment}} != 'flo'){
+            u_max = parseInt({{max_u_max}});
+        } else{
+            u_max = parseInt(document.getElementById("rateSlider").value);
+        }
 
         if(minprice >= maxprice){
             alert("Minimum Price should be less than Maximum Price")

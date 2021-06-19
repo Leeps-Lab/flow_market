@@ -61,6 +61,9 @@ class Group(BaseGroup):
 	def init_order_copies(self):
 		self.order_copies = {str(i):{} for i in range(1,self.num_players()+1)}
 	
+	def treatment(self):
+		return parse_config(self.session.config['config_file'])[self.round_number-1]['treatment']
+	
 	def round_length(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['round_length']
 
