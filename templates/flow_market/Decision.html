@@ -74,7 +74,7 @@
                 <input type="range" min="2" max="20" value="10" class="slider" id="algo-timeSlider"> 
                     <span id="algo-timeValue" style="float: left; width: 100px;"></span><br><br>
                 
-                <input type="range" min="1" max="15" value="10" class="slider" id="algo-quantitySlider"> 
+                <input type="range" min="1" max="10" value="5" class="slider" id="algo-quantitySlider"> 
                     <span id="algo-quantityValue" style="float: left; width: 100px;"></span><br><br>
 
                 <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="algo-minpriceSlider"> 
@@ -640,16 +640,16 @@
     };
 
     function new_buy_algo(){
-        var minprice = parseInt(document.getElementById("minpriceSlider-algo").value);
-        var volume = parseInt(document.getElementById("volSlider-algo").value);
-        var maxprice = parseInt(document.getElementById("maxpriceSlider-algo").value);
-        var time = parseInt(document.getElementById("timeSlider-algo").value);
-        var quantity_per = parseInt(document.getElementById("quantitySlider-algo").value);
+        var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
+        var volume = parseInt(document.getElementById("algo-volSlider").value);
+        var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
+        var time = parseInt(document.getElementById("algo-timeSlider").value);
+        var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
         var u_max;
         if('{{treatment}}' != 'flo'){
             u_max = parseInt({{max_u_max}});
         } else{
-            u_max = parseInt(document.getElementById("rateSlider-algo").value);
+            u_max = parseInt(document.getElementById("algo-rateSlider").value);
         }
         
 
@@ -665,7 +665,7 @@
             'u_max': u_max,
             'expiration_time': time,
             'quantity_per': quantity_per,
-            'direction': 'buy',
+            'direction': 'buy_algo',
             'status': 'active',
             'timestamp':performance.now()
         });
@@ -673,16 +673,16 @@
     };
 
     function new_sell_algo(){
-        var minprice = parseInt(document.getElementById("minpriceSlider-algo").value);
-        var volume = parseInt(document.getElementById("volSlider-algo").value);
-        var maxprice = parseInt(document.getElementById("maxpriceSlider-algo").value);
-        var time = parseInt(document.getElementById("timeSlider-algo").value);
-        var quantity_per = parseInt(document.getElementById("quantitySlider-algo").value);
+        var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
+        var volume = parseInt(document.getElementById("algo-volSlider").value);
+        var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
+        var time = parseInt(document.getElementById("algo-timeSlider").value);
+        var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
         var u_max;
         if('{{treatment}}' != 'flo'){
             u_max = parseInt({{max_u_max}});
         } else{
-            u_max = parseInt(document.getElementById("rateSlider-algo").value);
+            u_max = parseInt(document.getElementById("algo-rateSlider").value);
         }
 
         if(minprice > maxprice){
@@ -697,7 +697,7 @@
             'u_max': u_max,
             'expiration_time': time,
             'quantity_per': quantity_per,
-            'direction': 'sell',
+            'direction': 'sell_algo',
             'status': 'active',
             'timestamp':performance.now()
         });

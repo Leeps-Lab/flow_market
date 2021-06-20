@@ -93,6 +93,46 @@ class Group(BaseGroup):
 	
 	def num_players(self):
 		return parse_config(self.session.config['config_file'])[self.round_number-1]['num_players']
+	
+	def new_buy_algo(self, data):
+		time_start = time.time()
+		payloads = {}
+		while time.time() < time_start + data['expiration_time']:
+			for i in range(data['quantity_per']):
+				self.get_player_by_id(data['trader_id']).new_order({
+					'p_min': data['p_min'],
+					'p_max': data['p_max'],
+					'q_max': data['q_max'],
+					'u_max': data['u_max'],
+					'direction': 'buy',
+					'status': 'active',
+					'timestamp': data['timestamp']
+				})
+				for player in self.get_players():
+					payloads[player.participant.code] = {'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
+							
+				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+			time.sleep(1)
+
+	def new_sell_algo(self, data):
+		time_start = time.time()
+		payloads = {}
+		while time.time() < time_start + data['expiration_time']:
+			for i in range(data['quantity_per']):
+				self.get_player_by_id(data['trader_id']).new_order({
+					'p_min': data['p_min'],
+					'p_max': data['p_max'],
+					'q_max': data['q_max'],
+					'u_max': data['u_max'],
+					'direction': 'sell',
+					'status': 'active',
+					'timestamp': data['timestamp']
+				})
+				for player in self.get_players():
+					payloads[player.participant.code] = {'type': 'sell', 'buys': self.buys(), 'sells': self.sells()}
+							
+				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+			time.sleep(1)		
 
 	def set_bets(self):
 		print("setting up bets")
@@ -312,7 +352,7 @@ class Group(BaseGroup):
 				
 				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
 
-			print("----Buys in Update--------------------")
+			#print("----Buys in Update--------------------")
 			for buy in buys:
 				buyer = self.get_player_by_id(buy['player'])
 				print(self.order_copies[str(buy['player'])][str(buy['orderID'])])
@@ -389,7 +429,16 @@ class Player(BasePlayer):
 				call_with_delay(0, self.group.input_order_file)
 				# Begin Continuously Updating function
 				call_with_delay_infinite(self.group.update_freq(), self.group.update)
-			return {0: {'type':'begin'}}	
+			return {0: {'type':'begin'}}
+
+		data['trader_id'] = self.id_in_group
+		if data['direction'] == 'buy_algo':
+			call_with_delay(0, self.group.new_buy_algo, data)
+			return {0: {'type':'buy_algo'}}
+		
+		if data['direction'] == 'sell_algo':
+			call_with_delay(0, self.group.new_sell_algo, data)
+			return {0: {'type':'sell_algo'}}	
 
 		#Input new order
 		self.new_order(data)
