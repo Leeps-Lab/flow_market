@@ -68,6 +68,30 @@
                 <button type="button" id="sendBid" onclick="new_buy()" style="background-color: #008CBA;">Send Buy</button>
                 <button type="button" id="sendAsk" onclick="new_sell()" style="background-color: #f44336;">Send Sell</button>
             </div>
+
+            <div class="border">
+                <h2>Algorithmic Input</h2>
+                <input type="range" min="2" max="20" value="10" class="slider" id="algo-timeSlider"> 
+                    <span id="algo-timeValue" style="float: left; width: 100px;"></span><br><br>
+                
+                <input type="range" min="1" max="15" value="10" class="slider" id="algo-quantitySlider"> 
+                    <span id="algo-quantityValue" style="float: left; width: 100px;"></span><br><br>
+
+                <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="algo-minpriceSlider"> 
+                    <span id="algo-minpriceValue" style="float: left; width: 100px;"></span><br><br>
+
+                <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="algo-maxpriceSlider">
+                    <span id="algo-maxpriceValue" style="float: left; width: 100px;"></span><br><br>
+
+                <input type="range" min="1" max="{{max_q_max}}" value="50" class="slider" id="algo-volSlider">
+                    <span id="algo-volValue" style="float: left; width: 100px;"></span><br><br>
+
+                <input type="range" min="1.0" max="{{max_u_max}}" value="2.50" class="slider" id="algo-rateSlider"> 
+                    <span id="algo-rateValue" style="float: left; width: 100px;"></span><br><br>
+
+                <button type="button" id="algo-sendBid" onclick="new_buy_algo()" style="background-color: #008CBA;">Send Buy</button>
+                <button type="button" id="algo-sendAsk" onclick="new_sell_algo()" style="background-color: #f44336;">Send Sell</button>
+            </div>
         </div>
 
         <div id="right" style="display:flex;flex-direction:column;width:500px;">
@@ -98,39 +122,6 @@
 
     function init_graphs() {
         var cash_ctx = document.getElementById('cash-bar');
-        
-        /*var cash_bar = new Chart(cash_ctx, {
-            type: 'bar',
-            options: {
-                scales: {
-                    yAxes: [{
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        ticks: {
-                            beginAtZero: true,
-                        },
-                    }]
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Trader Cash'
-                },
-                legend: {
-                    display: false,	
-                }
-            },
-            data: {
-                labels: ['Trader'],
-                datasets: [{
-                    label: 'Cash',
-                    backgroundColor: "#14b10c",
-                    borderWidth: 1,
-                    data: [5000],
-                }]
-            },
-        });*/
         var cash_bar = Highcharts.chart('cash-bar', {
 
             title: {
@@ -159,6 +150,9 @@
                 series: {
                     label: {
                         connectorAllowed: false
+                    },
+                    marker: {
+                        enabled: false
                     }
                 }
             },
@@ -180,40 +174,6 @@
         
 
         var inv_ctx = document.getElementById('inv-bar');
-        /*
-        var inventory_bar = new Chart(inv_ctx, {
-            type: 'bar',
-            options: {
-                scales: {
-                    yAxes: [{
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        ticks: {
-                            beginAtZero: true,
-                        },
-                    }]
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Trader Inventory'
-                },
-                legend: {
-                    display: false,	
-                }
-            },
-            data: {
-                labels: ['Trader'],
-                datasets: [{
-                    label: 'Inventory',
-                    backgroundColor: "#2f9bde",
-                    borderWidth: 1,
-                    data: [500],
-                }]
-            },
-        });
-        */
         var inventory_bar = Highcharts.chart('inv-bar', {
 
             title: {
@@ -240,6 +200,9 @@
                 series: {
                     label: {
                         connectorAllowed: false
+                    },
+                    marker: {
+                        enabled: false
                     }
                 }
             },
@@ -312,6 +275,7 @@
 
         return [cash_bar, inventory_bar, klf_line];
     }
+
     let graphs = init_graphs();
     let klf_line = graphs[2];
     let cash_bar = graphs[0];
@@ -359,6 +323,70 @@
     if('{{treatment}}' != 'flo'){
         rateSlider.remove();
         rateValue.remove();
+    }
+
+    var algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
+    var algo_minpriceValue = document.getElementById("algo-minpriceValue");
+    var algo_volSlider = document.getElementById("algo-volSlider");
+    var algo_volValue = document.getElementById("algo-volValue");
+    var algo_rateSlider = document.getElementById("algo-rateSlider");
+    var algo_rateValue = document.getElementById("algo-rateValue");
+    var algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
+    var algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
+    var algo_timeSlider = document.getElementById("algo-timeSlider");
+    var algo_timeValue = document.getElementById("algo-timeValue");
+    var algo_quantitySlider = document.getElementById("algo-quantitySlider");
+    var algo_quantityValue = document.getElementById("algo-quantityValue");
+
+    algo_minpriceSlider.value = 10;
+    algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
+
+    algo_volSlider.value = 50;
+    algo_volValue.innerHTML = "Max Volume: " + algo_volSlider.value;
+
+    algo_rateSlider.value = 3;
+    algo_rateValue.innerHTML = "Max Rate: " + algo_rateSlider.value;
+
+    algo_maxpriceSlider.value = 10;
+    algo_maxpriceValue.innerHTML = "Max Price: " + algo_maxpriceSlider.value;
+
+    algo_timeSlider.value = 3;
+    algo_timeValue.innerHTML = "Expiration time: " + algo_timeSlider.value;
+
+    algo_quantitySlider.value = 10;
+    algo_quantityValue.innerHTML = "Units at a time: " + algo_quantitySlider.value;
+
+
+    algo_minpriceSlider.oninput = function() {
+        algo_minpriceValue.innerHTML = "Min Price: " + this.value;
+    }
+
+    algo_volSlider.oninput = function() {
+        algo_volValue.innerHTML = "Max Volume: " + this.value;
+    }
+
+    algo_rateSlider.oninput = function() {
+        algo_rateValue.innerHTML = "Max Rate: " + this.value;
+    }
+
+    algo_maxpriceSlider.oninput = function() {
+        algo_maxpriceValue.innerHTML = "Max Price: " + this.value;
+    }
+
+    algo_timeSlider.oninput = function() {
+        algo_timeValue.innerHTML = "Expiration time: " + this.value;
+    }
+
+    algo_quantitySlider.oninput = function() {
+        algo_quantityValue.innerHTML = "Units at a time: " + this.value;
+    }
+
+    if('{{treatment}}' != 'flo'){
+        // Because cda and fba has a fixed u_max
+        rateSlider.remove();
+        rateValue.remove();
+        algo_rateSlider.remove();
+        algo_rateValue.remove();
     }
 
     function calcDemand(buy, price) {
@@ -424,48 +452,81 @@
     }
 
     
-    function graphKlfBids(chart, buys) {
+    function graphBids(chart, buys) {
         buys = buys.filter(buy => buy['status'] == 'active');
-        if (buys.length == 0) {
-            chart.data.datasets[0].data = [];
-            chart.update();
-            return;
-        }
+        if('{{treatment}}' != 'cda'){
+            if (buys.length == 0) {
+                chart.data.datasets[0].data = [];
+                chart.update();
+                return;
+            }
 
-        var points = [];
+            var points = [];
 
-        // Generate range(70, 130) the domain based on sliders values
-        // var prices = Array.from(new Array(0), (x,i) => i + 20);
-        var prices = [...Array(20).keys()];
-        prices.forEach(function (price, _index, _array) {
-            var agg_supply = 0.0;
-            buys.forEach(function (buy, _index, _array) { 	
-                agg_supply += calcDemand(buy, price);
+            // Generate range(70, 130) the domain based on sliders values
+            // var prices = Array.from(new Array(0), (x,i) => i + 20);
+            var prices = [...Array(20).keys()];
+            prices.forEach(function (price, _index, _array) {
+                var agg_supply = 0.0;
+                buys.forEach(function (buy, _index, _array) { 	
+                    agg_supply += calcDemand(buy, price);
+                });
+                points.push({x: price, y: agg_supply});
             });
-            points.push({x: price, y: agg_supply});
-        });
+        }else{
+            buys.sort((a, b) => (a['p_max'] < b['p_max']) ? 1 : -1);
+            var volume = 0.0;
+			var points = [];
+
+            buys.forEach(function (buy, _index, _array) { 
+				// Graph (price, old_vol) -> (price, new_vol)
+				points.push({x: buy['p_max'], y: volume});
+				volume += buy['q_max'];
+				points.push({x: buy['p_max'], y: volume});
+			});
+
+			// insert a horizontal line to 0 to show limit order
+			points.push({x: 0.0, y: volume})
+        }
+    
 
         chart.data.datasets[0].data = points;
         chart.update();
     }
 
-    function graphKlfAsks(chart, sells) {
+    function graphAsks(chart, sells) {
         sells = sells.filter(sell => sell['status'] == 'active');
-        if (sells.length == 0) {
-            chart.data.datasets[1].data = [];
-            chart.update();
-            return;
+        if('{{treatment}}' != 'cda'){
+            if (sells.length == 0) {
+                chart.data.datasets[1].data = [];
+                chart.update();
+                return;
+            }
+                
+            var points = [];
+            var prices = [...Array(20).keys()];
+            prices.forEach(function (price, _index, _array) {
+                var agg_supply = 0.0;
+                sells.forEach(function (sell, _index, _array) { 	
+                    agg_supply += calcSupply(sell, price);
+                });
+                points.push({x: price, y: agg_supply});
+            });        
+        } else{
+            sells.sort((a, b) => (a['p_max'] > b['p_max']) ? 1 : -1);
+			var volume = 0.0;
+			var points = [];
+			sells.forEach(function (sell, _index, _array) { 
+				// Graph (price, old_vol) -> (price, new_vol)
+				points.push({x: sell['p_max'], y: volume});
+				volume += sell['q_max'];
+				points.push({x: sell['p_max'], y: volume});
+			});
+
+			// insert a horizontal line to max price = 130 to show limit order
+			points.push({x: 20.0, y: volume})
         }
-            
-        var points = [];
-        var prices = [...Array(20).keys()];
-        prices.forEach(function (price, _index, _array) {
-            var agg_supply = 0.0;
-            sells.forEach(function (sell, _index, _array) { 	
-                agg_supply += calcSupply(sell, price);
-            });
-            points.push({x: price, y: agg_supply});
-        });
+
 
         chart.data.datasets[1].data = points;
         chart.update();
@@ -500,15 +561,15 @@
         }
         if(data['type'] == 'buy' || data['type'] == 'sell' || data['type'] == 'regraph'){
             console.log(data);
-            graphKlfBids(klf_line, data['buys']);
-			graphKlfAsks(klf_line, data['sells']);
+            graphBids(klf_line, data['buys']);
+			graphAsks(klf_line, data['sells']);
         }
         if(data['type'] == 'clearing_price'){
             console.log(data);
             global_clearing_price = data['clearing_price'];
-            graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']);
-            graphKlfBids(klf_line, data['buys']);
-			graphKlfAsks(klf_line, data['sells']);
+            if('{{treatment}}' != 'cda') graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']);
+            graphBids(klf_line, data['buys']);
+			graphAsks(klf_line, data['sells']);
         }
         if(data['type'] == 'update'){
             console.log(data);
@@ -533,8 +594,8 @@
         }
         
 
-        if(minprice >= maxprice){
-            alert("Minimum Price should be less than Maximum Price")
+        if(minprice > maxprice){
+            alert("Minimum Price should be less than or equal to Maximum Price")
             return;
         }
         
@@ -561,8 +622,8 @@
             u_max = parseInt(document.getElementById("rateSlider").value);
         }
 
-        if(minprice >= maxprice){
-            alert("Minimum Price should be less than Maximum Price")
+        if(minprice > maxprice){
+            alert("Minimum Price should be less than or equal to Maximum Price")
             return;
         }
         
@@ -571,6 +632,71 @@
             'p_max': maxprice,
             'q_max': volume,
             'u_max': u_max,
+            'direction': 'sell',
+            'status': 'active',
+            'timestamp':performance.now()
+        });
+
+    };
+
+    function new_buy_algo(){
+        var minprice = parseInt(document.getElementById("minpriceSlider-algo").value);
+        var volume = parseInt(document.getElementById("volSlider-algo").value);
+        var maxprice = parseInt(document.getElementById("maxpriceSlider-algo").value);
+        var time = parseInt(document.getElementById("timeSlider-algo").value);
+        var quantity_per = parseInt(document.getElementById("quantitySlider-algo").value);
+        var u_max;
+        if('{{treatment}}' != 'flo'){
+            u_max = parseInt({{max_u_max}});
+        } else{
+            u_max = parseInt(document.getElementById("rateSlider-algo").value);
+        }
+        
+
+        if(minprice > maxprice){
+            alert("Minimum Price should be less than or equal to Maximum Price")
+            return;
+        }
+        
+        liveSend({
+            'p_min': minprice,
+            'p_max': maxprice,
+            'q_max': volume,
+            'u_max': u_max,
+            'expiration_time': time,
+            'quantity_per': quantity_per,
+            'direction': 'buy',
+            'status': 'active',
+            'timestamp':performance.now()
+        });
+        order_id += 1;
+    };
+
+    function new_sell_algo(){
+        var minprice = parseInt(document.getElementById("minpriceSlider-algo").value);
+        var volume = parseInt(document.getElementById("volSlider-algo").value);
+        var maxprice = parseInt(document.getElementById("maxpriceSlider-algo").value);
+        var time = parseInt(document.getElementById("timeSlider-algo").value);
+        var quantity_per = parseInt(document.getElementById("quantitySlider-algo").value);
+        var u_max;
+        if('{{treatment}}' != 'flo'){
+            u_max = parseInt({{max_u_max}});
+        } else{
+            u_max = parseInt(document.getElementById("rateSlider-algo").value);
+        }
+
+        if(minprice > maxprice){
+            alert("Minimum Price should be less than or equal to Maximum Price")
+            return;
+        }
+        
+        liveSend({
+            'p_min': minprice,
+            'p_max': maxprice,
+            'q_max': volume,
+            'u_max': u_max,
+            'expiration_time': time,
+            'quantity_per': quantity_per,
             'direction': 'sell',
             'status': 'active',
             'timestamp':performance.now()

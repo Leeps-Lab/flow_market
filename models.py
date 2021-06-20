@@ -196,6 +196,8 @@ class Group(BaseGroup):
 			return 0.0
 		else:
 			# The price fell p_min < price < p_max
+			if((buy['p_max'] - buy['p_min']) == 0):
+				return buy['q_max']
 			trade_vol = buy['u_max'] * ((buy['p_max'] - price) / (buy['p_max'] - buy['p_min']))
 			if (trade_vol > buy['q_max']):
 				# Saturate to q_max if trade_vol will exceed q_max
@@ -214,6 +216,8 @@ class Group(BaseGroup):
 			return sell['u_max']
 		else:
 			# The price fell p_min < price < p_max
+			if((sell['p_max'] - sell['p_min']) == 0):
+				return sell['q_max']
 			trade_vol = sell['u_max'] + ((price - sell['p_max']) / (sell['p_max'] - sell['p_min'])) * sell['u_max']
 			if (trade_vol > sell['q_max']):
 				# Saturate to q_max if trade_vol will exceed q_max
