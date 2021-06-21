@@ -11,3 +11,9 @@ Add to session configs
     'app_sequence': ['flow_market'],
 }
 ````
+
+Function used to send messages from server to client
+````
+live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+````
+payloads is a dictionary mapping of {player_id : data} (see models.py for example use)
