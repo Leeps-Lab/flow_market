@@ -98,6 +98,7 @@ class Group(BaseGroup):
 		time_start = time.time()
 		payloads = {}
 		while time.time() < time_start + data['expiration_time']:
+			# create group of orders
 			for i in range(data['quantity_per']):
 				self.get_player_by_id(data['trader_id']).new_order({
 					'p_min': data['p_min'],
@@ -108,16 +109,19 @@ class Group(BaseGroup):
 					'status': 'active',
 					'timestamp': data['timestamp']
 				})
-				for player in self.get_players():
-					payloads[player.participant.code] = {'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
-							
-				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
-			time.sleep(1)
+			# Send out updated orderbooks to update graph on frontend
+			for player in self.get_players():
+				payloads[player.participant.code] = {'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
+			print("Sending orderbooks")
+			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+			# time between groups of orders
+			time.sleep(2)
 
 	def new_sell_algo(self, data):
 		time_start = time.time()
 		payloads = {}
 		while time.time() < time_start + data['expiration_time']:
+			# Create group of orders
 			for i in range(data['quantity_per']):
 				self.get_player_by_id(data['trader_id']).new_order({
 					'p_min': data['p_min'],
@@ -128,11 +132,12 @@ class Group(BaseGroup):
 					'status': 'active',
 					'timestamp': data['timestamp']
 				})
-				for player in self.get_players():
-					payloads[player.participant.code] = {'type': 'sell', 'buys': self.buys(), 'sells': self.sells()}
-							
-				live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
-			time.sleep(1)		
+			# Send out updated orderbooks to update graph on frontend
+			for player in self.get_players():
+				payloads[player.participant.code] = {'type': 'sell', 'buys': self.buys(), 'sells': self.sells()}			
+			live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[0].participant._index_in_pages, payloads)
+			# time between groups of orders
+			time.sleep(2)		
 
 	def set_bets(self):
 		print("setting up bets")
@@ -433,6 +438,7 @@ class Player(BasePlayer):
 
 		data['trader_id'] = self.id_in_group
 		if data['direction'] == 'buy_algo':
+			print(data)
 			call_with_delay(0, self.group.new_buy_algo, data)
 			return {0: {'type':'buy_algo'}}
 		
