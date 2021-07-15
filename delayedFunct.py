@@ -1,6 +1,6 @@
 from .infiniteTimer import InfiniteTimer
 import threading
-from otree.db import idmap
+from otree.db import idmap # type: ignore
 
 def call_with_delay_infinite(delay: float, callback, *args, **kwargs):
     """Calls a model method with a specified delay

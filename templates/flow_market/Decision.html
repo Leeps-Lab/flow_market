@@ -320,10 +320,11 @@
         maxpriceValue.innerHTML = "Max Price: " + this.value;
     }
 
-    if('{{treatment}}' != 'flo'){
+    {% comment %} if('{{treatment}}' != 'flo'){
+        // DONE code needed?, these elements are already removed in another if statement
         rateSlider.remove();
         rateValue.remove();
-    }
+    } {% endcomment %}
 
     var algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
     var algo_minpriceValue = document.getElementById("algo-minpriceValue");
@@ -382,6 +383,11 @@
     }
 
     if('{{treatment}}' != 'flo'){
+        // DONE are rateSlider and rateValue removed if treatment is cda/fba?
+        // if treatment is cda/fba, then remove max rate slider 
+        // if treatment is flo, have a max rate slider
+        // this is for both the manual and the algorithmic input
+
         // Because cda and fba has a fixed u_max
         rateSlider.remove();
         rateValue.remove();
@@ -448,13 +454,14 @@
 
         chart.data.datasets[2].data = points;
         chart.update();
-
     }
 
     
     function graphBids(chart, buys) {
         buys = buys.filter(buy => buy['status'] == 'active');
-        if('{{treatment}}' != 'cda'){
+        if('{{treatment}}' != 'cda'){ // TEST changes
+            // READ
+            // if treatment is fba/flo, calculate aggregate supply and graph x, y as price, aggregate supply 
             if (buys.length == 0) {
                 chart.data.datasets[0].data = [];
                 chart.update();
@@ -474,6 +481,7 @@
                 points.push({x: price, y: agg_supply});
             });
         }else{
+            // if treatment is cda, sort the buy orders, 
             buys.sort((a, b) => (a['p_max'] < b['p_max']) ? 1 : -1);
             var volume = 0.0;
 			var points = [];
@@ -496,7 +504,8 @@
 
     function graphAsks(chart, sells) {
         sells = sells.filter(sell => sell['status'] == 'active');
-        if('{{treatment}}' != 'cda'){
+        if('{{treatment}}' != 'cda'){ // TEST changes 
+            // READ
             if (sells.length == 0) {
                 chart.data.datasets[1].data = [];
                 chart.update();
@@ -567,7 +576,8 @@
         if(data['type'] == 'clearing_price'){
             console.log(data);
             global_clearing_price = data['clearing_price'];
-            if('{{treatment}}' != 'cda') graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']);
+            // READ
+            if('{{treatment}}' != 'cda') graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']); // TEST changes
             graphBids(klf_line, data['buys']);
 			graphAsks(klf_line, data['sells']);
         }
@@ -587,7 +597,7 @@
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max;
-        if('{{treatment}}' != 'flo'){
+        if('{{treatment}}' != 'flo'){ // use rate slider if flo
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("rateSlider").value);
@@ -616,7 +626,7 @@
         var volume = parseInt(document.getElementById("volSlider").value);
         var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
         var u_max;
-        if('{{treatment}}' != 'flo'){
+        if('{{treatment}}' != 'flo'){ // use rate slider if flo
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("rateSlider").value);
@@ -646,7 +656,7 @@
         var time = parseInt(document.getElementById("algo-timeSlider").value);
         var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
         var u_max;
-        if('{{treatment}}' != 'flo'){
+        if('{{treatment}}' != 'flo'){ // use rate slider if flo
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("algo-rateSlider").value);
@@ -679,7 +689,7 @@
         var time = parseInt(document.getElementById("algo-timeSlider").value);
         var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
         var u_max;
-        if('{{treatment}}' != 'flo'){
+        if('{{treatment}}' != 'flo'){ // use rate slider if flo
             u_max = parseInt({{max_u_max}});
         } else{
             u_max = parseInt(document.getElementById("algo-rateSlider").value);
@@ -703,6 +713,6 @@
         });
 
     };
-    
 </script>
+
 {% endblock %}
