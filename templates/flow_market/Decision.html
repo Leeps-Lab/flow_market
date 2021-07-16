@@ -54,7 +54,7 @@
             <div class="border">
                 <h2>Manual Input</h2>
                 <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="minpriceSlider"> 
-                    <span id="minpriceValue" style="float: left; width: 100px;"></span><br><br>
+                    <span id="minpriceValue" style="float: left; width: 100px;"></span><br class="minpriceSpacing"><br class="minpriceSpacing">
 
                 <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="maxpriceSlider">
                     <span id="maxpriceValue" style="float: left; width: 100px;"></span><br><br>
@@ -78,7 +78,7 @@
                     <span id="algo-quantityValue" style="float: left; width: 100px;"></span><br><br>
 
                 <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="algo-minpriceSlider"> 
-                    <span id="algo-minpriceValue" style="float: left; width: 100px;"></span><br><br>
+                    <span id="algo-minpriceValue" style="float: left; width: 100px;"></span><br class="algo-minpriceSpacing"><br class="algo-minpriceSpacing">
 
                 <input type="range" min="1" max="{{max_price}}" value="10" class="slider" id="algo-maxpriceSlider">
                     <span id="algo-maxpriceValue" style="float: left; width: 100px;"></span><br><br>
@@ -440,6 +440,14 @@
         minpriceValue.style.display = "none"
         algo_minpriceSlider.style.display = "none"
         algo_minpriceValue.style.display = "none"
+        document.querySelectorAll(".minpriceSpacing").forEach((node) => {
+            console.log(node)
+            node.style.display = "none"
+        })
+        document.querySelectorAll(".algo-minpriceSpacing").forEach((node) => {
+            console.log(node)
+            node.style.display = "none"
+        })
         // CHANGING
         // maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
         // algo_maxpriceValue.innerHTML = "Price: " + algo_maxpriceSlider.value;
