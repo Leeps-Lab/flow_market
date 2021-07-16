@@ -301,8 +301,12 @@
     rateValue.innerHTML = "Max Rate: " + rateSlider.value;
 
     maxpriceSlider.value = 10;
-    maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
-
+    // From demo: in CDA, max price and min price are the same
+    if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+        maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
+    } else {
+        maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
+    }
 
     minpriceSlider.oninput = function() {
         minpriceValue.innerHTML = "Min Price: " + this.value;
@@ -317,7 +321,16 @@
     }
 
     maxpriceSlider.oninput = function() {
-        maxpriceValue.innerHTML = "Max Price: " + this.value;
+        {% comment %} maxpriceValue.innerHTML = "Max Price: " + this.value; {% endcomment %}
+        if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+            // From demo: in CDA, max price and min price are the same
+            console.log("minprice slider applied")
+            maxpriceValue.innerHTML = "Price: " + this.value;
+            minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
+            minpriceSlider.value = this.value;
+        } else {
+            maxpriceValue.innerHTML = "Max Price: " + this.value;
+        }
     }
 
     {% comment %} if('{{treatment}}' != 'flo'){
@@ -349,7 +362,12 @@
     algo_rateValue.innerHTML = "Max Rate: " + algo_rateSlider.value;
 
     algo_maxpriceSlider.value = 10;
-    algo_maxpriceValue.innerHTML = "Max Price: " + algo_maxpriceSlider.value;
+    // From demo: in CDA, max price and min price are the same
+    if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+        algo_maxpriceValue.innerHTML = "Price: " + algo_maxpriceSlider.value;
+    } else {
+        algo_maxpriceValue.innerHTML = "Max Price: " + algo_maxpriceSlider.value;
+    }
 
     algo_timeSlider.value = 3;
     algo_timeValue.innerHTML = "Expiration time: " + algo_timeSlider.value;
@@ -360,10 +378,24 @@
 
     algo_minpriceSlider.oninput = function() {
         algo_minpriceValue.innerHTML = "Min Price: " + this.value;
+
+        // if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+            // // From demo: in CDA, max price and min price are the same
+            // console.log("minprice slider applied")
+            // algo_minpriceSlider.value = algo_maxpriceValue;
+        // } 
+        // if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+        //     // From demo: in CDA, max price and min price are the same
+        //     console.log("minprice slider applied")
+        //     algo_minpriceValue.innerHTML = "Min Price: " + algo_maxpriceSlider.value;
+        // } else {
+        //     algo_minpriceValue.innerHTML = "Min Price: " + this.value;
+        // }
     }
 
     algo_volSlider.oninput = function() {
         algo_volValue.innerHTML = "Max Volume: " + this.value;
+        console.log(`min: ${minpriceValue} max: ${maxpriceValue}`)
     }
 
     algo_rateSlider.oninput = function() {
@@ -371,7 +403,15 @@
     }
 
     algo_maxpriceSlider.oninput = function() {
-        algo_maxpriceValue.innerHTML = "Max Price: " + this.value;
+        if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+            // From demo: in CDA, max price and min price are the same
+            console.log("minprice slider applied")
+            algo_maxpriceValue.innerHTML = "Price: " + this.value;
+            algo_minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
+            algo_minpriceSlider.value = this.value;
+        } else {
+            algo_maxpriceValue.innerHTML = "Max Price: " + this.value;
+        }
     }
 
     algo_timeSlider.oninput = function() {
@@ -382,7 +422,7 @@
         algo_quantityValue.innerHTML = "Units at a time: " + this.value;
     }
 
-    if('{{treatment}}' != 'flo'){
+    if ('{{treatment}}' != 'flo') {
         // DONE are rateSlider and rateValue removed if treatment is cda/fba?
         // if treatment is cda/fba, then remove max rate slider 
         // if treatment is flo, have a max rate slider
@@ -393,6 +433,19 @@
         rateValue.remove();
         algo_rateSlider.remove();
         algo_rateValue.remove();
+
+
+        // From demo: in CDA, max price and min price are the same
+        minpriceSlider.style.display = "none"
+        minpriceValue.style.display = "none"
+        algo_minpriceSlider.style.display = "none"
+        algo_minpriceValue.style.display = "none"
+        // CHANGING
+        // maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
+        // algo_maxpriceValue.innerHTML = "Price: " + algo_maxpriceSlider.value;
+        // minpriceSlider.remove()
+        // algo_minpriceSlider.remove()
+        // algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
     }
 
     function calcDemand(buy, price) {
