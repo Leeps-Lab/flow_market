@@ -1,5 +1,1 @@
 timestamp,trader_id,direction,p_min,p_max,q_max,u_max
-0,1,buy,5,13,5,5
-1000,2,sell,7,12,5,5
-3000,3,buy,4,13,5,5
-5000,4,sell,7,14,5,5
