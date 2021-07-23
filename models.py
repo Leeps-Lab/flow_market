@@ -50,7 +50,8 @@ def parse_config(config_file):
 
 class Subsession(BaseSubsession):
     def creating_session(self):
-        self.group_randomly()
+        # ENABLE
+        # self.group_randomly()
         for p in self.get_players():
             p.init_cash_inv()
 
