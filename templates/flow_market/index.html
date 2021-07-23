@@ -1,0 +1,263 @@
+{% load otree %}
+
+<style>
+  table {
+    border-collapse: collapse;
+    width: 90%;
+  }
+  td,
+  th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  .border {
+    border-radius: 18px;
+    border: 2px solid;
+    padding: 20px;
+    margin: 5px;
+  }
+
+  .button {
+    background-color: #4caf50; /* Green */
+    border: none;
+    color: white;
+    padding: 7px 14px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .button:hover {
+    filter: brightness(85%);
+  }
+
+  .buttonGreen {
+    background-color: #4caf50;
+  } /* Green */
+  .buttonBlue {
+    background-color: #008cba;
+  } /* Blue */
+  .buttonRed {
+    background-color: #f44336;
+  } /* Red */
+  .buttonGray {
+    background-color: #e7e7e7;
+    color: black;
+  } /* Gray */
+  .buttonBlack {
+    background-color: #555555;
+  } /* Black */
+
+  .spacing {
+    padding-bottom: 5px;
+  }
+</style>
+<div id="container" style="display: flex">
+  <div id="left" style="display: flex; flex-direction: column; width: 500px">
+    <div class="border" style="padding-bottom: 0px">
+      <h1>Round {{subsession.round_number}}</h1>
+      <div class="spacing"></div>
+      <div class="spacing"></div>
+
+      <h3>Bets</h3>
+      <table>
+        <tr>
+          <th>Direction</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Deadline</th>
+        </tr>
+        {% for bet in bets %}
+        <tr>
+          <td>{{bet.direction}}</td>
+          <td>{{bet.limit_price}}</td>
+          <td>{{bet.quantity}}</td>
+          <td>{{bet.deadline}} ms</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <div style="display: flex; flex-direction: row; margin-top: 20px">
+        <p>Cash: <span id="cashInfo">{{player.cash}}</span></p>
+        <p style="padding-left: 50px">
+          Inventory: <span id="invInfo">{{player.inventory}}</span>
+        </p>
+      </div>
+    </div>
+    <div class="border">
+      <h2>Manual Input</h2>
+      <div class="spacing"></div>
+      <input
+        type="range"
+        min="1"
+        max="{{max_price}}"
+        value="10"
+        class="slider"
+        id="minpriceSlider"
+      />
+      <span id="minpriceValue" style="float: left; width: 135px"></span
+      ><br class="minpriceSpacing" /><br class="minpriceSpacing" />
+
+      <input
+        type="range"
+        min="1"
+        max="{{max_price}}"
+        value="10"
+        class="slider"
+        id="maxpriceSlider"
+      />
+      <span id="maxpriceValue" style="float: left; width: 135px"></span
+      ><br /><br />
+
+      <input
+        type="range"
+        min="1"
+        max="{{max_q_max}}"
+        value="50"
+        class="slider"
+        id="volSlider"
+      />
+      <span id="volValue" style="float: left; width: 135px"></span><br /><br />
+
+      <input
+        type="range"
+        min="1.0"
+        max="{{max_u_max}}"
+        value="2.50"
+        class="slider"
+        id="rateSlider"
+      />
+      <span id="rateValue" style="float: left; width: 135px"></span>
+      <div class="spacing"></div>
+      <div class="spacing"></div>
+      <div class="spacing"></div>
+
+      <button
+        type="button"
+        id="sendBid"
+        class="button buttonBlue"
+        onclick="new_buy()"
+        style="background-color: #008cba"
+      >
+        Send Buy
+      </button>
+      <button
+        type="button"
+        id="sendAsk"
+        class="button buttonRed"
+        onclick="new_sell()"
+        style="background-color: #f44336"
+      >
+        Send Sell
+      </button>
+    </div>
+
+    <div class="border">
+      <h2>Algorithmic Input</h2>
+      <div class="spacing"></div>
+      <input
+        type="range"
+        min="2"
+        max="20"
+        value="10"
+        class="slider"
+        id="algo-timeSlider"
+      />
+      <span id="algo-timeValue" style="float: left; width: 135px"></span
+      ><br /><br />
+
+      <input
+        type="range"
+        min="1"
+        max="10"
+        value="5"
+        class="slider"
+        id="algo-quantitySlider"
+      />
+      <span id="algo-quantityValue" style="float: left; width: 135px"></span
+      ><br /><br />
+
+      <input
+        type="range"
+        min="1"
+        max="{{max_price}}"
+        value="10"
+        class="slider"
+        id="algo-minpriceSlider"
+      />
+      <span id="algo-minpriceValue" style="float: left; width: 135px"></span
+      ><br class="algo-minpriceSpacing" /><br class="algo-minpriceSpacing" />
+
+      <input
+        type="range"
+        min="1"
+        max="{{max_price}}"
+        value="10"
+        class="slider"
+        id="algo-maxpriceSlider"
+      />
+      <span id="algo-maxpriceValue" style="float: left; width: 135px"></span
+      ><br /><br />
+
+      <input
+        type="range"
+        min="1"
+        max="{{max_q_max}}"
+        value="50"
+        class="slider"
+        id="algo-volSlider"
+      />
+      <span id="algo-volValue" style="float: left; width: 135px"></span
+      ><br /><br />
+
+      <input
+        type="range"
+        min="1.0"
+        max="{{max_u_max}}"
+        value="2.50"
+        class="slider"
+        id="algo-rateSlider"
+      />
+      <span id="algo-rateValue" style="float: left; width: 135px"></span>
+
+      <div class="spacing"></div>
+      <div class="spacing"></div>
+      <div class="spacing"></div>
+
+      <button
+        type="button"
+        id="algo-sendBid"
+        class="button buttonBlue"
+        onclick="new_buy_algo()"
+        style="background-color: #008cba"
+      >
+        Send Buy
+      </button>
+      <button
+        type="button"
+        id="algo-sendAsk"
+        class="button buttonRed"
+        onclick="new_sell_algo()"
+        style="background-color: #f44336"
+      >
+        Send Sell
+      </button>
+    </div>
+  </div>
+
+  <div id="right" style="display: flex; flex-direction: column; width: 500px">
+    <div class="wrapper"><canvas id="klf-line"></canvas></div>
+    <div class="wrapper" style="flex: 50%">
+      <div id="cash-bar" width=""></div>
+    </div>
+    <div class="wrapper" style="flex: 50%">
+      <div id="inv-bar" width=""></div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %} {% include Constants.scripts_template %} {% endblock %}

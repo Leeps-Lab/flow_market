@@ -1,10 +1,21 @@
+# from otree.api import (  # type: ignore
+#     models,
+#     BaseConstants,
+#     BaseSubsession,
+#     BaseGroup,
+#     BasePlayer,
+#     ExtraModel,
+# )
 from otree.api import (  # type: ignore
     models,
+    widgets,
     BaseConstants,
     BaseSubsession,
     BaseGroup,
     BasePlayer,
     ExtraModel,
+    Currency as c,
+    currency_range,
 )
 import csv
 from otree import live  # type: ignore
@@ -23,6 +34,9 @@ class Constants(BaseConstants):
     name_in_url = 'flow_market'
     players_per_group = None
     num_rounds = 1
+
+    index_template = 'flow_market/index.html'
+    scripts_template = 'flow_market/scripts.html'
 
 
 def parse_config(config_file):
