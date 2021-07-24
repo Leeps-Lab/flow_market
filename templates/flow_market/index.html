@@ -31,10 +31,10 @@
     height: 400px;
   }
 
-  .fixMargin {
-    /* margin-right: 20px; */
-    /* max-width: 1000px; */
-  }
+  /* .fixMargin { */
+  /* margin-right: 20px; */
+  /* max-width: 1000px; */
+  /* } */
 
   .manualInput {
     width: 100px;
@@ -56,23 +56,24 @@
       <h2>Round {{subsession.round_number}}</h1>
     </div>
     <div class="col-4 text-center bg-warning">
-      <h2>Cash {{player.cash}}</h1>
+      <h2 id="cashInfo">Cash
+        {{ player.cash|floatformat:1 }}
+      </h2>
     </div>
     <div class="col-4 text-center bg-info">
-      <h2>Inventory {{player.inventory}}</h1>
+      <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
     </div>
   </div>
   <div class="row justify-content-center">
     <div class="minWidth minHeight">
-      <div class="bg-primary minWidth history fixedHeight" id="HISTORY">
+      <div
+        class=" d-flex align-items-center bg-primary minWidth history fixedHeight"
+        id="HISTORY">
         <div class="col bg-primary">
           <div class="row bg-warning justify-content-center">
             <div class="bg-warning" id="BETS">
               <div class="" id="bets" style="padding-bottom: 0px">
-                <div class="spacing"></div>
-                <div class="spacing"></div>
-
-                <h3>Bets</h3>
+                <h2 class="bg-danger text-center">Active Bets</h2>
                 <table>
                   <tr>
                     <th>Direction</th>
@@ -89,26 +90,33 @@
                   </tr>
                   {% endfor %}
                 </table>
-                <div
+                <!-- <div
                   style="display: flex; flex-direction: row; margin-top: 20px">
-                  <p>Cash: <span id="cashInfo">{{player.cash}}</span></p>
+                  <p>Cash: <span id="cashInfo">
+                      {{ player.cash|floatformat:1 }}
+                    </span></p>
                   <p style="padding-left: 50px">
-                    Inventory: <span id="invInfo">{{player.inventory}}</span>
+                    Inventory: <span id="invInfo">
+
+                      {{ player.inventory|floatformat:1 }}
+                    </span>
                   </p>
-                </div>
+                </div> -->
               </div>
 
             </div>
           </div>
           <div class="row bg-danger justify-content-center">
-            <div class="bg-danger" id="ACTIVE_ORDERS">ACTIVE ORDERS</div>
+            <h2 class="bg-danger" id="ACTIVE_ORDERS">Active Orders</h2>
           </div>
         </div>
       </div>
-      <div class="bg-success manual minWidth fixedHeight" id="MANUAL">
+      <div
+        class="d-flex align-items-center bg-success manual minWidth fixedHeight"
+        id="MANUAL">
         <div class="col">
           <div class="row justify-content-center">
-            <div class="text-center">
+            <div class="text-center align-items-center">
               <h2>Manual Input</h2>
               <form>
                 <div class="form-group row ml-1 mr-1">
@@ -151,14 +159,6 @@
             </div>
           </div>
         </div>
-
-
-
-
-
-
-
-
       </div>
     </div>
     <div class="col-8 bg-secondary market" id="MARKET">
@@ -167,53 +167,80 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="minWidth fixedHeight bg-primary" id="ALGORITHM">
+    <div class="d-flex align-items-center minWidth fixedHeight bg-primary"
+      id="ALGORITHM">
+      <div class="col">
+        <div class="row justify-content-center">
+          <div class="text-center">
+            <h2>Algorithmic Input</h2>
+            <form>
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label class="mr-3" id="algo-timeValue">Time value</label>
+                  <input type="range" id="algo-timeSlider" class="slider"
+                    min="2" max="20" value="10">
+                </div>
+              </div>
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label id="algo-quantityValue" class="mr-3">Quantity
+                    Value</label>
+                  <input type="range" id="algo-quantitySlider" class="slider"
+                    min="1" max="10" value="5">
+                </div>
+              </div>
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label id="algo-minpriceValue" class="mr-3">Min Price</label>
+                  <input type="range" id="algo-minpriceSlider" class="slider"
+                    min="1" max="{{max_price}}" value="10">
+                </div>
+              </div>
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label id="algo-maxpriceValue" class="mr-3">Max Volume:
+                    50</label>
+                  <input type="range" id="algo-maxpriceSlider" class="slider"
+                    min="1" max="{{max_price}}" value="10">
+                </div>
+              </div>
+              <!--  -->
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label id="algo-volValue" class="mr-3">Volume</label>
+                  <input type="range" id="algo-volSlider" class="slider" min="1"
+                    max="{{max_q_max}}" value="50">
+                </div>
+              </div>
+              <div class="form-group row ml-1 mr-1">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label id="algo-rateValue" class="mr-3">Max Volume:
+                    50</label>
+                  <input type="range" id="algo-rateSlider" class="slider"
+                    min="1.0" max="{{max_u_max}}" value="2.50">
+                </div>
+              </div>
+            </form>
+            <button type="button" id="algo-sendBid" class="btn btn-primary"
+              onclick="new_buy_algo()">
+              Send Buy
+            </button>
+            <button type="button" id="algo-sendAsk" class="btn btn-danger"
+              onclick="new_sell_algo()">
+              Send Sell
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- end cur -->
 
       <div class="">
-        <h2>Algorithmic Input</h2>
-        <div class="spacing"></div>
-        <input type="range" min="2" max="20" value="10" class="slider"
-          id="algo-timeSlider" />
-        <span id="algo-timeValue"
-          style="float: left; width: 135px"></span><br /><br />
 
-        <input type="range" min="1" max="10" value="5" class="slider"
-          id="algo-quantitySlider" />
-        <span id="algo-quantityValue"
-          style="float: left; width: 135px"></span><br /><br />
 
-        <input type="range" min="1" max="{{max_price}}" value="10"
-          class="slider" id="algo-minpriceSlider" />
-        <span id="algo-minpriceValue"
-          style="float: left; width: 135px"></span><br
-          class="algo-minpriceSpacing" /><br class="algo-minpriceSpacing" />
 
-        <input type="range" min="1" max="{{max_price}}" value="10"
-          class="slider" id="algo-maxpriceSlider" />
-        <span id="algo-maxpriceValue"
-          style="float: left; width: 135px"></span><br /><br />
 
-        <input type="range" min="1" max="{{max_q_max}}" value="50"
-          class="slider" id="algo-volSlider" />
-        <span id="algo-volValue"
-          style="float: left; width: 135px"></span><br /><br />
 
-        <input type="range" min="1.0" max="{{max_u_max}}" value="2.50"
-          class="slider" id="algo-rateSlider" />
-        <span id="algo-rateValue" style="float: left; width: 135px"></span>
 
-        <div class="spacing"></div>
-        <div class="spacing"></div>
-        <div class="spacing"></div>
-
-        <button type="button" id="algo-sendBid" class="button buttonBlue"
-          onclick="new_buy_algo()" style="background-color: #008cba">
-          Send Buy
-        </button>
-        <button type="button" id="algo-sendAsk" class="button buttonRed"
-          onclick="new_sell_algo()" style="background-color: #f44336">
-          Send Sell
-        </button>
       </div>
     </div>
 

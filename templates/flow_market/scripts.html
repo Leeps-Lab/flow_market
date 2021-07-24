@@ -228,7 +228,7 @@
    maxpriceSlider.oninput = function() {
        if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
            // From demo: in CDA, max price and min price are the same
-           console.log("minprice slider applied")
+           // console.log("minprice slider applied")
            maxpriceValue.innerHTML = "Price: " + this.value;
            minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
            minpriceSlider.value = this.value;
@@ -542,8 +542,8 @@
        }
        if(data['type'] == 'update'){
            console.log(data);
-           document.getElementById("cashInfo").innerHTML = data['cash'];
-           document.getElementById("invInfo").innerHTML = data['inventory'];
+           document.getElementById("cashInfo").innerHTML ="Cash " + Number.parseFloat(data['cash']).toFixed(2);
+           document.getElementById("invInfo").innerHTML = "Inventory " + Number.parseFloat( data['inventory']).toFixed(2);
            updateProfit(cash_bar, data['cash']);
   updateVolume(inventory_bar, data['inventory']);
        }
