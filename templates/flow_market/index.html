@@ -47,33 +47,39 @@
   .sliderWrapper {
     min-width: 280px;
   }
+
+  .cardWrapper {
+    border: solid;
+    border-width: 10px;
+
+  }
 </style>
 
 
 <div class="container-fluid noMargin">
-  <div class="row justify-content-center fixMargin" id="HEADER">
-    <div class="text-center minWidth bg-danger">
+  <div class="row justify-content-center fixMargin " id="HEADER">
+    <div class="text-center minWidth ">
       <h2>Round {{subsession.round_number}}</h1>
     </div>
-    <div class="col-4 text-center bg-warning">
+    <div class="col-4 text-center ">
       <h2 id="cashInfo">Cash
         {{ player.cash|floatformat:1 }}
       </h2>
     </div>
-    <div class="col-4 text-center bg-info">
+    <div class="col-4 text-center ">
       <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
     </div>
   </div>
   <div class="row justify-content-center">
     <div class="minWidth minHeight">
       <div
-        class=" d-flex align-items-center bg-primary minWidth history fixedHeight"
+        class=" d-flex align-items-center  minWidth history fixedHeight cardWrapper"
         id="HISTORY">
-        <div class="col bg-primary">
-          <div class="row bg-warning justify-content-center">
-            <div class="bg-warning" id="BETS">
-              <div class="" id="bets" style="padding-bottom: 0px">
-                <h2 class="bg-danger text-center">Active bets</h2>
+        <div class="col ">
+          <div class="row  justify-content-center">
+            <div class="" id="BETS">
+              <div class="" id="bets2" style="padding-bottom: 0px">
+                <h2 class=" text-center">Active bets</h2>
                 <table>
                   <tr>
                     <th>Direction</th>
@@ -103,16 +109,15 @@
                   </p>
                 </div> -->
               </div>
-
             </div>
           </div>
-          <div class="row bg-danger justify-content-center">
-            <h2 class="bg-danger" id="ACTIVE_ORDERS">Active orders</h2>
+          <div class="row  justify-content-center">
+            <h2 class="" id="ACTIVE_ORDERS">Active orders</h2>
           </div>
         </div>
       </div>
       <div
-        class="d-flex align-items-center bg-success manual minWidth fixedHeight"
+        class="cardWrapper d-flex align-items-center  manual minWidth fixedHeight"
         id="MANUAL">
         <div class="col">
           <div class="row justify-content-center">
@@ -161,13 +166,12 @@
         </div>
       </div>
     </div>
-    <div class="col-8 bg-secondary market" id="MARKET">
-      <canvas style="background-color:blue;height:1000px;"
-        id="klf-line"></canvas>
+    <div class="col-8 market cardWrapper" id="MARKET">
+      <canvas id="klf-line"></canvas>
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="d-flex align-items-center minWidth fixedHeight bg-primary"
+    <div class="d-flex align-items-center minWidth fixedHeight  cardWrapper"
       id="ALGORITHM">
       <div class="col">
         <div class="row justify-content-center">
@@ -232,23 +236,12 @@
           </div>
         </div>
       </div>
-      <!-- end cur -->
-
-      <div class="">
-
-
-
-
-
-
-      </div>
     </div>
 
-    <div class="fixedHeight col-4 bg-danger" id="CASH">
+    <div class="fixedHeight col-4  cardWrapper" id="CASH">
       <div id="cash-bar" width=""></div>
     </div>
-    <div class="col-4 fixedHeight bg-warning" id="INVENTORY">
-
+    <div class="col-4 fixedHeight  cardWrapper" id="INVENTORY">
       <div id="inv-bar" width=""></div>
     </div>
   </div>
