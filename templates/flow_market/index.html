@@ -1,206 +1,201 @@
 {% load otree %}
 
-<div id="container" style="display: flex">
-  <div id="left" style="display: flex; flex-direction: column; width: 500px">
-    <div class="border" style="padding-bottom: 0px">
-      <h1>Round {{subsession.round_number}}</h1>
-      <div class="spacing"></div>
-      <div class="spacing"></div>
 
-      <h3>Bets</h3>
-      <table>
-        <tr>
-          <th>Direction</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Deadline</th>
-        </tr>
-        {% for bet in bets %}
-        <tr>
-          <td>{{bet.direction}}</td>
-          <td>{{bet.limit_price}}</td>
-          <td>{{bet.quantity}}</td>
-          <td>{{bet.deadline}} ms</td>
-        </tr>
-        {% endfor %}
-      </table>
-      <div style="display: flex; flex-direction: row; margin-top: 20px">
-        <p>Cash: <span id="cashInfo">{{player.cash}}</span></p>
-        <p style="padding-left: 50px">
-          Inventory: <span id="invInfo">{{player.inventory}}</span>
-        </p>
-      </div>
+<style>
+  /* div {
+    background-color: lightblue;
+  } */
+
+  .fixed {
+    width: 400px;
+    height: 400px;
+  }
+
+  .market {
+    height: 800px;
+  }
+
+  .minWidth {
+    min-width: 400px;
+  }
+
+  .maxWidth {
+    max-width: 400px;
+  }
+
+  .minHeight {
+    height: 800px;
+  }
+
+  .fixedHeight {
+    height: 400px;
+  }
+</style>
+
+
+<div class="container-fluid noMargin padding">
+  <div class="row justify-content-center bg-success">
+    <div class="col text-center">
+      Round 1
     </div>
-    <div class="border">
-      <h2>Manual Input</h2>
-      <div class="spacing"></div>
-      <input
-        type="range"
-        min="1"
-        max="{{max_price}}"
-        value="10"
-        class="slider"
-        id="minpriceSlider"
-      />
-      <span id="minpriceValue" style="float: left; width: 135px"></span
-      ><br class="minpriceSpacing" /><br class="minpriceSpacing" />
-
-      <input
-        type="range"
-        min="1"
-        max="{{max_price}}"
-        value="10"
-        class="slider"
-        id="maxpriceSlider"
-      />
-      <span id="maxpriceValue" style="float: left; width: 135px"></span
-      ><br /><br />
-
-      <input
-        type="range"
-        min="1"
-        max="{{max_q_max}}"
-        value="50"
-        class="slider"
-        id="volSlider"
-      />
-      <span id="volValue" style="float: left; width: 135px"></span><br /><br />
-
-      <input
-        type="range"
-        min="1.0"
-        max="{{max_u_max}}"
-        value="2.50"
-        class="slider"
-        id="rateSlider"
-      />
-      <span id="rateValue" style="float: left; width: 135px"></span>
-      <div class="spacing"></div>
-      <div class="spacing"></div>
-      <div class="spacing"></div>
-
-      <button
-        type="button"
-        id="sendBid"
-        class="button buttonBlue"
-        onclick="new_buy()"
-        style="background-color: #008cba"
-      >
-        Send Buy
-      </button>
-      <button
-        type="button"
-        id="sendAsk"
-        class="button buttonRed"
-        onclick="new_sell()"
-        style="background-color: #f44336"
-      >
-        Send Sell
-      </button>
+    <div class="col text-center">
+      Cash: $5000
     </div>
-
-    <div class="border">
-      <h2>Algorithmic Input</h2>
-      <div class="spacing"></div>
-      <input
-        type="range"
-        min="2"
-        max="20"
-        value="10"
-        class="slider"
-        id="algo-timeSlider"
-      />
-      <span id="algo-timeValue" style="float: left; width: 135px"></span
-      ><br /><br />
-
-      <input
-        type="range"
-        min="1"
-        max="10"
-        value="5"
-        class="slider"
-        id="algo-quantitySlider"
-      />
-      <span id="algo-quantityValue" style="float: left; width: 135px"></span
-      ><br /><br />
-
-      <input
-        type="range"
-        min="1"
-        max="{{max_price}}"
-        value="10"
-        class="slider"
-        id="algo-minpriceSlider"
-      />
-      <span id="algo-minpriceValue" style="float: left; width: 135px"></span
-      ><br class="algo-minpriceSpacing" /><br class="algo-minpriceSpacing" />
-
-      <input
-        type="range"
-        min="1"
-        max="{{max_price}}"
-        value="10"
-        class="slider"
-        id="algo-maxpriceSlider"
-      />
-      <span id="algo-maxpriceValue" style="float: left; width: 135px"></span
-      ><br /><br />
-
-      <input
-        type="range"
-        min="1"
-        max="{{max_q_max}}"
-        value="50"
-        class="slider"
-        id="algo-volSlider"
-      />
-      <span id="algo-volValue" style="float: left; width: 135px"></span
-      ><br /><br />
-
-      <input
-        type="range"
-        min="1.0"
-        max="{{max_u_max}}"
-        value="2.50"
-        class="slider"
-        id="algo-rateSlider"
-      />
-      <span id="algo-rateValue" style="float: left; width: 135px"></span>
-
-      <div class="spacing"></div>
-      <div class="spacing"></div>
-      <div class="spacing"></div>
-
-      <button
-        type="button"
-        id="algo-sendBid"
-        class="button buttonBlue"
-        onclick="new_buy_algo()"
-        style="background-color: #008cba"
-      >
-        Send Buy
-      </button>
-      <button
-        type="button"
-        id="algo-sendAsk"
-        class="button buttonRed"
-        onclick="new_sell_algo()"
-        style="background-color: #f44336"
-      >
-        Send Sell
-      </button>
+    <div class="col text-center">
+      Inventory: 500
     </div>
   </div>
+  <div class="row justify-content-center">
+    <div class="minWidth minHeight">
+      <div class="bg-primary minWidth history fixedHeight" id="HISTORY">
+        <div class="col bg-primary">
+          <div class="row bg-warning">
+            <div class="bg-warning" id="BETS">
+              <div class="border" id="bets" style="padding-bottom: 0px">
+                <h1>Round {{subsession.round_number}}</h1>
+                <div class="spacing"></div>
+                <div class="spacing"></div>
 
-  <div id="right" style="display: flex; flex-direction: column; width: 500px">
-    <div class="wrapper"><canvas id="klf-line"></canvas></div>
-    <div class="wrapper" style="flex: 50%">
+                <h3>Bets</h3>
+                <table>
+                  <tr>
+                    <th>Direction</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Deadline</th>
+                  </tr>
+                  {% for bet in bets %}
+                  <tr>
+                    <td>{{bet.direction}}</td>
+                    <td>{{bet.limit_price}}</td>
+                    <td>{{bet.quantity}}</td>
+                    <td>{{bet.deadline}} ms</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+                <div
+                  style="display: flex; flex-direction: row; margin-top: 20px">
+                  <p>Cash: <span id="cashInfo">{{player.cash}}</span></p>
+                  <p style="padding-left: 50px">
+                    Inventory: <span id="invInfo">{{player.inventory}}</span>
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="row bg-danger">
+            <div class="bg-danger" id="ACTIVE_ORDERS">ACTIVE ORDERS</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-success manual minWidth fixedHeight" id="MANUAL">
+        <div class="border">
+          <h2>Manual Input</h2>
+          <div class="spacing"></div>
+          <input type="range" min="1" max="{{max_price}}" value="10"
+            class="slider" id="minpriceSlider" />
+          <span id="minpriceValue" style="float: left; width: 135px"></span><br
+            class="minpriceSpacing" /><br class="minpriceSpacing" />
+
+          <input type="range" min="1" max="{{max_price}}" value="10"
+            class="slider" id="maxpriceSlider" />
+          <span id="maxpriceValue"
+            style="float: left; width: 135px"></span><br /><br />
+
+          <input type="range" min="1" max="{{max_q_max}}" value="50"
+            class="slider" id="volSlider" />
+          <span id="volValue"
+            style="float: left; width: 135px"></span><br /><br />
+
+          <input type="range" min="1.0" max="{{max_u_max}}" value="2.50"
+            class="slider" id="rateSlider" />
+          <span id="rateValue" style="float: left; width: 135px"></span>
+          <div class="spacing"></div>
+          <div class="spacing"></div>
+          <div class="spacing"></div>
+
+          <button type="button" id="sendBid" class="button buttonBlue"
+            onclick="new_buy()" style="background-color: #008cba">
+            Send Buy
+          </button>
+          <button type="button" id="sendAsk" class="button buttonRed"
+            onclick="new_sell()" style="background-color: #f44336">
+            Send Sell
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-8 bg-secondary market" id="MARKET">
+      <canvas style="background-color:blue;height:1000px;"
+        id="klf-line"></canvas>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="minWidth fixedHeight bg-primary" id="ALGORITHM">
+
+      <div class="border">
+        <h2>Algorithmic Input</h2>
+        <div class="spacing"></div>
+        <input type="range" min="2" max="20" value="10" class="slider"
+          id="algo-timeSlider" />
+        <span id="algo-timeValue"
+          style="float: left; width: 135px"></span><br /><br />
+
+        <input type="range" min="1" max="10" value="5" class="slider"
+          id="algo-quantitySlider" />
+        <span id="algo-quantityValue"
+          style="float: left; width: 135px"></span><br /><br />
+
+        <input type="range" min="1" max="{{max_price}}" value="10"
+          class="slider" id="algo-minpriceSlider" />
+        <span id="algo-minpriceValue"
+          style="float: left; width: 135px"></span><br
+          class="algo-minpriceSpacing" /><br class="algo-minpriceSpacing" />
+
+        <input type="range" min="1" max="{{max_price}}" value="10"
+          class="slider" id="algo-maxpriceSlider" />
+        <span id="algo-maxpriceValue"
+          style="float: left; width: 135px"></span><br /><br />
+
+        <input type="range" min="1" max="{{max_q_max}}" value="50"
+          class="slider" id="algo-volSlider" />
+        <span id="algo-volValue"
+          style="float: left; width: 135px"></span><br /><br />
+
+        <input type="range" min="1.0" max="{{max_u_max}}" value="2.50"
+          class="slider" id="algo-rateSlider" />
+        <span id="algo-rateValue" style="float: left; width: 135px"></span>
+
+        <div class="spacing"></div>
+        <div class="spacing"></div>
+        <div class="spacing"></div>
+
+        <button type="button" id="algo-sendBid" class="button buttonBlue"
+          onclick="new_buy_algo()" style="background-color: #008cba">
+          Send Buy
+        </button>
+        <button type="button" id="algo-sendAsk" class="button buttonRed"
+          onclick="new_sell_algo()" style="background-color: #f44336">
+          Send Sell
+        </button>
+      </div>
+    </div>
+
+    <div class="fixedHeight col-4 bg-danger" id="CASH">
       <div id="cash-bar" width=""></div>
     </div>
-    <div class="wrapper" style="flex: 50%">
+    <div class="col-4 fixedHeight bg-warning" id="INVENTORY">
+
       <div id="inv-bar" width=""></div>
     </div>
   </div>
 </div>
+
+
+
+
+
+
 
 {% block scripts %} {% include Constants.scripts_template %} {% endblock %}

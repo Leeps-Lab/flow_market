@@ -1,8 +1,8 @@
 {% load otree %}
 
 <!--
-    Code heavily adopted from Jason Vranek (github.com/JasonVranek)
--->
+            Code heavily adopted from Jason Vranek (github.com/JasonVranek)
+        -->
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -12,13 +12,15 @@
            liveSend({'direction': 'begin'});
            console.log("begin round");
        }
-
    }, false);
 
 
    function init_graphs() {
        var cash_ctx = document.getElementById('cash-bar');
        var cash_bar = Highcharts.chart('cash-bar', {
+           credits: {
+    enabled: false
+  },
            title: {
                // text: 'Cash'
                text: undefined
@@ -71,6 +73,9 @@
 
        var inv_ctx = document.getElementById('inv-bar');
        var inventory_bar = Highcharts.chart('inv-bar', {
+           credits: {
+    enabled: false
+  },
            title: {
                // text: 'Inventory'
                text: undefined
@@ -125,6 +130,7 @@
        var klf_line = new Chart(klf_line_ctx, {
            type: 'scatter',
            options: {
+               maintainAspectRatio: false,
                scales: {
                    yAxes: [{
                        ticks: {
@@ -440,10 +446,10 @@
   var points = [];
 
            buys.forEach(function (buy, _index, _array) {
-  	// Graph (price, old_vol) -> (price, new_vol)
-  	points.push({x: buy['p_max'], y: volume});
-  	volume += buy['q_max'];
-  	points.push({x: buy['p_max'], y: volume});
+    // Graph (price, old_vol) -> (price, new_vol)
+    points.push({x: buy['p_max'], y: volume});
+    volume += buy['q_max'];
+    points.push({x: buy['p_max'], y: volume});
   });
 
   // insert a horizontal line to 0 to show limit order
@@ -479,10 +485,10 @@
   var volume = 0.0;
   var points = [];
   sells.forEach(function (sell, _index, _array) {
-  	// Graph (price, old_vol) -> (price, new_vol)
-  	points.push({x: sell['p_max'], y: volume});
-  	volume += sell['q_max'];
-  	points.push({x: sell['p_max'], y: volume});
+    // Graph (price, old_vol) -> (price, new_vol)
+    points.push({x: sell['p_max'], y: volume});
+    volume += sell['q_max'];
+    points.push({x: sell['p_max'], y: volume});
   });
 
   // insert a horizontal line to max price = 130 to show limit order
