@@ -35,29 +35,40 @@
     /* margin-right: 20px; */
     /* max-width: 1000px; */
   }
+
+  .manualInput {
+    width: 100px;
+  }
+
+  .slider {
+    width: 150px;
+  }
+
+  .sliderWrapper {
+    min-width: 280px;
+  }
 </style>
 
 
 <div class="container-fluid noMargin">
-  <div class="row justify-content-center fixMargin">
+  <div class="row justify-content-center fixMargin" id="HEADER">
     <div class="text-center minWidth bg-danger">
-      Round 1
+      <h2>Round {{subsession.round_number}}</h1>
     </div>
     <div class="col-4 text-center bg-warning">
-      Cash: $5000
+      <h2>Cash {{player.cash}}</h1>
     </div>
     <div class="col-4 text-center bg-info">
-      Inventory: 500
+      <h2>Inventory {{player.inventory}}</h1>
     </div>
   </div>
   <div class="row justify-content-center">
     <div class="minWidth minHeight">
       <div class="bg-primary minWidth history fixedHeight" id="HISTORY">
         <div class="col bg-primary">
-          <div class="row bg-warning">
+          <div class="row bg-warning justify-content-center">
             <div class="bg-warning" id="BETS">
-              <div class="border" id="bets" style="padding-bottom: 0px">
-                <h1>Round {{subsession.round_number}}</h1>
+              <div class="" id="bets" style="padding-bottom: 0px">
                 <div class="spacing"></div>
                 <div class="spacing"></div>
 
@@ -89,46 +100,65 @@
 
             </div>
           </div>
-          <div class="row bg-danger">
+          <div class="row bg-danger justify-content-center">
             <div class="bg-danger" id="ACTIVE_ORDERS">ACTIVE ORDERS</div>
           </div>
         </div>
       </div>
       <div class="bg-success manual minWidth fixedHeight" id="MANUAL">
-        <div class="border">
-          <h2>Manual Input</h2>
-          <div class="spacing"></div>
-          <input type="range" min="1" max="{{max_price}}" value="10"
-            class="slider" id="minpriceSlider" />
-          <span id="minpriceValue" style="float: left; width: 135px"></span><br
-            class="minpriceSpacing" /><br class="minpriceSpacing" />
-
-          <input type="range" min="1" max="{{max_price}}" value="10"
-            class="slider" id="maxpriceSlider" />
-          <span id="maxpriceValue"
-            style="float: left; width: 135px"></span><br /><br />
-
-          <input type="range" min="1" max="{{max_q_max}}" value="50"
-            class="slider" id="volSlider" />
-          <span id="volValue"
-            style="float: left; width: 135px"></span><br /><br />
-
-          <input type="range" min="1.0" max="{{max_u_max}}" value="2.50"
-            class="slider" id="rateSlider" />
-          <span id="rateValue" style="float: left; width: 135px"></span>
-          <div class="spacing"></div>
-          <div class="spacing"></div>
-          <div class="spacing"></div>
-
-          <button type="button" id="sendBid" class="button buttonBlue"
-            onclick="new_buy()" style="background-color: #008cba">
-            Send Buy
-          </button>
-          <button type="button" id="sendAsk" class="button buttonRed"
-            onclick="new_sell()" style="background-color: #f44336">
-            Send Sell
-          </button>
+        <div class="col">
+          <div class="row justify-content-center">
+            <div class="text-center">
+              <h2>Manual Input</h2>
+              <form>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label class="mr-3" id="minpriceValue">Min price: 10</label>
+                    <input type="range" id="minpriceSlider" class="slider"
+                      min="1" max="{{max_price}}" value="10">
+                  </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="maxpriceValue" class="mr-3">Max price: 10</label>
+                    <input type="range" id="maxpriceSlider" class="slider"
+                      min="1" max="{{max_price}}" value="10">
+                  </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="volValue" class="mr-3">Max Volume: 50</label>
+                    <input type="range" id="volSlider" class="slider" min="1"
+                      max="{{max_q_max}}" value="50">
+                  </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="rateValue" class="mr-3">Max Volume: 50</label>
+                    <input type="range" id="rateSlider" class="slider" min="1"
+                      max="{{max_u_max}}" value="2.50">
+                  </div>
+                </div>
+              </form>
+              <button type="button" id="sendBid" class="btn mr-2 btn-primary"
+                onclick="new_buy()">
+                Send Buy
+              </button>
+              <button type="button" id="sendAsk" class="btn btn-danger"
+                onclick="new_sell()">
+                Send Sell
+              </button>
+            </div>
+          </div>
         </div>
+
+
+
+
+
+
+
+
       </div>
     </div>
     <div class="col-8 bg-secondary market" id="MARKET">
@@ -139,7 +169,7 @@
   <div class="row justify-content-center">
     <div class="minWidth fixedHeight bg-primary" id="ALGORITHM">
 
-      <div class="border">
+      <div class="">
         <h2>Algorithmic Input</h2>
         <div class="spacing"></div>
         <input type="range" min="2" max="20" value="10" class="slider"
