@@ -15,6 +15,7 @@
 
   .market {
     height: 800px;
+    /* height: 700px; */
   }
 
   .minWidth {
@@ -88,7 +89,8 @@
   }
 
   .fixedHeightModified {
-    height: calc(400px - var(--cardSpacing));
+    height: calc(400px - var(--cardSpacing) - (800px - 800px));
+    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
     /* height: 350px; */
   }
 
@@ -137,11 +139,11 @@
     <div class="minWidth minHeight cardSpacingRight cardSpacingBottomMore">
       <div class="col cardSpacingBottom">
         <div
-          class="shadow d-flex align-items-center  minWidth history  fixedHeight cardWrapper"
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
           id="HISTORY">
-          <div class="row  justify-content-center">
+          <div class="row justify-content-center">
             <div class="" id="BETS">
-              <div class="" id="bets2" style="padding-bottom: 0px">
+              <div class="" id="bets2">
                 <h2 class=" text-center">Active bets</h2>
                 <table>
                   <tr>
@@ -159,67 +161,76 @@
                   </tr>
                   {% endfor %}
                 </table>
-                <!-- <div
-                  style="display: flex; flex-direction: row; margin-top: var(--cardSpacing)">
-                  <p>Cash: <span id="cashInfo">
-                      {{ player.cash|floatformat:1 }}
-                    </span></p>
-                  <p style="padding-left: 50px">
-                    Inventory: <span id="invInfo">
-
-                      {{ player.inventory|floatformat:1 }}
-                    </span>
-                  </p>
-                </div> -->
               </div>
             </div>
           </div>
           <div class="row  justify-content-center">
-            <h2 class="" id="ACTIVE_ORDERS">Active orders</h2>
+            <div>
+
+              <h2 class="text-center" id="ACTIVE_ORDERS">Active orders</h2>
+              <table>
+                <tr>
+                  <th>Direction</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Deadline</th>
+                </tr>
+                {% for bet in bets %}
+                <tr>
+                  <td>{{bet.direction}}</td>
+                  <td>{{bet.limit_price}}</td>
+                  <td>{{bet.quantity}}</td>
+                  <td>{{bet.deadline}} ms</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
           </div>
         </div>
       </div>
-      <div class="cardSpacingBottomMore ">
-        <div
-          class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
-          id="MANUAL">
-          <div class="borderRadiusFix col shadow">
-            <div class="row justify-content-center">
-              <div class="text-center align-items-center">
-                <h2>Manual Input</h2>
-                <form>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label class="mr-3" id="minpriceValue">Min price:
-                        10</label>
-                      <input type="range" id="minpriceSlider" class="slider"
-                        min="1" max="{{max_price}}" value="10">
-                    </div>
+      <div
+        class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+        id="MANUAL">
+        <div class=" p-4  borderRadiusFix col shadow">
+          <div class="row h-100 justify-content-center">
+            <div
+              class="h-100 text-center align-items-center d-flex flex-column justify-content-between">
+              <h2>Manual Input</h2>
+              <form>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label class="mr-3" id="minpriceValue">Min price:
+                      10</label>
+                    <input type="range" id="minpriceSlider" class="slider"
+                      min="1" max="{{max_price}}" value="10">
                   </div>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label id="maxpriceValue" class="mr-3">Max price:
-                        10</label>
-                      <input type="range" id="maxpriceSlider" class="slider"
-                        min="1" max="{{max_price}}" value="10">
-                    </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="maxpriceValue" class="mr-3">Max price:
+                      10</label>
+                    <input type="range" id="maxpriceSlider" class="slider"
+                      min="1" max="{{max_price}}" value="10">
                   </div>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label id="volValue" class="mr-3">Max Volume: 50</label>
-                      <input type="range" id="volSlider" class="slider" min="1"
-                        max="{{max_q_max}}" value="50">
-                    </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="volValue" class="mr-3">Max Volume: 50</label>
+                    <input type="range" id="volSlider" class="slider" min="1"
+                      max="{{max_q_max}}" value="50">
                   </div>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label id="rateValue" class="mr-3">Max Volume: 50</label>
-                      <input type="range" id="rateSlider" class="slider" min="1"
-                        max="{{max_u_max}}" value="2.50">
-                    </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="rateValue" class="mr-3">Max Volume: 50</label>
+                    <input type="range" id="rateSlider" class="slider" min="1"
+                      max="{{max_u_max}}" value="2.50">
                   </div>
-                </form>
-                <button type="button" id="sendBid" class="btn mr-2 btn-primary"
+                </div>
+              </form>
+              <div>
+
+                <button type="button" id="sendBid" class="btn mr-3 btn-primary"
                   onclick="new_buy()">
                   Send Buy
                 </button>
@@ -242,9 +253,10 @@
       <div
         class="shadow d-flex align-items-center minWidth fixedHeight  cardWrapper"
         id="ALGORITHM">
-        <div class="col">
-          <div class="row justify-content-center">
-            <div class="text-center">
+        <div class="col ">
+          <div class="row pt-2 h-100 justify-content-center">
+            <div
+              class="pb-4 text-center d-flex flex-column justify-content-between">
               <h2>Algorithmic Input</h2>
               <form>
                 <div class="form-group row ml-1 mr-1">
@@ -295,14 +307,16 @@
                   </div>
                 </div>
               </form>
-              <button type="button" id="algo-sendBid" class="btn btn-primary"
-                onclick="new_buy_algo()">
-                Send Buy
-              </button>
-              <button type="button" id="algo-sendAsk" class="btn btn-danger"
-                onclick="new_sell_algo()">
-                Send Sell
-              </button>
+              <div>
+                <button type="button" id="algo-sendBid"
+                  class="btn mr-3 btn-primary" onclick="new_buy_algo()">
+                  Send Buy
+                </button>
+                <button type="button" id="algo-sendAsk" class="btn btn-danger"
+                  onclick="new_sell_algo()">
+                  Send Sell
+                </button>
+              </div>
             </div>
           </div>
         </div>
