@@ -16,7 +16,7 @@
     font-family: Lato;
     /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
   }
-  
+
   body {
     background-color: #f8fbff;
   }
@@ -120,7 +120,18 @@
     margin-bottom: var(--cardSpacing);
   }
 
-  @media (max-width: 1300px) { .conditionalMargin{margin-bottom: var(--cardSpacing);}}
+  @media (max-width: 1300px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+    }
+  }
+
+  @media (max-width: 1300px) {
+    .conditionalMargin2 {
+      margin-right: var(--cardSpacing);
+    }
+  }
+
 
   .col,
   .col-1,
@@ -155,7 +166,8 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+    <div
+      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
       <div class="col cardSpacingBottom">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -212,50 +224,53 @@
         id="MANUAL">
         <div class=" p-4  borderRadiusFix col shadow">
           <div class="row h-100 justify-content-center">
-            <div
-              class="h-100 text-center align-items-center d-flex flex-column justify-content-between">
-              <h2>Manual Input</h2>
-              <form>
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label class="mr-3" id="minpriceValue">Min price:
-                      10</label>
-                    <input type="range" id="minpriceSlider" class="slider"
-                      min="1" max="{{max_price}}" value="10">
+            <div class="col">
+              <div
+                class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
+                <h2>Manual Input</h2>
+                <form>
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label class="mr-3" id="minpriceValue">Min price:
+                        10</label>
+                      <input type="range" id="minpriceSlider" class="slider"
+                        min="1" max="{{max_price}}" value="10">
+                    </div>
                   </div>
-                </div>
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="maxpriceValue" class="mr-3">Max price:
-                      10</label>
-                    <input type="range" id="maxpriceSlider" class="slider"
-                      min="1" max="{{max_price}}" value="10">
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="maxpriceValue" class="mr-3">Max price:
+                        10</label>
+                      <input type="range" id="maxpriceSlider" class="slider"
+                        min="1" max="{{max_price}}" value="10">
+                    </div>
                   </div>
-                </div>
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="volValue" class="mr-3">Max Volume: 50</label>
-                    <input type="range" id="volSlider" class="slider" min="1"
-                      max="{{max_q_max}}" value="50">
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="volValue" class="mr-3">Max Volume: 50</label>
+                      <input type="range" id="volSlider" class="slider" min="1"
+                        max="{{max_q_max}}" value="50">
+                    </div>
                   </div>
-                </div>
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="rateValue" class="mr-3">Max Volume: 50</label>
-                    <input type="range" id="rateSlider" class="slider" min="1"
-                      max="{{max_u_max}}" value="2.50">
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="rateValue" class="mr-3">Max Volume: 50</label>
+                      <input type="range" id="rateSlider" class="slider" min="1"
+                        max="{{max_u_max}}" value="2.50">
+                    </div>
+                    <div id="slider" style="width:100%;"></div>
                   </div>
+                </form>
+                <div>
+                  <button type="button" id="sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="sendAsk" class="btn btn-danger"
+                    onclick="new_sell()">
+                    Send Sell
+                  </button>
                 </div>
-              </form>
-              <div>
-                <button type="button" id="sendBid" class="btn mr-3 btn-primary"
-                  onclick="new_buy()">
-                  Send Buy
-                </button>
-                <button type="button" id="sendAsk" class="btn btn-danger"
-                  onclick="new_sell()">
-                  Send Sell
-                </button>
               </div>
             </div>
           </div>
@@ -341,13 +356,17 @@
       </div>
     </div>
 
-    <div class="marginBottom minWidth fixedHeight col-4 cardSpacingRight  marginRight" id="CASH">
+    <div
+      class="marginBottom minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
+      id="CASH">
       <div class="shadow minWidth cardWrapper">
         <div id="cash-bar"></div>
       </div>
     </div>
 
-    <div class="minWidth  shadow col-4 fixedHeight borderRadiusFix" id="INVENTORY">
+    <div
+      class="minWidth  shadow col-4 fixedHeight borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
       <div class="cardWrapper ">
         <div id="inv-bar" width=""></div>
       </div>
