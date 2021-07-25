@@ -111,7 +111,7 @@
   }
 
   .cardSpacingBottomMore {
-    margin-bottom: var(--cardSpacing);
+    {% comment %} margin-bottom: var(--cardSpacing); {% endcomment %}
     height: 300px;
   }
 
@@ -126,6 +126,8 @@
   {% comment %} .marginRight {
     margin-right: var(--cardSpacing);
   } {% endcomment %}
+
+  @media (max-width: 1300px) { .conditionalMargin{margin-bottom: var(--cardSpacing);}}
 
   .col,
   .col-1,
@@ -150,17 +152,17 @@
     <div class="text-center minWidth ">
       <h2>Round {{subsession.round_number}}</h1>
     </div>
-    <div class="col-4 text-center ">
+    <div class="col-xl-4  col-6 text-center ">
       <h2 id="cashInfo">Cash
         {{ player.cash|floatformat:1 }}
       </h2>
     </div>
-    <div class="col-4 text-center ">
+    <div class="col-xl-4  col-6 text-center ">
       <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore">
+    <div class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
       <div class="col cardSpacingBottom">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -268,12 +270,12 @@
         </div>
       </div>
     </div>
-    <div class="col-8 shadow market cardWrapper" id="MARKET">
+    <div class="col-8 shadow market cardWrapper conditionalMargin" id="MARKET">
       <canvas id="klf-line"></canvas>
     </div>
   </div>
-  <div class="row justify-content-center rowSpacingTop ">
-    <div class="cardSpacingRight cardSpacingBottom">
+  <div class="row justify-content-center  ">
+    <div class="cardSpacingRight marginBottom ">
       <div
         class="shadow d-flex align-items-center minWidth fixedHeight  cardWrapper"
         id="ALGORITHM">
