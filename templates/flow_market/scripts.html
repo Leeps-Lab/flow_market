@@ -51,34 +51,6 @@
    const minpriceSliderVal = 6
    const maxpriceSliderVal = 10
 
-   const minpriceSlider = document.getElementById("minpriceSlider");
-   minpriceSlider.value = minpriceSliderVal;
-   minpriceSlider.oninput = function() {
-       minpriceValue.innerHTML = "Min Price: " + this.value;
-   }
-   const minpriceValue = document.getElementById("minpriceValue");
-   minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
-
-   const maxpriceSlider = document.getElementById("maxpriceSlider");
-   maxpriceSlider.value = maxpriceSliderVal;
-   maxpriceSlider.oninput = function() {
-       if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-           // In CDA, max price and min price are the same
-           maxpriceValue.innerHTML = "Price: " + this.value;
-           minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
-           minpriceSlider.value = this.value;
-       } else {
-           maxpriceValue.innerHTML = "Max Price: " + this.value;
-       }
-   }
-   const maxpriceValue = document.getElementById("maxpriceValue");
-   // In CDA, max price and min price are the same
-   if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-       maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
-   } else {
-       maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
-   }
-
     const slider = document.getElementById('noUiPriceSlider');
     if (isCDA || isFBA) {
         noUiSlider.create(slider, {
@@ -195,19 +167,6 @@
 
    algo_minpriceSlider.oninput = function() {
        algo_minpriceValue.innerHTML = "Min Price: " + this.value;
-
-       // if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-           // // From demo: in CDA, max price and min price are the same
-           // console.log("minprice slider applied")
-           // algo_minpriceSlider.value = algo_maxpriceValue;
-       // }
-       // if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-       //     // From demo: in CDA, max price and min price are the same
-       //     console.log("minprice slider applied")
-       //     algo_minpriceValue.innerHTML = "Min Price: " + algo_maxpriceSlider.value;
-       // } else {
-       //     algo_minpriceValue.innerHTML = "Min Price: " + this.value;
-       // }
    }
 
    algo_volSlider.oninput = function() {
@@ -240,37 +199,13 @@
    }
 
    if ('{{treatment}}' != 'flo') {
-       // DONE are rateSlider and rateValue removed if treatment is cda/fba?
-       // if treatment is cda/fba, then remove max rate slider
-       // if treatment is flo, have a max rate slider
-       // this is for both the manual and the algorithmic input
-
        // Because cda and fba has a fixed u_max
        rateSlider.remove();
        rateValue.remove();
+       document.getElementById("rateValueWrapper").remove()
+
        algo_rateSlider.remove();
        algo_rateValue.remove();
-
-
-       // From demo: in CDA, max price and min price are the same
-       minpriceSlider.style.display = "none"
-       minpriceValue.style.display = "none"
-       algo_minpriceSlider.style.display = "none"
-       algo_minpriceValue.style.display = "none"
-       document.querySelectorAll(".minpriceSpacing").forEach((node) => {
-           console.log(node)
-           node.style.display = "none"
-       })
-       document.querySelectorAll(".algo-minpriceSpacing").forEach((node) => {
-           console.log(node)
-           node.style.display = "none"
-       })
-       // CHANGING
-       // maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
-       // algo_maxpriceValue.innerHTML = "Price: " + algo_maxpriceSlider.value;
-       // minpriceSlider.remove()
-       // algo_minpriceSlider.remove()
-       // algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
    }
 
    function calcDemand(buy, price) {
@@ -471,8 +406,6 @@
 
 
    function new_buy(){
-       {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
-       {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
        let maxprice;
        let minprice;
        if (isCDA || isFBA) {
@@ -511,9 +444,6 @@
    };
 
    function new_sell(){
-       {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
-       {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
-
        let maxprice;
        let minprice;
        if (isCDA || isFBA) {

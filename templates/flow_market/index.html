@@ -249,18 +249,8 @@
                 <form>
                   <div class="form-group row ml-1 mr-1">
                     <div class="d-flex justify-content-between sliderWrapper">
-                      <label class="mr-3" id="minpriceValue">Min price:
-                        10</label>
-                      <input type="range" id="minpriceSlider" class="slider"
-                        min="1" max="{{max_price}}" value="10">
-                    </div>
-                  </div>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label id="maxpriceValue" class="mr-3">Max price:
-                        10</label>
-                      <input type="range" id="maxpriceSlider" class="slider"
-                        min="1" max="{{max_price}}" value="10">
+                      <label class="mr-4" id="">Price</label>
+                      <div id="noUiPriceSlider" style="width:100%;"></div>
                     </div>
                   </div>
                   <div class="form-group row ml-1 mr-1">
@@ -270,21 +260,15 @@
                         max="{{max_q_max}}" value="50">
                     </div>
                   </div>
-                  <div class="form-group row ml-1 mr-1">
+                  <div id="rateValueWrapper" class="form-group row ml-1 mr-1">
                     <div class="d-flex justify-content-between sliderWrapper">
                       <label id="rateValue" class="mr-3">Max Volume: 50</label>
                       <input type="range" id="rateSlider" class="slider" min="1"
                         max="{{max_u_max}}" value="2.50">
                     </div>
                   </div>
-                  <div class="form-group row ml-1 mr-1">
-                    <div class="d-flex justify-content-between sliderWrapper">
-                      <label class="mr-4" id="">Price</label>
-                      <div id="noUiPriceSlider" style="width:100%;"></div>
-                    </div>
-                  </div>
                 </form>
-                <div class="mt-5">
+                <div class="">
                   <button type="button" id="sendBid"
                     class="btn mr-3 btn-primary" onclick="new_buy()">
                     Send Buy
