@@ -442,11 +442,11 @@
 
 
    function new_buy(){
-       var minprice = parseInt(document.getElementById("minpriceSlider").value);
-       var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
-       const minprice1 = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
-       const maxprice1 = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
-       console.log("noUI buy", minprice1, maxprice1)
+       {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
+       {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
+       const minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
+       const maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+       console.log("noUI buy", minprice, maxprice)
 
        var volume = parseInt(document.getElementById("volSlider").value);
        var u_max;
@@ -475,10 +475,14 @@
    };
 
    function new_sell(){
-       var minprice = parseInt(document.getElementById("minpriceSlider").value);
-       var volume = parseInt(document.getElementById("volSlider").value);
-       var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
+       {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
+       {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
+       const minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
+       const maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+       console.log("noUI sell", minprice, maxprice)
+
        var u_max;
+       var volume = parseInt(document.getElementById("volSlider").value);
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
        } else{
