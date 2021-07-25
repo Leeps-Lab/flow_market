@@ -30,6 +30,7 @@
 
   .market {
     height: 800px;
+    min-width: 400px;
     /* height: 700px; */
   }
 
@@ -118,6 +119,14 @@
     margin-top: var(--cardSpacing);
   }
 
+  .marginBottom {
+    margin-bottom: var(--cardSpacing);
+  }
+
+  {% comment %} .marginRight {
+    margin-right: var(--cardSpacing);
+  } {% endcomment %}
+
   .col,
   .col-1,
   .col-2,
@@ -151,7 +160,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="minWidth minHeight cardSpacingRight cardSpacingBottomMore">
+    <div class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore">
       <div class="col cardSpacingBottom">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -263,8 +272,8 @@
       <canvas id="klf-line"></canvas>
     </div>
   </div>
-  <div class="row justify-content-center rowSpacingTop">
-    <div class="cardSpacingRight">
+  <div class="row justify-content-center rowSpacingTop ">
+    <div class="cardSpacingRight cardSpacingBottom">
       <div
         class="shadow d-flex align-items-center minWidth fixedHeight  cardWrapper"
         id="ALGORITHM">
@@ -338,13 +347,13 @@
       </div>
     </div>
 
-    <div class=" fixedHeight col-4 cardSpacingRight  " id="CASH">
-      <div class="shadow cardWrapper">
+    <div class="marginBottom minWidth fixedHeight col-4 cardSpacingRight  marginRight" id="CASH">
+      <div class="shadow minWidth cardWrapper">
         <div id="cash-bar"></div>
       </div>
     </div>
 
-    <div class="shadow col-4 fixedHeight borderRadiusFix" id="INVENTORY">
+    <div class="minWidth  shadow col-4 fixedHeight borderRadiusFix" id="INVENTORY">
       <div class="cardWrapper ">
         <div id="inv-bar" width=""></div>
       </div>
