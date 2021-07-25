@@ -19,6 +19,12 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 />
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"
+  integrity="sha512-igVQ7hyQVijOUlfg3OmcTZLwYJIBXU63xL9RC12xBHNpmGJAktDnzl9Iw0J4yrSaQtDxTTVlwhY730vphoVqJQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
 
 {% block scripts %} {% include Constants.scripts_init_graphs_template %}
 {%endblock %}
@@ -30,8 +36,7 @@
        }
    }, false);
 
-   const slider = document.getElementById('slider');
-
+   const slider = document.getElementById('noUiPriceSlider');
 
     Chart.defaults.global.defaultFontFamily = 'Nunito';
 
@@ -41,8 +46,11 @@
    const inventory_bar = graphs[1];
 
    // Initialize the manual inputs
+   const minpriceSliderVal = 6
+   const maxpriceSliderVal = 10
+
    const minpriceSlider = document.getElementById("minpriceSlider");
-   minpriceSlider.value = 10;
+   minpriceSlider.value = minpriceSliderVal;
    minpriceSlider.oninput = function() {
        minpriceValue.innerHTML = "Min Price: " + this.value;
    }
@@ -50,7 +58,7 @@
    minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
 
    const maxpriceSlider = document.getElementById("maxpriceSlider");
-   maxpriceSlider.value = 10;
+   maxpriceSlider.value = maxpriceSliderVal;
    maxpriceSlider.oninput = function() {
        if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
            // In CDA, max price and min price are the same
@@ -69,6 +77,37 @@
        maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
    }
 
+    noUiSlider.create(slider, {
+        start: [minpriceSliderVal, maxpriceSliderVal],
+        connect: true,
+        pips: {
+            mode: "count",
+            values: 3,
+            density: 10,
+
+            {% comment %} mode: 'steps', {% endcomment %}
+            {% comment %} density: 100, {% endcomment %}
+
+            {% comment %} mode: 'range', {% endcomment %}
+            {% comment %} density: 50 // DISCUSS {% endcomment %}
+        },
+        step: 1,
+        tooltips: [
+            wNumb({decimals: 0}),
+            wNumb({decimals: 0}),
+        ],
+        range: {
+            'min': 1,
+            'max': {{max_price}},
+        },
+    });
+
+    slider.noUiSlider.on('change', () => {
+        console.log("hello")
+        console.log(slider.noUiSlider.get(true))
+
+    });
+
    const volSlider = document.getElementById("volSlider");
    volSlider.value = 50;
    volSlider.oninput = function() {
@@ -86,14 +125,6 @@
    rateValue.innerHTML = "Max Rate: " + rateSlider.value;
 
 
-    noUiSlider.create(slider, {
-        start: [20, 80],
-        connect: true,
-        range: {
-            'min': 0,
-            'max': 100
-        }
-    });
 
    // Initialize the algorithm inputs
    let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
@@ -412,8 +443,12 @@
 
    function new_buy(){
        var minprice = parseInt(document.getElementById("minpriceSlider").value);
-       var volume = parseInt(document.getElementById("volSlider").value);
        var maxprice = parseInt(document.getElementById("maxpriceSlider").value);
+       const minprice1 = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
+       const maxprice1 = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+       console.log("noUI buy", minprice1, maxprice1)
+
+       var volume = parseInt(document.getElementById("volSlider").value);
        var u_max;
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
