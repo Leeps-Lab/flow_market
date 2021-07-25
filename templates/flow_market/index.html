@@ -2,9 +2,11 @@
 
 
 <style>
-  /* div {
-    background-color: lightblue;
-  } */
+  :root {
+    --cardSpacing: 24px;
+    --borderRadius: .7rem;
+    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+  }
 
   .fixed {
     width: 400px;
@@ -31,11 +33,6 @@
     height: 400px;
   }
 
-  /* .fixMargin { */
-  /* margin-right: 20px; */
-  /* max-width: 1000px; */
-  /* } */
-
   .manualInput {
     width: 100px;
   }
@@ -48,6 +45,14 @@
     min-width: 280px;
   }
 
+  .shadow {
+    box-shadow: var(--shadow);
+  }
+
+
+
+  #inv-bar,
+  #cash-bar,
   .cardWrapper {
     /* copied from https://zuramai.github.io/mazer/demo/ */
     font-family: Nunito;
@@ -62,9 +67,54 @@
     word-wrap: break-word;
     background-color: #fff;
     background-clip: border-box;
-    border-radius: .7rem;
+    border-radius: var(--borderRadius);
 
-    border: solid;
+    /* border: solid; */
+  }
+
+  .borderRadiusFix {
+    border-radius: var(--borderRadius);
+  }
+
+
+
+
+  .cardSpacingRight {
+    padding-right: var(--cardSpacing) !important;
+  }
+
+  .cardSpacingBottom {
+    padding-bottom: var(--cardSpacing) !important;
+  }
+
+  .fixedHeightModified {
+    height: calc(400px - var(--cardSpacing));
+    /* height: 350px; */
+  }
+
+  .cardSpacingBottomMore {
+    margin-bottom: var(--cardSpacing);
+    height: 300px;
+  }
+
+  .rowSpacingTop {
+    margin-top: var(--cardSpacing);
+  }
+
+  .col,
+  .col-1,
+  .col-2,
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    padding: 0px;
   }
 </style>
 
@@ -84,11 +134,11 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="minWidth minHeight">
-      <div
-        class=" d-flex align-items-center  minWidth history fixedHeight cardWrapper"
-        id="HISTORY">
-        <div class="col ">
+    <div class="minWidth minHeight cardSpacingRight cardSpacingBottomMore">
+      <div class="col cardSpacingBottom">
+        <div
+          class="shadow d-flex align-items-center  minWidth history  fixedHeight cardWrapper"
+          id="HISTORY">
           <div class="row  justify-content-center">
             <div class="" id="BETS">
               <div class="" id="bets2" style="padding-bottom: 0px">
@@ -110,7 +160,7 @@
                   {% endfor %}
                 </table>
                 <!-- <div
-                  style="display: flex; flex-direction: row; margin-top: 20px">
+                  style="display: flex; flex-direction: row; margin-top: var(--cardSpacing)">
                   <p>Cash: <span id="cashInfo">
                       {{ player.cash|floatformat:1 }}
                     </span></p>
@@ -129,49 +179,128 @@
           </div>
         </div>
       </div>
+      <div class="cardSpacingBottomMore ">
+        <div
+          class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+          id="MANUAL">
+          <div class="borderRadiusFix col shadow">
+            <div class="row justify-content-center">
+              <div class="text-center align-items-center">
+                <h2>Manual Input</h2>
+                <form>
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label class="mr-3" id="minpriceValue">Min price:
+                        10</label>
+                      <input type="range" id="minpriceSlider" class="slider"
+                        min="1" max="{{max_price}}" value="10">
+                    </div>
+                  </div>
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="maxpriceValue" class="mr-3">Max price:
+                        10</label>
+                      <input type="range" id="maxpriceSlider" class="slider"
+                        min="1" max="{{max_price}}" value="10">
+                    </div>
+                  </div>
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="volValue" class="mr-3">Max Volume: 50</label>
+                      <input type="range" id="volSlider" class="slider" min="1"
+                        max="{{max_q_max}}" value="50">
+                    </div>
+                  </div>
+                  <div class="form-group row ml-1 mr-1">
+                    <div class="d-flex justify-content-between sliderWrapper">
+                      <label id="rateValue" class="mr-3">Max Volume: 50</label>
+                      <input type="range" id="rateSlider" class="slider" min="1"
+                        max="{{max_u_max}}" value="2.50">
+                    </div>
+                  </div>
+                </form>
+                <button type="button" id="sendBid" class="btn mr-2 btn-primary"
+                  onclick="new_buy()">
+                  Send Buy
+                </button>
+                <button type="button" id="sendAsk" class="btn btn-danger"
+                  onclick="new_sell()">
+                  Send Sell
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8 shadow market cardWrapper" id="MARKET">
+      <canvas id="klf-line"></canvas>
+    </div>
+  </div>
+  <div class="row justify-content-center rowSpacingTop">
+    <div class="cardSpacingRight">
       <div
-        class="cardWrapper d-flex align-items-center  manual minWidth fixedHeight"
-        id="MANUAL">
+        class="shadow d-flex align-items-center minWidth fixedHeight  cardWrapper"
+        id="ALGORITHM">
         <div class="col">
           <div class="row justify-content-center">
-            <div class="text-center align-items-center">
-              <h2>Manual Input</h2>
+            <div class="text-center">
+              <h2>Algorithmic Input</h2>
               <form>
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
-                    <label class="mr-3" id="minpriceValue">Min price: 10</label>
-                    <input type="range" id="minpriceSlider" class="slider"
+                    <label class="mr-3" id="algo-timeValue">Time value</label>
+                    <input type="range" id="algo-timeSlider" class="slider"
+                      min="2" max="20" value="10">
+                  </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="algo-quantityValue" class="mr-3">Quantity
+                      Value</label>
+                    <input type="range" id="algo-quantitySlider" class="slider"
+                      min="1" max="10" value="5">
+                  </div>
+                </div>
+                <div class="form-group row ml-1 mr-1">
+                  <div class="d-flex justify-content-between sliderWrapper">
+                    <label id="algo-minpriceValue" class="mr-3">Min
+                      Price</label>
+                    <input type="range" id="algo-minpriceSlider" class="slider"
                       min="1" max="{{max_price}}" value="10">
                   </div>
                 </div>
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="maxpriceValue" class="mr-3">Max price: 10</label>
-                    <input type="range" id="maxpriceSlider" class="slider"
+                    <label id="algo-maxpriceValue" class="mr-3">Max Volume:
+                      50</label>
+                    <input type="range" id="algo-maxpriceSlider" class="slider"
                       min="1" max="{{max_price}}" value="10">
                   </div>
                 </div>
+                <!--  -->
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="volValue" class="mr-3">Max Volume: 50</label>
-                    <input type="range" id="volSlider" class="slider" min="1"
-                      max="{{max_q_max}}" value="50">
+                    <label id="algo-volValue" class="mr-3">Volume</label>
+                    <input type="range" id="algo-volSlider" class="slider"
+                      min="1" max="{{max_q_max}}" value="50">
                   </div>
                 </div>
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="rateValue" class="mr-3">Max Volume: 50</label>
-                    <input type="range" id="rateSlider" class="slider" min="1"
-                      max="{{max_u_max}}" value="2.50">
+                    <label id="algo-rateValue" class="mr-3">Max Volume:
+                      50</label>
+                    <input type="range" id="algo-rateSlider" class="slider"
+                      min="1.0" max="{{max_u_max}}" value="2.50">
                   </div>
                 </div>
               </form>
-              <button type="button" id="sendBid" class="btn mr-2 btn-primary"
-                onclick="new_buy()">
+              <button type="button" id="algo-sendBid" class="btn btn-primary"
+                onclick="new_buy_algo()">
                 Send Buy
               </button>
-              <button type="button" id="sendAsk" class="btn btn-danger"
-                onclick="new_sell()">
+              <button type="button" id="algo-sendAsk" class="btn btn-danger"
+                onclick="new_sell_algo()">
                 Send Sell
               </button>
             </div>
@@ -179,83 +308,17 @@
         </div>
       </div>
     </div>
-    <div class="col-8 market cardWrapper" id="MARKET">
-      <canvas id="klf-line"></canvas>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="d-flex align-items-center minWidth fixedHeight  cardWrapper"
-      id="ALGORITHM">
-      <div class="col">
-        <div class="row justify-content-center">
-          <div class="text-center">
-            <h2>Algorithmic Input</h2>
-            <form>
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label class="mr-3" id="algo-timeValue">Time value</label>
-                  <input type="range" id="algo-timeSlider" class="slider"
-                    min="2" max="20" value="10">
-                </div>
-              </div>
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label id="algo-quantityValue" class="mr-3">Quantity
-                    Value</label>
-                  <input type="range" id="algo-quantitySlider" class="slider"
-                    min="1" max="10" value="5">
-                </div>
-              </div>
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label id="algo-minpriceValue" class="mr-3">Min Price</label>
-                  <input type="range" id="algo-minpriceSlider" class="slider"
-                    min="1" max="{{max_price}}" value="10">
-                </div>
-              </div>
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label id="algo-maxpriceValue" class="mr-3">Max Volume:
-                    50</label>
-                  <input type="range" id="algo-maxpriceSlider" class="slider"
-                    min="1" max="{{max_price}}" value="10">
-                </div>
-              </div>
-              <!--  -->
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label id="algo-volValue" class="mr-3">Volume</label>
-                  <input type="range" id="algo-volSlider" class="slider" min="1"
-                    max="{{max_q_max}}" value="50">
-                </div>
-              </div>
-              <div class="form-group row ml-1 mr-1">
-                <div class="d-flex justify-content-between sliderWrapper">
-                  <label id="algo-rateValue" class="mr-3">Max Volume:
-                    50</label>
-                  <input type="range" id="algo-rateSlider" class="slider"
-                    min="1.0" max="{{max_u_max}}" value="2.50">
-                </div>
-              </div>
-            </form>
-            <button type="button" id="algo-sendBid" class="btn btn-primary"
-              onclick="new_buy_algo()">
-              Send Buy
-            </button>
-            <button type="button" id="algo-sendAsk" class="btn btn-danger"
-              onclick="new_sell_algo()">
-              Send Sell
-            </button>
-          </div>
-        </div>
+
+    <div class=" fixedHeight col-4 cardSpacingRight  " id="CASH">
+      <div class="shadow cardWrapper">
+        <div id="cash-bar"></div>
       </div>
     </div>
 
-    <div class="fixedHeight col-4  cardWrapper" id="CASH">
-      <div id="cash-bar" width=""></div>
-    </div>
-    <div class="col-4 fixedHeight  cardWrapper" id="INVENTORY">
-      <div id="inv-bar" width=""></div>
+    <div class="shadow col-4 fixedHeight borderRadiusFix" id="INVENTORY">
+      <div class="cardWrapper ">
+        <div id="inv-bar" width=""></div>
+      </div>
     </div>
   </div>
 </div>
