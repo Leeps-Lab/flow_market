@@ -35,8 +35,10 @@
            console.log("begin round");
        }
    }, false);
+   const isCDA = '{{treatment}}' === 'cda';
+   const isFLO = '{{treatment}}' === 'flo';
+   const isFBA = '{{treatment}}' === 'fba';
 
-   const slider = document.getElementById('noUiPriceSlider');
 
     Chart.defaults.global.defaultFontFamily = 'Nunito';
 
@@ -77,30 +79,57 @@
        maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
    }
 
-    noUiSlider.create(slider, {
-        start: [minpriceSliderVal, maxpriceSliderVal],
-        connect: true,
-        pips: {
-            mode: "count",
-            values: 3,
-            density: 10,
+    const slider = document.getElementById('noUiPriceSlider');
+    if (isCDA || isFBA) {
+        noUiSlider.create(slider, {
+            start: [maxpriceSliderVal],
+            connect: true,
+            pips: {
+                mode: "count",
+                values: 3,
+                density: 10,
 
-            {% comment %} mode: 'steps', {% endcomment %}
-            {% comment %} density: 100, {% endcomment %}
+                {% comment %} mode: 'steps', {% endcomment %}
+                {% comment %} density: 100, {% endcomment %}
 
-            {% comment %} mode: 'range', {% endcomment %}
-            {% comment %} density: 50 // DISCUSS {% endcomment %}
-        },
-        step: 1,
-        tooltips: [
-            wNumb({decimals: 0}),
-            wNumb({decimals: 0}),
-        ],
-        range: {
-            'min': 1,
-            'max': {{max_price}},
-        },
-    });
+                {% comment %} mode: 'range', {% endcomment %}
+                {% comment %} density: 50 // DISCUSS {% endcomment %}
+            },
+            step: 1,
+            tooltips: [
+                wNumb({decimals: 0}),
+            ],
+            range: {
+                'min': 1,
+                'max': {{max_price}},
+            },
+        });
+    } else if (isFLO) {
+        noUiSlider.create(slider, {
+            start: [minpriceSliderVal, maxpriceSliderVal],
+            connect: true,
+            pips: {
+                mode: "count",
+                values: 3,
+                density: 10,
+
+                {% comment %} mode: 'steps', {% endcomment %}
+                {% comment %} density: 100, {% endcomment %}
+
+                {% comment %} mode: 'range', {% endcomment %}
+                {% comment %} density: 50 // DISCUSS {% endcomment %}
+            },
+            step: 1,
+            tooltips: [
+                wNumb({decimals: 0}),
+                wNumb({decimals: 0}),
+            ],
+            range: {
+                'min': 1,
+                'max': {{max_price}},
+            },
+        });
+    }
 
     slider.noUiSlider.on('change', () => {
         console.log("hello")
@@ -444,8 +473,15 @@
    function new_buy(){
        {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
        {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
-       const minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
-       const maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+       let maxprice;
+       let minprice;
+       if (isCDA || isFBA) {
+            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get())
+            minprice = maxprice
+       } else if (isFLO) {
+            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+            minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
+       }
        console.log("noUI buy", minprice, maxprice)
 
        var volume = parseInt(document.getElementById("volSlider").value);
@@ -477,8 +513,16 @@
    function new_sell(){
        {% comment %} var minprice = parseInt(document.getElementById("minpriceSlider").value); {% endcomment %}
        {% comment %} var maxprice = parseInt(document.getElementById("maxpriceSlider").value); {% endcomment %}
-       const minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
-       const maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+
+       let maxprice;
+       let minprice;
+       if (isCDA || isFBA) {
+            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get())
+            minprice = maxprice
+       } else if (isFLO) {
+            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
+            minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
+       }
        console.log("noUI sell", minprice, maxprice)
 
        var u_max;
