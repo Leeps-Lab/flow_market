@@ -557,6 +557,14 @@
        var time = parseInt(document.getElementById("algo-timeSlider").value);
        var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
        var u_max;
+       console.log({
+        minprice,
+        volume ,
+        maxprice,
+        time ,
+        quantity_per,
+        u_max,
+       })
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
        } else {
