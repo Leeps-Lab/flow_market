@@ -527,12 +527,12 @@
        }
        if(data['type'] == 'clear'){
            klf_line.data.datasets[2].data = [];
-  klf_line.update();
+           klf_line.update();
        }
        if(data['type'] == 'buy' || data['type'] == 'sell' || data['type'] == 'regraph'){
            console.log(data);
            graphBids(klf_line, data['buys']);
-  graphAsks(klf_line, data['sells']);
+           graphAsks(klf_line, data['sells']);
        }
        if(data['type'] == 'clearing_price'){
            console.log(data);
@@ -540,14 +540,14 @@
            // READ
            if('{{treatment}}' != 'cda') graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']); // TEST changes
            graphBids(klf_line, data['buys']);
-  graphAsks(klf_line, data['sells']);
+           graphAsks(klf_line, data['sells']);
        }
        if(data['type'] == 'update'){
            console.log(data);
            document.getElementById("cashInfo").innerHTML ="Cash " + Number.parseFloat(data['cash']).toFixed(2);
            document.getElementById("invInfo").innerHTML = "Inventory " + Number.parseFloat( data['inventory']).toFixed(2);
            updateProfit(cash_bar, data['cash']);
-  updateVolume(inventory_bar, data['inventory']);
+           updateVolume(inventory_bar, data['inventory']);
        }
    };
 
