@@ -19,6 +19,9 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 />
+
+{% block scripts %} {% include Constants.scripts_init_graphs_template %}
+{%endblock %}
 <script>
    document.addEventListener('DOMContentLoaded', function() {
        if({{player.id_in_group}} == 1){
@@ -27,7 +30,7 @@
        }
    }, false);
 
-    var slider = document.getElementById('slider');
+   var slider = document.getElementById('slider');
 
     noUiSlider.create(slider, {
         start: [20, 80],
@@ -41,171 +44,6 @@
     Chart.defaults.global.defaultFontFamily = 'Nunito';
 
 
-   function init_graphs() {
-       var cash_ctx = document.getElementById('cash-bar');
-       var cash_bar = Highcharts.chart('cash-bar', {
-           credits: {
-    enabled: false
-  },
-           title: {
-               // text: 'Cash'
-               text: undefined
-           },
-
-           yAxis: {
-               title: {
-                   // text: 'Cash'
-                   text: undefined
-               }
-           },
-
-           xAxis: {
-               title: {
-                   text: 'Time'
-               }
-           },
-
-           legend: {
-               layout: 'vertical',
-               align: 'right',
-               verticalAlign: 'middle'
-           },
-
-           plotOptions: {
-               series: {
-                   label: {
-                       connectorAllowed: false
-                   },
-                   marker: {
-                       enabled: false
-                   }
-               }
-           },
-
-           series: [{
-               name: 'Cash',
-               data: [{{player.cash}}]
-           }],
-
-           responsive: {
-               rules: [{
-                   condition: {
-                       maxWidth: 500
-                   }
-               }]
-           }
-       });
-
-
-       var inv_ctx = document.getElementById('inv-bar');
-       var inventory_bar = Highcharts.chart('inv-bar', {
-           credits: {
-    enabled: false
-  },
-           title: {
-               // text: 'Inventory'
-               text: undefined
-           },
-
-           yAxis: {
-               title: {
-                   // text: 'Units'
-                   text: undefined
-               }
-           },
-
-           xAxis: {
-               title: {
-                   text: 'Time'
-               }
-
-           },
-
-           legend: {
-               layout: 'vertical',
-               align: 'right',
-               verticalAlign: 'middle'
-           },
-
-           plotOptions: {
-               series: {
-                   label: {
-                       connectorAllowed: false
-                   },
-                   marker: {
-                       enabled: false
-                   }
-               }
-           },
-
-           series: [{
-               name: 'Inventory',
-               data: [{{player.inventory}}]
-           }],
-
-           responsive: {
-               rules: [{
-                   condition: {
-                       maxWidth: 500
-                   }
-               }]
-           }
-       });
-
-       var klf_line_ctx = document.getElementById('klf-line');
-       var klf_line = new Chart(klf_line_ctx, {
-           type: 'scatter',
-           options: {
-               maintainAspectRatio: false,
-               scales: {
-                   yAxes: [{
-                       ticks: {
-                           // beginAtZero: true,
-                       },
-                   }]
-               },
-               title: {
-                   display: true,
-                   text: 'Market',
-               },
-               elements: {
-                   point: {
-                       radius: 3,
-                       pointStyle: 'dash',
-                   },
-               },
-           },
-           data: {
-               datasets: [{
-                   label: 'Bids',
-                   borderColor: "#0000fe",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }, {
-                   label: 'Asks',
-                   borderColor: "#fb0009",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }, {
-                   label: 'Clearing Price',
-                   borderColor: "#55d22e",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }]
-           },
-       });
-
-       return [cash_bar, inventory_bar, klf_line];
-   }
 
    let graphs = init_graphs();
    let klf_line = graphs[2];

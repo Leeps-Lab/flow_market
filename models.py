@@ -36,7 +36,10 @@ class Constants(BaseConstants):
     num_rounds = 1
 
     index_template = 'flow_market/index.html'
+
     scripts_template = 'flow_market/scripts.html'
+    scripts_init_graphs_template = 'flow_market/helperFuncs/init_graphs.html'
+
     style_template = 'flow_market/style.html'
 
 
