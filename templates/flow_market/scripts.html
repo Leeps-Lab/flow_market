@@ -30,7 +30,61 @@
        }
    }, false);
 
-   var slider = document.getElementById('slider');
+   const slider = document.getElementById('slider');
+
+
+    Chart.defaults.global.defaultFontFamily = 'Nunito';
+
+   const graphs = init_graphs();
+   const klf_line = graphs[2];
+   const cash_bar = graphs[0];
+   const inventory_bar = graphs[1];
+
+   // Initialize the manual inputs
+   const minpriceSlider = document.getElementById("minpriceSlider");
+   minpriceSlider.value = 10;
+   minpriceSlider.oninput = function() {
+       minpriceValue.innerHTML = "Min Price: " + this.value;
+   }
+   const minpriceValue = document.getElementById("minpriceValue");
+   minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
+
+   const maxpriceSlider = document.getElementById("maxpriceSlider");
+   maxpriceSlider.value = 10;
+   maxpriceSlider.oninput = function() {
+       if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+           // In CDA, max price and min price are the same
+           maxpriceValue.innerHTML = "Price: " + this.value;
+           minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
+           minpriceSlider.value = this.value;
+       } else {
+           maxpriceValue.innerHTML = "Max Price: " + this.value;
+       }
+   }
+   const maxpriceValue = document.getElementById("maxpriceValue");
+   // In CDA, max price and min price are the same
+   if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
+       maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
+   } else {
+       maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
+   }
+
+   const volSlider = document.getElementById("volSlider");
+   volSlider.value = 50;
+   volSlider.oninput = function() {
+       volValue.innerHTML = "Max Volume: " + this.value;
+   }
+   const volValue = document.getElementById("volValue");
+   volValue.innerHTML = "Max Volume: " + volSlider.value;
+
+   const rateSlider = document.getElementById("rateSlider");
+   rateSlider.value = 3;
+   rateSlider.oninput = function() {
+       rateValue.innerHTML = "Max Rate: " + this.value;
+   }
+   const rateValue = document.getElementById("rateValue");
+   rateValue.innerHTML = "Max Rate: " + rateSlider.value;
+
 
     noUiSlider.create(slider, {
         start: [20, 80],
@@ -41,64 +95,7 @@
         }
     });
 
-    Chart.defaults.global.defaultFontFamily = 'Nunito';
-
-   const graphs = init_graphs();
-   const klf_line = graphs[2];
-   const cash_bar = graphs[0];
-   const inventory_bar = graphs[1];
-
-   // Initialize the UI elements
-   let minpriceSlider = document.getElementById("minpriceSlider");
-   let minpriceValue = document.getElementById("minpriceValue");
-   let volSlider = document.getElementById("volSlider");
-   let volValue = document.getElementById("volValue");
-   let rateSlider = document.getElementById("rateSlider");
-   let rateValue = document.getElementById("rateValue");
-   let maxpriceSlider = document.getElementById("maxpriceSlider");
-   let maxpriceValue = document.getElementById("maxpriceValue");
-
-   minpriceSlider.value = 10;
-   minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
-
-   volSlider.value = 50;
-   volValue.innerHTML = "Max Volume: " + volSlider.value;
-
-   rateSlider.value = 3;
-   rateValue.innerHTML = "Max Rate: " + rateSlider.value;
-
-   maxpriceSlider.value = 10;
-   // From demo: in CDA, max price and min price are the same
-   if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-       maxpriceValue.innerHTML = "Price: " + maxpriceSlider.value;
-   } else {
-       maxpriceValue.innerHTML = "Max Price: " + maxpriceSlider.value;
-   }
-
-   minpriceSlider.oninput = function() {
-       minpriceValue.innerHTML = "Min Price: " + this.value;
-   }
-
-   volSlider.oninput = function() {
-       volValue.innerHTML = "Max Volume: " + this.value;
-   }
-
-   rateSlider.oninput = function() {
-       rateValue.innerHTML = "Max Rate: " + this.value;
-   }
-
-   maxpriceSlider.oninput = function() {
-       if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-           // From demo: in CDA, max price and min price are the same
-           // console.log("minprice slider applied")
-           maxpriceValue.innerHTML = "Price: " + this.value;
-           minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
-           minpriceSlider.value = this.value;
-       } else {
-           maxpriceValue.innerHTML = "Max Price: " + this.value;
-       }
-   }
-
+   // Initialize the algorithm inputs
    let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
    let algo_minpriceValue = document.getElementById("algo-minpriceValue");
    let algo_volSlider = document.getElementById("algo-volSlider");
