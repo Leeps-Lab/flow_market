@@ -6,6 +6,19 @@
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"
+  integrity="sha512-jWNpWAWx86B/GZV4Qsce63q5jxx/rpWnw812vh0RE+SBIo/mmepwOSQkY2eVQnMuE28pzUEO7ux0a5sJX91g8A=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"
+  integrity="sha512-40vN6DdyQoxRJCw0klEUwZfTTlcwkOLKpP8K8125hy9iF4fi8gPpWZp60qKC6MYAFaond8yQds7cTMVU8eMbgA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
 <script>
    document.addEventListener('DOMContentLoaded', function() {
        if({{player.id_in_group}} == 1){
@@ -13,6 +26,17 @@
            console.log("begin round");
        }
    }, false);
+
+    {% comment %} var slider = document.getElementById('slider');
+
+    noUiSlider.create(slider, {
+        start: [20, 80],
+        connect: true,
+        range: {
+            'min': 0,
+            'max': 100
+        }
+    }); {% endcomment %}
 
     Chart.defaults.global.defaultFontFamily = 'Nunito';
 
