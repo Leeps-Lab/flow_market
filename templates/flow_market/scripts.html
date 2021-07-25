@@ -43,22 +43,20 @@
 
     Chart.defaults.global.defaultFontFamily = 'Nunito';
 
-
-
-   let graphs = init_graphs();
-   let klf_line = graphs[2];
-   let cash_bar = graphs[0];
-   let inventory_bar = graphs[1];
+   const graphs = init_graphs();
+   const klf_line = graphs[2];
+   const cash_bar = graphs[0];
+   const inventory_bar = graphs[1];
 
    // Initialize the UI elements
-   var minpriceSlider = document.getElementById("minpriceSlider");
-   var minpriceValue = document.getElementById("minpriceValue");
-   var volSlider = document.getElementById("volSlider");
-   var volValue = document.getElementById("volValue");
-   var rateSlider = document.getElementById("rateSlider");
-   var rateValue = document.getElementById("rateValue");
-   var maxpriceSlider = document.getElementById("maxpriceSlider");
-   var maxpriceValue = document.getElementById("maxpriceValue");
+   let minpriceSlider = document.getElementById("minpriceSlider");
+   let minpriceValue = document.getElementById("minpriceValue");
+   let volSlider = document.getElementById("volSlider");
+   let volValue = document.getElementById("volValue");
+   let rateSlider = document.getElementById("rateSlider");
+   let rateValue = document.getElementById("rateValue");
+   let maxpriceSlider = document.getElementById("maxpriceSlider");
+   let maxpriceValue = document.getElementById("maxpriceValue");
 
    minpriceSlider.value = 10;
    minpriceValue.innerHTML = "Min Price: " + minpriceSlider.value;
@@ -101,18 +99,18 @@
        }
    }
 
-   var algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
-   var algo_minpriceValue = document.getElementById("algo-minpriceValue");
-   var algo_volSlider = document.getElementById("algo-volSlider");
-   var algo_volValue = document.getElementById("algo-volValue");
-   var algo_rateSlider = document.getElementById("algo-rateSlider");
-   var algo_rateValue = document.getElementById("algo-rateValue");
-   var algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
-   var algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
-   var algo_timeSlider = document.getElementById("algo-timeSlider");
-   var algo_timeValue = document.getElementById("algo-timeValue");
-   var algo_quantitySlider = document.getElementById("algo-quantitySlider");
-   var algo_quantityValue = document.getElementById("algo-quantityValue");
+   let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
+   let algo_minpriceValue = document.getElementById("algo-minpriceValue");
+   let algo_volSlider = document.getElementById("algo-volSlider");
+   let algo_volValue = document.getElementById("algo-volValue");
+   let algo_rateSlider = document.getElementById("algo-rateSlider");
+   let algo_rateValue = document.getElementById("algo-rateValue");
+   let algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
+   let algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
+   let algo_timeSlider = document.getElementById("algo-timeSlider");
+   let algo_timeValue = document.getElementById("algo-timeValue");
+   let algo_quantitySlider = document.getElementById("algo-quantitySlider");
+   let algo_quantityValue = document.getElementById("algo-quantityValue");
 
    algo_minpriceSlider.value = 10;
    algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
