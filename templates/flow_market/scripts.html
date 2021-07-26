@@ -117,7 +117,7 @@
        pips: {
            mode: 'values',
            values: [1, 50, {{max_q_max}}],
-           density: 10
+           density: 5,
        },
        step: 1,
        tooltips: [
@@ -238,12 +238,12 @@
 
    const noUiAlgoVolSlider = document.getElementById("noUiAlgoVolSlider")
    noUiSlider.create(noUiAlgoVolSlider, {
-       start: [10],
+       start: [50],
        connect: true,
        pips: {
-            mode: "count",
-            values: 3,
-            density: 10,
+           mode: 'values',
+           values: [1, 50, {{max_q_max}}],
+           density: 5,
        },
        step: 1,
        tooltips: [
@@ -251,7 +251,7 @@
        ],
        range: {
            'min': 1,
-           'max': {{max_price}},
+           'max': {{max_q_max}},
        },
    });
 
