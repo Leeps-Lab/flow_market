@@ -43,15 +43,6 @@
     /* height: 700px; */
   }
 
-  /* .graph {
-    padding: 10px;
-  } */
-
-  #inv-bar,
-  #cash-bar {
-    padding: 20px;
-  }
-
   .minWidth {
     min-width: 400px;
   }
@@ -68,14 +59,8 @@
     height: 400px;
   }
 
-
-
   .manualInput {
     width: 100px;
-  }
-
-
-  width: 150px;
   }
 
   .sliderWrapper {
@@ -172,12 +157,10 @@
   }
 
   .hideDebug {
-    margin-bottom: 200px;
+    margin-bottom: 500px;
   }
 
   .noUiSlider {
-    /* color: red !important;
-    background-color: red !important; */
     position: relative;
     bottom: -8px;
   }
@@ -202,13 +185,11 @@
 
   .noUi-handle {
     height: 20px !important;
-    /* background-color: hotpink !important; */
   }
 
   .noUi-handle::before,
   .noUi-handle::after {
     height: 6px !important;
-    /* background-color: black !important; */
   }
 
 
@@ -231,33 +212,20 @@
   }
 
   .cardHeader {
-    /* background-color: chartreuse !important; */
     margin-top: -10px;
   }
-
-  /* .noUi-pips.noUi-pips-horizontal { */
-  /* background-color: coral; */
-  /* position: relative; */
-  /* z-index: 1; */
-  /* } */
 
   .btn {
     position: relative;
     z-index: 100;
   }
 
-  /* .form-group.row {
-    width: 350px !important;
-  } */
   #noUiRateSlider {
     position: relative;
-    /* margin-left: auto; */
-    /* margin-right: 0; */
-    /* right: -100px; */
   }
 </style>
 
-
+<!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 <div class="container-fluid noMargin hideDebug">
   <div class="mt-2 mb-2 row justify-content-center fixMargin " id="HEADER">
     <div class="text-center minWidth ">
@@ -457,14 +425,14 @@
       class="marginBottom minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
-        <div id="cash-bar"></div>
+        <div class="pt-4 pl-4 pb-1 pr-1" id="cash-bar"></div>
       </div>
     </div>
 
     <div class="minWidth  col-4 fixedHeight borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
-        <div id="inv-bar" width=""></div>
+        <div class="pt-4 pl-4 pb-1 pr-1" id="inv-bar" width=""></div>
       </div>
     </div>
   </div>

@@ -198,8 +198,8 @@
 
    const noUiAlgoPriceSlider = document.getElementById('noUiAlgoPriceSlider');
    if (isCDA || isFBA) {
-       noUiSlider.create(slider, {
-           start: [noUiAlgoPriceSlider],
+       noUiSlider.create(noUiAlgoPriceSlider, {
+           start: [10],
            connect: true,
            pips: {
                mode: "count",
@@ -277,12 +277,11 @@
 
   if ('{{treatment}}' != 'flo') {
       // Because cda and fba has a fixed u_max
-      rateValue.remove();
-      document.getElementById("rateValueWrapper").remove()
-      document.getElementById("noUiRateSliderWrapper").remove()
+      document.querySelector('.noUiRateSliderWrapper').remove()
+      document.querySelector('.noUiAlgoRateSliderWrapper').remove()
 
-      algo_rateSlider.remove();
-      algo_rateValue.remove();
+      {% comment %} algo_rateSlider.remove(); {% endcomment %}
+      {% comment %} algo_rateValue.remove(); {% endcomment %}
   }
 
   function calcDemand(buy, price) {
