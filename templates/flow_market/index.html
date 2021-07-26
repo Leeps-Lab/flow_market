@@ -399,8 +399,8 @@
                       min="1" max="{{max_price}}" value="10">
                   </div>
                 </div>
-
                 <!--  -->
+
                 <div class="mb-5 noUiAlgoVolSliderWrapper form-group row mt-4">
                   <div class=" d-flex justify-content-between sliderWrapper">
                     <label class="mr-4" id="">Volume</label>
@@ -412,10 +412,17 @@
 
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="algo-rateValue" class="mr-3">Max Volume:
-                      50</label>
+                    <label id="algo-rateValue" class="mr-3">RATE</label>
                     <input type="range" id="algo-rateSlider" class="slider"
                       min="1.0" max="{{max_u_max}}" value="2.50">
+                  </div>
+                </div>
+
+                <div class="mb-5 noUiAlgoRateSliderWrapper form-group row mt-4">
+                  <div class=" d-flex justify-content-between sliderWrapper">
+                    <label class="mr-4" id="">Rate</label>
+                    <div id="noUiAlgoRateSlider" class="noUiSlider"
+                      style="min-width:200px;"></div>
                   </div>
                 </div>
               </form>

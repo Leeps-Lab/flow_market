@@ -253,6 +253,25 @@
       algo_rateValue.innerHTML = "Max Rate: " + this.value;
   }
 
+   const noUiAlgoRateSlider = document.getElementById("noUiAlgoRateSlider")
+   noUiSlider.create(noUiAlgoRateSlider, {
+       start: [3],
+       connect: true,
+       pips: {
+            mode: "count",
+            values: 3,
+            density: 30,
+       },
+       step: 1,
+       tooltips: [
+           wNumb({decimals: 0}),
+       ],
+       range: {
+           'min': 1,
+           'max': {{max_u_max}},
+       },
+   });
+
 
   if ('{{treatment}}' != 'flo') {
       // Because cda and fba has a fixed u_max
@@ -545,7 +564,7 @@
       if('{{treatment}}' != 'flo'){ // use rate slider if flo
           u_max = parseInt({{max_u_max}});
       } else {
-          u_max = parseInt(document.getElementById("algo-rateSlider").value);
+            u_max = parseInt(document.getElementById("noUiAlgoRateSlider").noUiSlider.get())
       }
       console.log({
        minprice,
@@ -582,8 +601,8 @@
 
       if('{{treatment}}' != 'flo'){ // use rate slider if flo
           u_max = parseInt({{max_u_max}});
-      } else{
-          u_max = parseInt(document.getElementById("algo-rateSlider").value);
+      } else {
+          u_max = parseInt(document.getElementById("noUiAlgoRateSlider").noUiSlider.get())
       }
 
       console.log({
