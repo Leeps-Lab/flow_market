@@ -210,6 +210,17 @@
     /* background-color: chartreuse !important; */
     margin-top: -10px;
   }
+
+  .noUi-pips.noUi-pips-horizontal {
+    /* background-color: coral; */
+    /* position: relative; */
+    /* z-index: 1; */
+  }
+
+  .btn {
+    position: relative;
+    z-index: 100;
+  }
 </style>
 
 
@@ -353,6 +364,13 @@
                 <h4 class="mb-4 text-center">Algorithmic Input</h4>
               </div>
               <form>
+                <div class="noUiTimeSliderWrapper form-group row mt-4">
+                  <div class=" d-flex justify-content-between sliderWrapper">
+                    <label class="mr-4" id="">Expiration Time</label>
+                    <div id="noUiTimeSlider" class="noUiSlider"
+                      style="min-width:200px;"></div>
+                  </div>
+                </div>
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
                     <label class="mr-3" id="algo-timeValue">Time value</label>
