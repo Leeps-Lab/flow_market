@@ -128,14 +128,6 @@
         },
     });
 
-   {% comment %} const volSlider = document.getElementById("volSlider"); {% endcomment %}
-   {% comment %} volSlider.value = volSliderVal; {% endcomment %}
-   {% comment %} volSlider.oninput = function() { {% endcomment %}
-       {% comment %} volValue.innerHTML = "Max Volume: " + this.value; {% endcomment %}
-   {% comment %} } {% endcomment %}
-   {% comment %} const volValue = document.getElementById("volValue"); {% endcomment %}
-   {% comment %} volValue.innerHTML = "Max Volume: " + volSlider.value; {% endcomment %}
-
    const rateSlider = document.getElementById("rateSlider");
    rateSlider.value = 3;
    rateSlider.oninput = function() {
@@ -143,8 +135,6 @@
    }
    const rateValue = document.getElementById("rateValue");
    rateValue.innerHTML = "Max Rate: " + rateSlider.value;
-
-
 
    // Initialize the algorithm inputs
    let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
@@ -312,23 +302,22 @@
                });
                points.push({x: price, y: agg_supply});
            });
-       }else{
+       } else {
            // if treatment is cda, sort the buy orders,
            buys.sort((a, b) => (a['p_max'] < b['p_max']) ? 1 : -1);
            var volume = 0.0;
-  var points = [];
+            var points = [];
 
-           buys.forEach(function (buy, _index, _array) {
-    // Graph (price, old_vol) -> (price, new_vol)
-    points.push({x: buy['p_max'], y: volume});
-    volume += buy['q_max'];
-    points.push({x: buy['p_max'], y: volume});
-  });
+            buys.forEach(function (buy, _index, _array) {
+            // Graph (price, old_vol) -> (price, new_vol)
+            points.push({x: buy['p_max'], y: volume});
+            volume += buy['q_max'];
+            points.push({x: buy['p_max'], y: volume});
+        });
 
-  // insert a horizontal line to 0 to show limit order
-  points.push({x: 0.0, y: volume})
+        // insert a horizontal line to 0 to show limit order
+        points.push({x: 0.0, y: volume})
        }
-
 
        chart.data.datasets[0].data = points;
        chart.update();
@@ -353,21 +342,20 @@
                });
                points.push({x: price, y: agg_supply});
            });
-       } else{
+       } else {
            sells.sort((a, b) => (a['p_max'] > b['p_max']) ? 1 : -1);
-  var volume = 0.0;
-  var points = [];
-  sells.forEach(function (sell, _index, _array) {
-    // Graph (price, old_vol) -> (price, new_vol)
-    points.push({x: sell['p_max'], y: volume});
-    volume += sell['q_max'];
-    points.push({x: sell['p_max'], y: volume});
-  });
+            var volume = 0.0;
+            var points = [];
+            sells.forEach(function (sell, _index, _array) {
+                // Graph (price, old_vol) -> (price, new_vol)
+                points.push({x: sell['p_max'], y: volume});
+                volume += sell['q_max'];
+                points.push({x: sell['p_max'], y: volume});
+            });
 
-  // insert a horizontal line to max price = 130 to show limit order
-  points.push({x: 20.0, y: volume})
+            // insert a horizontal line to max price = 130 to show limit order
+            points.push({x: 20.0, y: volume})
        }
-
 
        chart.data.datasets[1].data = points;
        chart.update();
@@ -436,8 +424,8 @@
        }
        console.log("noUI buy", minprice, maxprice)
 
-       {% comment %} var volume = parseInt(document.getElementById("volSlider").value); {% endcomment %}
        const volume = parseInt(document.getElementById("noUiVolSlider").noUiSlider.get())
+
        var u_max;
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
@@ -475,18 +463,13 @@
        }
        console.log("noUI sell", minprice, maxprice)
 
-       var u_max;
-       {% comment %} var volume = parseInt(document.getElementById("volSlider").value); {% endcomment %}
         const volume = parseInt(document.getElementById("noUiVolSlider").noUiSlider.get())
+
+       var u_max;
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
        } else{
            u_max = parseInt(document.getElementById("rateSlider").value);
-       }
-
-       if(minprice > maxprice){
-           alert("Minimum Price should be less than or equal to Maximum Price")
-           return;
        }
 
        liveSend({
@@ -516,16 +499,11 @@
         quantity_per,
         u_max,
        })
+
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
        } else {
            u_max = parseInt(document.getElementById("algo-rateSlider").value);
-       }
-
-
-       if(minprice > maxprice){
-           alert("Minimum Price should be less than or equal to Maximum Price")
-           return;
        }
 
        liveSend({
@@ -549,15 +527,11 @@
        var time = parseInt(document.getElementById("algo-timeSlider").value);
        var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
        var u_max;
+
        if('{{treatment}}' != 'flo'){ // use rate slider if flo
            u_max = parseInt({{max_u_max}});
        } else{
            u_max = parseInt(document.getElementById("algo-rateSlider").value);
-       }
-
-       if(minprice > maxprice){
-           alert("Minimum Price should be less than or equal to Maximum Price")
-           return;
        }
 
        liveSend({
