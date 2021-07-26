@@ -38,8 +38,8 @@
   .market {
     height: 800px;
     min-width: 400px;
-    padding: 20px !important;
-    padding-right: 32px !important;
+    /* padding: 20px !important; */
+    /* padding-right: 32px !important; */
     /* height: 700px; */
   }
 
@@ -353,7 +353,11 @@
       </div>
     </div>
     <div class="col-8 shadow market cardWrapper conditionalMargin" id="MARKET">
-      <canvas id="klf-line"></canvas>
+      <div class="pb-5 pl-4 pr-4 w-100 h-100"
+        style="padding-top: 14px !important;">
+        <h4 class="mb-2 text-center">Market</h4>
+        <canvas id="klf-line" class="h-100 pb-2"></canvas>
+      </div>
     </div>
   </div>
   <div class="row justify-content-center  ">
@@ -425,14 +429,24 @@
       class="marginBottom minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-4 pb-1 pr-1" id="cash-bar"></div>
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h4 class="text-center mb-3">Cash</h4>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
       </div>
     </div>
 
     <div class="minWidth  col-4 fixedHeight borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
-        <div class="pt-4 pl-4 pb-1 pr-1" id="inv-bar" width=""></div>
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h4 class="text-center mb-3">Inventory</h4>
+          </div>
+          <div class="" id="inv-bar"></div>
+        </div>
       </div>
     </div>
   </div>

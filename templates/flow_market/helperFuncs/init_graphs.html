@@ -41,7 +41,9 @@
 
            series: [{
                name: 'Cash',
-               data: [{{player.cash}}]
+               data: [{{player.cash}}],
+               showInLegend: false,
+               color: '#17a2b8',
            }],
 
            responsive: {
@@ -97,7 +99,9 @@
 
            series: [{
                name: 'Inventory',
-               data: [{{player.inventory}}]
+               showInLegend: false,
+               color: '#17a2b8',
+               data: [{{player.inventory}}],
            }],
 
            responsive: {
@@ -122,7 +126,7 @@
                    }]
                },
                title: {
-                   display: true,
+                   display: false,
                    text: 'Market',
                },
                elements: {
@@ -135,7 +139,7 @@
            data: {
                datasets: [{
                    label: 'Bids',
-                   borderColor: "#0000fe",
+                   borderColor: "#007bff",
                    backgroundColor: 'rgba(0, 0, 0, 0)',
                    fill: false,
                    showLine: true,
@@ -143,7 +147,7 @@
                    data: [],
                }, {
                    label: 'Asks',
-                   borderColor: "#fb0009",
+                   borderColor: "#dc3545",
                    backgroundColor: 'rgba(0, 0, 0, 0)',
                    fill: false,
                    showLine: true,
@@ -151,7 +155,7 @@
                    data: [],
                }, {
                    label: 'Clearing Price',
-                   borderColor: "#55d22e",
+                   borderColor: "#28a745",
                    backgroundColor: 'rgba(0, 0, 0, 0)',
                    fill: false,
                    showLine: true,
