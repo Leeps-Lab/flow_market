@@ -155,16 +155,50 @@
 
   .noUi-handle:hover {
     cursor: grab;
+    filter: brightness(95%);
   }
 
   .noUi-handle:active {
     cursor: grabbing;
-    filter: brightness(95%);
+    filter: brightness(90%);
   }
 
   .noUi-connect {
-    /* background-color: var(--primary); */
     background: var(--info) !important;
+  }
+
+  .noUi-horizontal {
+    height: 10px !important;
+  }
+
+  .noUi-handle {
+    height: 20px !important;
+    /* background-color: hotpink !important; */
+  }
+
+  .noUi-handle::before,
+  .noUi-handle::after {
+    height: 6px !important;
+    /* background-color: black !important; */
+  }
+
+
+  .noUi-tooltip {
+    height: 25px !important;
+    /* line-height: 30px; */
+    font-size: 15px;
+    line-height: 100%;
+    padding-top: 4px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .noUi-pips {
+    height: 10px;
+    font-size: 0.8rem;
+  }
+
+  .noUi-marker-large {
+    height: 5px !important;
   }
 </style>
 
@@ -240,31 +274,34 @@
       <div
         class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
         id="MANUAL">
-        <div class=" p-4  borderRadiusFix col shadow">
+        <div class="pt-2 pb-2 pr-4 pl-4 borderRadiusFix col shadow">
           <div class="row h-100 justify-content-center">
             <div class="col">
               <div
                 class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
-                <h2>Manual Input</h2>
+                <h4>Manual Input</h4>
                 <form>
-                  <div class="form-group row ml-1 mr-1">
+                  <div class="mt-2 form-group row ml-1 mr-1">
                     <div class="d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Price</label>
-                      <div id="noUiPriceSlider" style="width:100%;"></div>
+                      <div id="noUiPriceSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
                     </div>
                   </div>
                   <div
                     class="noUiVolSliderWrapper form-group row ml-1 mr-1 mt-4">
                     <div class=" d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Volume</label>
-                      <div id="noUiVolSlider" style="width:100%;"></div>
+                      <div id="noUiVolSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
                     </div>
                   </div>
                   <div
                     class="noUiRateSliderWrapper form-group row ml-1 mr-1 mt-4">
-                    <div class=" d-flex justify-content-between sliderWrapper">
+                    <div class="d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Rate</label>
-                      <div id="noUiRateSlider" style="width:100%;"></div>
+                      <div id="noUiRateSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
                     </div>
                   </div>
                 </form>
