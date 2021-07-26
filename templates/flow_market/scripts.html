@@ -226,14 +226,24 @@
       }
   }
 
-  let algo_volSlider = document.getElementById("algo-volSlider");
-  let algo_volValue = document.getElementById("algo-volValue");
-  algo_volSlider.value = 50;
-  algo_volValue.innerHTML = "Max Volume: " + algo_volSlider.value;
-  algo_volSlider.oninput = function() {
-      algo_volValue.innerHTML = "Max Volume: " + this.value;
-      console.log(`min: ${minpriceValue} max: ${maxpriceValue}`)
-  }
+   const noUiAlgoVolSlider = document.getElementById("noUiAlgoVolSlider")
+   noUiSlider.create(noUiAlgoVolSlider, {
+       start: [10],
+       connect: true,
+       pips: {
+            mode: "count",
+            values: 3,
+            density: 10,
+       },
+       step: 1,
+       tooltips: [
+           wNumb({decimals: 0}),
+       ],
+       range: {
+           'min': 1,
+           'max': {{max_price}},
+       },
+   });
 
   let algo_rateSlider = document.getElementById("algo-rateSlider");
   let algo_rateValue = document.getElementById("algo-rateValue");
@@ -523,13 +533,20 @@
 
   function new_buy_algo(){
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
-      var volume = parseInt(document.getElementById("algo-volSlider").value);
+      {% comment %} var volume = parseInt(document.getElementById("algo-volSlider").value); {% endcomment %}
+      const volume = parseInt(document.getElementById("noUiAlgoVolSlider").noUiSlider.get())
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
         const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
 
       const quantity_per = parseInt(document.getElementById("noUiAlgoQuantitySlider").noUiSlider.get())
 
       var u_max;
+
+      if('{{treatment}}' != 'flo'){ // use rate slider if flo
+          u_max = parseInt({{max_u_max}});
+      } else {
+          u_max = parseInt(document.getElementById("algo-rateSlider").value);
+      }
       console.log({
        minprice,
        volume ,
@@ -538,12 +555,6 @@
        quantity_per,
        u_max,
       })
-
-      if('{{treatment}}' != 'flo'){ // use rate slider if flo
-          u_max = parseInt({{max_u_max}});
-      } else {
-          u_max = parseInt(document.getElementById("algo-rateSlider").value);
-      }
 
       liveSend({
           'p_min': minprice,
@@ -561,7 +572,8 @@
 
   function new_sell_algo(){
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
-      var volume = parseInt(document.getElementById("algo-volSlider").value);
+      {% comment %} var volume = parseInt(document.getElementById("algo-volSlider").value); {% endcomment %}
+      const volume = parseInt(document.getElementById("noUiAlgoVolSlider").noUiSlider.get())
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
         const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
 
@@ -573,6 +585,16 @@
       } else{
           u_max = parseInt(document.getElementById("algo-rateSlider").value);
       }
+
+      console.log({
+       minprice,
+       volume ,
+       maxprice,
+       time ,
+       quantity_per,
+       u_max,
+      })
+
 
       liveSend({
           'p_min': minprice,
