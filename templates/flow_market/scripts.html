@@ -196,35 +196,45 @@
        },
    });
 
-
-  let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
-  let algo_minpriceValue = document.getElementById("algo-minpriceValue");
-  algo_minpriceSlider.value = 10;
-  algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
-  algo_minpriceSlider.oninput = function() {
-      algo_minpriceValue.innerHTML = "Min Price: " + this.value;
-  }
-
-  let algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
-  let algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
-  algo_maxpriceSlider.value = 10;
-  // From demo: in CDA, max price and min price are the same
-  if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-      algo_maxpriceValue.innerHTML = "Price: " + algo_maxpriceSlider.value;
-  } else {
-      algo_maxpriceValue.innerHTML = "Max Price: " + algo_maxpriceSlider.value;
-  }
-  algo_maxpriceSlider.oninput = function() {
-      if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
-          // From demo: in CDA, max price and min price are the same
-          console.log("minprice slider applied")
-          algo_maxpriceValue.innerHTML = "Price: " + this.value;
-          algo_minpriceValue.innerHTML = "Should be same as max Price: " + this.value;
-          algo_minpriceSlider.value = this.value;
-      } else {
-          algo_maxpriceValue.innerHTML = "Max Price: " + this.value;
-      }
-  }
+   const noUiAlgoPriceSlider = document.getElementById('noUiAlgoPriceSlider');
+   if (isCDA || isFBA) {
+       noUiSlider.create(slider, {
+           start: [noUiAlgoPriceSlider],
+           connect: true,
+           pips: {
+               mode: "count",
+               values: 3,
+               density: 10,
+           },
+           step: 1,
+           tooltips: [
+               wNumb({decimals: 0}),
+           ],
+           range: {
+               'min': 1,
+               'max': {{max_price}},
+           },
+       });
+   } else if (isFLO) {
+       noUiSlider.create(noUiAlgoPriceSlider, {
+           start: [minpriceSliderVal, maxpriceSliderVal],
+           connect: true,
+           pips: {
+               mode: "count",
+               values: 3,
+               density: 10,
+           },
+           step: 1,
+           tooltips: [
+               wNumb({decimals: 0}),
+               wNumb({decimals: 0}),
+           ],
+           range: {
+               'min': 1,
+               'max': {{max_price}},
+           },
+       });
+   }
 
    const noUiAlgoVolSlider = document.getElementById("noUiAlgoVolSlider")
    noUiSlider.create(noUiAlgoVolSlider, {
@@ -244,14 +254,6 @@
            'max': {{max_price}},
        },
    });
-
-  let algo_rateSlider = document.getElementById("algo-rateSlider");
-  let algo_rateValue = document.getElementById("algo-rateValue");
-  algo_rateSlider.value = 3;
-  algo_rateValue.innerHTML = "Max Rate: " + algo_rateSlider.value;
-  algo_rateSlider.oninput = function() {
-      algo_rateValue.innerHTML = "Max Rate: " + this.value;
-  }
 
    const noUiAlgoRateSlider = document.getElementById("noUiAlgoRateSlider")
    noUiSlider.create(noUiAlgoRateSlider, {
@@ -551,16 +553,25 @@
   };
 
   function new_buy_algo(){
-      var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
+      {% comment %} var minprice = parseInt(document.getElementById("algo-minpriceSlider").value); {% endcomment %}
       {% comment %} var volume = parseInt(document.getElementById("algo-volSlider").value); {% endcomment %}
       const volume = parseInt(document.getElementById("noUiAlgoVolSlider").noUiSlider.get())
-      var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-        const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+      {% comment %} var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value); {% endcomment %}
+      const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+
+      let maxprice;
+      let minprice;
+      if (isCDA || isFBA) {
+           maxprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get())
+           minprice = maxprice
+      } else if (isFLO) {
+           maxprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get()[1])
+           minprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get()[0])
+      }
 
       const quantity_per = parseInt(document.getElementById("noUiAlgoQuantitySlider").noUiSlider.get())
 
-      var u_max;
-
+      let u_max;
       if('{{treatment}}' != 'flo'){ // use rate slider if flo
           u_max = parseInt({{max_u_max}});
       } else {
@@ -590,15 +601,25 @@
   };
 
   function new_sell_algo(){
-      var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
+      {% comment %} var minprice = parseInt(document.getElementById("algo-minpriceSlider").value); {% endcomment %}
       {% comment %} var volume = parseInt(document.getElementById("algo-volSlider").value); {% endcomment %}
       const volume = parseInt(document.getElementById("noUiAlgoVolSlider").noUiSlider.get())
-      var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-        const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+      {% comment %} var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value); {% endcomment %}
+      const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+
+      let maxprice;
+      let minprice;
+      if (isCDA || isFBA) {
+           maxprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get())
+           minprice = maxprice
+      } else if (isFLO) {
+           maxprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get()[1])
+           minprice = parseInt(document.getElementById("noUiAlgoPriceSlider").noUiSlider.get()[0])
+      }
 
       const quantity_per = parseInt(document.getElementById("noUiAlgoQuantitySlider").noUiSlider.get())
-      var u_max;
 
+      let u_max;
       if('{{treatment}}' != 'flo'){ // use rate slider if flo
           u_max = parseInt({{max_u_max}});
       } else {

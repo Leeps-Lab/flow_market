@@ -363,78 +363,53 @@
               <div class="cardHeader w-100 text-align-right">
                 <h4 class="mb-4 text-center">Algorithmic Input</h4>
               </div>
-              <form>
-                <div class="mb-5 noUiAlgoTimeSliderWrapper form-group row mt-4">
-                  <div class=" d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Expiration Time</label>
-                    <div id="noUiAlgoTimeSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
+              <div class="mb-4 noUiAlgoTimeSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Expiration Time</label>
+                  <div id="noUiAlgoTimeSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
                 </div>
-                <div
-                  class="mb-5 noUiAlgoQuantitySliderWrapper form-group row mt-4">
-                  <div class=" d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Units at a time</label>
-                    <div id="noUiAlgoQuantitySlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
+              </div>
+              <div
+                class="mb-4 noUiAlgoQuantitySliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Units at a time</label>
+                  <div id="noUiAlgoQuantitySlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
                 </div>
-
-                <!-- TODO -->
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="algo-minpriceValue" class="mr-3">Min
-                      Price</label>
-                    <input type="range" id="algo-minpriceSlider" class="slider"
-                      min="1" max="{{max_price}}" value="10">
-                  </div>
+              </div>
+              <div class="mb-4 noUiAlgoPriceSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Price</label>
+                  <div id="noUiAlgoPriceSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
                 </div>
-
-                <!-- TODO -->
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="algo-maxpriceValue" class="mr-3">Max
-                      Price</label>
-                    <input type="range" id="algo-maxpriceSlider" class="slider"
-                      min="1" max="{{max_price}}" value="10">
-                  </div>
+              </div>
+              <div class="mb-4 noUiAlgoVolSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Volume</label>
+                  <div id="noUiAlgoVolSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
                 </div>
-                <!--  -->
-
-                <div class="mb-5 noUiAlgoVolSliderWrapper form-group row mt-4">
-                  <div class=" d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Volume</label>
-                    <div id="noUiAlgoVolSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
+              </div>
+              <div class="noUiAlgoRateSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Rate</label>
+                  <div id="noUiAlgoRateSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
                 </div>
-
-
-                <div class="form-group row ml-1 mr-1">
-                  <div class="d-flex justify-content-between sliderWrapper">
-                    <label id="algo-rateValue" class="mr-3">RATE</label>
-                    <input type="range" id="algo-rateSlider" class="slider"
-                      min="1.0" max="{{max_u_max}}" value="2.50">
-                  </div>
-                </div>
-
-                <div class="mb-5 noUiAlgoRateSliderWrapper form-group row mt-4">
-                  <div class=" d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Rate</label>
-                    <div id="noUiAlgoRateSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
-                </div>
-              </form>
+              </div>
               <div>
-                <button type="button" id="algo-sendBid"
-                  class="btn mr-3 btn-primary" onclick="new_buy_algo()">
-                  Send Buy
-                </button>
-                <button type="button" id="algo-sendAsk" class="btn btn-danger"
-                  onclick="new_sell_algo()">
-                  Send Sell
-                </button>
+                <div class="mt-2">
+                  <button type="button" id="algo-sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy_algo()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="algo-sendAsk" class="btn btn-danger"
+                    onclick="new_sell_algo()">
+                    Send Sell
+                  </button>
+                </div>
               </div>
             </div>
           </div>
