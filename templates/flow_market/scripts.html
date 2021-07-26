@@ -153,15 +153,19 @@
   // Initialize the algorithm inputs
   // min="2" max="20" value="10"
   const algo_timeSliderVal = 3;
+  const algo_quantitySliderVal = 6;
 
    const noUiAlgoTimeSlider = document.getElementById("noUiAlgoTimeSlider")
    noUiSlider.create(noUiAlgoTimeSlider, {
        start: [algo_timeSliderVal],
        connect: true,
        pips: {
-           mode: 'values',
-           values: [2, 10, 20],
-           density: 10
+           {% comment %} mode: 'values', {% endcomment %}
+           {% comment %} values: [2, 10, 20], {% endcomment %}
+           {% comment %} density: 10 {% endcomment %}
+            mode: "count",
+            values: 3,
+            density: 10,
        },
        step: 1,
        tooltips: [
@@ -173,13 +177,25 @@
        },
    });
 
-  let algo_quantitySlider = document.getElementById("algo-quantitySlider");
-  let algo_quantityValue = document.getElementById("algo-quantityValue");
-  algo_quantitySlider.value = 10;
-  algo_quantityValue.innerHTML = "Units at a time: " + algo_quantitySlider.value;
-  algo_quantitySlider.oninput = function() {
-      algo_quantityValue.innerHTML = "Units at a time: " + this.value;
-  }
+   const noUiAlgoQuantitySlider = document.getElementById("noUiAlgoQuantitySlider")
+   noUiSlider.create(noUiAlgoQuantitySlider, {
+       start: [algo_quantitySliderVal],
+       connect: true,
+       pips: {
+            mode: "count",
+            values: 3,
+            density: 10,
+       },
+       step: 1,
+       tooltips: [
+           wNumb({decimals: 0}),
+       ],
+       range: {
+           'min': 1,
+           'max': 10,
+       },
+   });
+
 
   let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
   let algo_minpriceValue = document.getElementById("algo-minpriceValue");
@@ -509,10 +525,10 @@
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
       var volume = parseInt(document.getElementById("algo-volSlider").value);
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-      {% comment %} var time = parseInt(document.getElementById("algo-timeSlider").value); {% endcomment %}
         const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
 
-      var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
+      const quantity_per = parseInt(document.getElementById("noUiAlgoQuantitySlider").noUiSlider.get())
+
       var u_max;
       console.log({
        minprice,
@@ -547,10 +563,9 @@
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
       var volume = parseInt(document.getElementById("algo-volSlider").value);
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-      {% comment %} var time = parseInt(document.getElementById("algo-timeSlider").value); {% endcomment %}
         const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
 
-      var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
+      const quantity_per = parseInt(document.getElementById("noUiAlgoQuantitySlider").noUiSlider.get())
       var u_max;
 
       if('{{treatment}}' != 'flo'){ // use rate slider if flo
