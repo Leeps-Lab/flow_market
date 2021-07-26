@@ -151,28 +151,46 @@
 
 
   // Initialize the algorithm inputs
-  let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
-  let algo_minpriceValue = document.getElementById("algo-minpriceValue");
-  let algo_volSlider = document.getElementById("algo-volSlider");
-  let algo_volValue = document.getElementById("algo-volValue");
-  let algo_rateSlider = document.getElementById("algo-rateSlider");
-  let algo_rateValue = document.getElementById("algo-rateValue");
-  let algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
-  let algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
-  let algo_timeSlider = document.getElementById("algo-timeSlider");
-  let algo_timeValue = document.getElementById("algo-timeValue");
+  // min="2" max="20" value="10"
+  const algo_timeSliderVal = 3;
+
+   const noUiAlgoTimeSlider = document.getElementById("noUiAlgoTimeSlider")
+   noUiSlider.create(noUiAlgoTimeSlider, {
+       start: [algo_timeSliderVal],
+       connect: true,
+       pips: {
+           mode: 'values',
+           values: [2, 10, 20],
+           density: 10
+       },
+       step: 1,
+       tooltips: [
+           wNumb({decimals: 0}),
+       ],
+       range: {
+           'min': 2,
+           'max': 20,
+       },
+   });
+
   let algo_quantitySlider = document.getElementById("algo-quantitySlider");
   let algo_quantityValue = document.getElementById("algo-quantityValue");
+  algo_quantitySlider.value = 10;
+  algo_quantityValue.innerHTML = "Units at a time: " + algo_quantitySlider.value;
+  algo_quantitySlider.oninput = function() {
+      algo_quantityValue.innerHTML = "Units at a time: " + this.value;
+  }
 
+  let algo_minpriceSlider = document.getElementById("algo-minpriceSlider");
+  let algo_minpriceValue = document.getElementById("algo-minpriceValue");
   algo_minpriceSlider.value = 10;
   algo_minpriceValue.innerHTML = "Min Price: " + algo_minpriceSlider.value;
+  algo_minpriceSlider.oninput = function() {
+      algo_minpriceValue.innerHTML = "Min Price: " + this.value;
+  }
 
-  algo_volSlider.value = 50;
-  algo_volValue.innerHTML = "Max Volume: " + algo_volSlider.value;
-
-  algo_rateSlider.value = 3;
-  algo_rateValue.innerHTML = "Max Rate: " + algo_rateSlider.value;
-
+  let algo_maxpriceSlider = document.getElementById("algo-maxpriceSlider");
+  let algo_maxpriceValue = document.getElementById("algo-maxpriceValue");
   algo_maxpriceSlider.value = 10;
   // From demo: in CDA, max price and min price are the same
   if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
@@ -180,27 +198,6 @@
   } else {
       algo_maxpriceValue.innerHTML = "Max Price: " + algo_maxpriceSlider.value;
   }
-
-  algo_timeSlider.value = 3;
-  algo_timeValue.innerHTML = "Expiration time: " + algo_timeSlider.value;
-
-  algo_quantitySlider.value = 10;
-  algo_quantityValue.innerHTML = "Units at a time: " + algo_quantitySlider.value;
-
-
-  algo_minpriceSlider.oninput = function() {
-      algo_minpriceValue.innerHTML = "Min Price: " + this.value;
-  }
-
-  algo_volSlider.oninput = function() {
-      algo_volValue.innerHTML = "Max Volume: " + this.value;
-      console.log(`min: ${minpriceValue} max: ${maxpriceValue}`)
-  }
-
-  algo_rateSlider.oninput = function() {
-      algo_rateValue.innerHTML = "Max Rate: " + this.value;
-  }
-
   algo_maxpriceSlider.oninput = function() {
       if ('{{treatment}}' === 'cda' || '{{treatment}}' === 'fba') {
           // From demo: in CDA, max price and min price are the same
@@ -213,13 +210,23 @@
       }
   }
 
-  algo_timeSlider.oninput = function() {
-      algo_timeValue.innerHTML = "Expiration time: " + this.value;
+  let algo_volSlider = document.getElementById("algo-volSlider");
+  let algo_volValue = document.getElementById("algo-volValue");
+  algo_volSlider.value = 50;
+  algo_volValue.innerHTML = "Max Volume: " + algo_volSlider.value;
+  algo_volSlider.oninput = function() {
+      algo_volValue.innerHTML = "Max Volume: " + this.value;
+      console.log(`min: ${minpriceValue} max: ${maxpriceValue}`)
   }
 
-  algo_quantitySlider.oninput = function() {
-      algo_quantityValue.innerHTML = "Units at a time: " + this.value;
+  let algo_rateSlider = document.getElementById("algo-rateSlider");
+  let algo_rateValue = document.getElementById("algo-rateValue");
+  algo_rateSlider.value = 3;
+  algo_rateValue.innerHTML = "Max Rate: " + algo_rateSlider.value;
+  algo_rateSlider.oninput = function() {
+      algo_rateValue.innerHTML = "Max Rate: " + this.value;
   }
+
 
   if ('{{treatment}}' != 'flo') {
       // Because cda and fba has a fixed u_max
@@ -502,7 +509,9 @@
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
       var volume = parseInt(document.getElementById("algo-volSlider").value);
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-      var time = parseInt(document.getElementById("algo-timeSlider").value);
+      {% comment %} var time = parseInt(document.getElementById("algo-timeSlider").value); {% endcomment %}
+        const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+
       var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
       var u_max;
       console.log({
@@ -538,7 +547,9 @@
       var minprice = parseInt(document.getElementById("algo-minpriceSlider").value);
       var volume = parseInt(document.getElementById("algo-volSlider").value);
       var maxprice = parseInt(document.getElementById("algo-maxpriceSlider").value);
-      var time = parseInt(document.getElementById("algo-timeSlider").value);
+      {% comment %} var time = parseInt(document.getElementById("algo-timeSlider").value); {% endcomment %}
+        const time = parseInt(document.getElementById("noUiAlgoTimeSlider").noUiSlider.get())
+
       var quantity_per = parseInt(document.getElementById("algo-quantitySlider").value);
       var u_max;
 
