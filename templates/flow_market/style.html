@@ -1,0 +1,86 @@
+{% load otree %}
+
+
+<style>
+  .otree-title.page-header {
+    {% comment %} background-color: red; {% endcomment %}
+    display: none;
+  }
+
+
+  .otree-body.container {
+    {% comment %} background-color: lightpink; {% endcomment %}
+    margin-left: 0;
+    max-width: 100%;
+    margin-right: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 90%;
+  }
+
+  td,
+  th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+
+  .border {
+    border-radius: 18px;
+    border: 2px solid;
+    padding: 20px;
+    margin: 5px;
+  }
+
+  .button {
+    background-color: #4caf50;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 7px 14px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .button:hover {
+    filter: brightness(85%);
+  }
+
+  .buttonGreen {
+    background-color: #4caf50;
+  }
+
+  /* Green */
+  .buttonBlue {
+    background-color: #008cba;
+  }
+
+  /* Blue */
+  .buttonRed {
+    background-color: #f44336;
+  }
+
+  /* Red */
+  .buttonGray {
+    background-color: #e7e7e7;
+    color: black;
+  }
+
+  /* Gray */
+  .buttonBlack {
+    background-color: #555555;
+  }
+
+  /* Black */
+
+  .spacing {
+    padding-bottom: 5px;
+  }
+</style>

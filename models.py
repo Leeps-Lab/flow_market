@@ -1,10 +1,21 @@
+# from otree.api import (  # type: ignore
+#     models,
+#     BaseConstants,
+#     BaseSubsession,
+#     BaseGroup,
+#     BasePlayer,
+#     ExtraModel,
+# )
 from otree.api import (  # type: ignore
     models,
+    widgets,
     BaseConstants,
     BaseSubsession,
     BaseGroup,
     BasePlayer,
     ExtraModel,
+    Currency as c,
+    currency_range,
 )
 import csv
 from otree import live  # type: ignore
@@ -23,6 +34,13 @@ class Constants(BaseConstants):
     name_in_url = 'flow_market'
     players_per_group = None
     num_rounds = 1
+
+    index_template = 'flow_market/index.html'
+
+    scripts_template = 'flow_market/scripts.html'
+    scripts_init_graphs_template = 'flow_market/helperFuncs/init_graphs.html'
+
+    style_template = 'flow_market/style.html'
 
 
 def parse_config(config_file):
@@ -50,7 +68,8 @@ def parse_config(config_file):
 
 class Subsession(BaseSubsession):
     def creating_session(self):
-        self.group_randomly()
+        # ENABLE
+        # self.group_randomly()
         for p in self.get_players():
             p.init_cash_inv()
 
@@ -167,6 +186,8 @@ class Group(BaseGroup):
                             self.execute_bet, data)
         return
 
+    # seems to be updating price and inv correctly here for executing bets
+    # HERE works execute_bet
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
         if data['direction'] == 'buy':
@@ -366,8 +387,17 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
+                # HERE1 wrong seems to be wrong here
+                # seller.updateProfit(trader_vol * clearing_price)
+                # seller.updateVolume(-trader_vol)
+
+                # from executing bets... lets copy this:
+                # player.updateProfit(-data['quantity']*data['limit_price'])
+                # player.updateVolume(data['quantity'])
+
                 seller.updateProfit(trader_vol * clearing_price)
                 seller.updateVolume(-trader_vol)
+
                 #print("Trader " + str(sell['player']) + " Cash: " + str(seller.cash))
                 #print("Trader " + str(sell['player']) + " Inventory: " + str(seller.inventory))
                 # Use live send back to update seller's frontend
@@ -409,8 +439,9 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                buyer.updateProfit(trader_vol * clearing_price)
-                buyer.updateVolume(-trader_vol)
+                # HERE2 check if right here
+                buyer.updateProfit(-trader_vol * clearing_price)
+                buyer.updateVolume(trader_vol)
                 #print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
                 #print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
                 # Use live send back to update buyer's frontend
@@ -462,7 +493,8 @@ class Player(BasePlayer):
                     p.setUpdateRunning()
                 # Setup Bets and File input
                 self.group.init_order_copies()
-                call_with_delay(0, self.group.set_bets)
+                # ENABLE reenable set_bets
+                # call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
                 # Begin Continuously Updating function
                 call_with_delay_infinite(

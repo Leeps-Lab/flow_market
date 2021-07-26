@@ -1,0 +1,447 @@
+{% load otree %}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" />
+
+<style>
+  :root {
+    --cardSpacing: 24px;
+    --borderRadius: .7rem;
+    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+  }
+
+
+  * {
+    /* font-family: Tangerine; */
+    font-family: Lato;
+    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
+  }
+
+  body {
+    background-color: #f8fbff;
+  }
+
+  .fixedAlgoInputHeight {
+    height: 550px;
+  }
+
+
+  /* .form-group.row { */
+  /* background-color: chocolate; */
+  /* } */
+
+  .fixed {
+    width: 400px;
+    height: 400px;
+  }
+
+  .market {
+    height: 800px;
+    min-width: 400px;
+    padding: 20px !important;
+    padding-right: 32px !important;
+    /* height: 700px; */
+  }
+
+  .minWidth {
+    min-width: 400px;
+  }
+
+  .maxWidth {
+    max-width: 400px;
+  }
+
+  .minHeight {
+    height: 800px;
+  }
+
+  .fixedHeight {
+    height: 400px;
+  }
+
+  .manualInput {
+    width: 100px;
+  }
+
+  .sliderWrapper {
+    min-width: 280px;
+  }
+
+  .shadow {
+    box-shadow: var(--shadow);
+  }
+
+
+
+  #inv-bar,
+  #cash-bar,
+  .cardWrapper {
+    /* copied from https://zuramai.github.io/mazer/demo/ */
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: var(--borderRadius);
+
+    /* border: solid; */
+  }
+
+  .borderRadiusFix {
+    border-radius: var(--borderRadius);
+  }
+
+
+
+
+  .cardSpacingRight {
+    padding-right: var(--cardSpacing) !important;
+  }
+
+  .cardSpacingBottom {
+    padding-bottom: var(--cardSpacing) !important;
+  }
+
+  .fixedHeightModified {
+    height: calc(400px - var(--cardSpacing) - (800px - 800px));
+    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
+    /* height: 350px; */
+  }
+
+  .cardSpacingBottomMore {
+    height: 300px;
+  }
+
+  .rowSpacingTop {
+    margin-top: var(--cardSpacing);
+  }
+
+  .marginBottom {
+    margin-bottom: var(--cardSpacing);
+  }
+
+  @media (max-width: 1300px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+    }
+  }
+
+  @media (max-width: 1300px) {
+    .conditionalMargin2 {
+      margin-right: var(--cardSpacing);
+    }
+  }
+
+
+  .col,
+  .col-1,
+  .col-2,
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    padding: 0px;
+  }
+
+  .hideDebug {
+    margin-bottom: 500px;
+  }
+
+  .noUiSlider {
+    position: relative;
+    bottom: -8px;
+  }
+
+  .noUi-handle:hover {
+    cursor: grab;
+    filter: brightness(95%);
+  }
+
+  .noUi-handle:active {
+    cursor: grabbing;
+    filter: brightness(90%);
+  }
+
+  .noUi-connect {
+    background: var(--info) !important;
+  }
+
+  .noUi-horizontal {
+    height: 10px !important;
+  }
+
+  .noUi-handle {
+    height: 20px !important;
+  }
+
+  .noUi-handle::before,
+  .noUi-handle::after {
+    height: 6px !important;
+  }
+
+
+  .noUi-tooltip {
+    height: 25px !important;
+    /* line-height: 30px; */
+    font-size: 15px;
+    line-height: 100%;
+    padding-top: 4px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .noUi-pips {
+    height: 10px;
+    font-size: 0.8rem;
+  }
+
+  .noUi-marker-large {
+    height: 5px !important;
+  }
+
+  .cardHeader {
+    margin-top: -10px;
+  }
+
+  .btn {
+    position: relative;
+    z-index: 100;
+  }
+
+  #noUiRateSlider {
+    position: relative;
+  }
+</style>
+
+<!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
+<div class="container-fluid noMargin hideDebug">
+  <div class="mt-2 mb-2 row justify-content-center fixMargin " id="HEADER">
+    <div class="text-center minWidth ">
+      <h2>Round {{subsession.round_number}}</h1>
+    </div>
+    <div class="col-xl-4  col-6 text-center ">
+      <h2 id="cashInfo" class="">Cash
+        {{ player.cash|floatformat:1 }}
+      </h2>
+    </div>
+    <div class="col-xl-4  col-6 text-center ">
+      <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div
+      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+      <div class="col cardSpacingBottom">
+        <div
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
+          id="HISTORY">
+          <div class="row justify-content-center">
+            <div class="" id="BETS">
+              <div class="" id="bets2">
+                <div class="cardHeader w-100 text-align-right">
+                  <h4 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets</h4>
+                </div>
+                <table>
+                  <tr>
+                    <th>Direction</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Deadline</th>
+                  </tr>
+                  {% for bet in bets %}
+                  <tr>
+                    <td>{{bet.direction}}</td>
+                    <td>{{bet.limit_price}}</td>
+                    <td>{{bet.quantity}}</td>
+                    <td>{{bet.deadline}} ms</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row  justify-content-center">
+            <div>
+
+              <div class="cardHeader w-100 text-align-right">
+                <h4 class="mb-2 text-center" id="ACTIVE_ORDERS">Active Orders
+                </h4>
+              </div>
+              <table>
+                <tr>
+                  <th>Direction</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Deadline</th>
+                </tr>
+                {% for bet in bets %}
+                <tr>
+                  <td>{{bet.direction}}</td>
+                  <td>{{bet.limit_price}}</td>
+                  <td>{{bet.quantity}}</td>
+                  <td>{{bet.deadline}} ms</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+        id="MANUAL">
+        <div class="p-4 borderRadiusFix col shadow">
+          <div class="row h-100 justify-content-center">
+            <div class="col">
+              <div
+                class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
+                <div class="cardHeader w-100 text-align-right">
+                  <h4 class="mb-4 pt-1 text-center">Manual Input</h4>
+                </div>
+                <form class="formPadding">
+                  <div class="form-group row w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Price</label>
+                      <div id="noUiPriceSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                  <div class="noUiVolSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Volume</label>
+                      <div id="noUiVolSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                  <div class="noUiRateSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Rate</label>
+                      <div id="noUiRateSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                </form>
+                <div class="mt-2">
+                  <button type="button" id="sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="sendAsk" class="btn btn-danger"
+                    onclick="new_sell()">
+                    Send Sell
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8 shadow market cardWrapper conditionalMargin" id="MARKET">
+      <canvas id="klf-line"></canvas>
+    </div>
+  </div>
+  <div class="row justify-content-center  ">
+    <div class="cardSpacingRight marginBottom ">
+      <div
+        class="shadow d-flex align-items-center minWidth fixedAlgoInputHeight  cardWrapper"
+        id="ALGORITHM">
+        <div class="col p-4">
+          <div class="row pt-2 h-100 justify-content-center">
+            <div class="text-center d-flex flex-column justify-content-between">
+              <div class="cardHeader w-100 text-align-right">
+                <h4 class="mb-2 text-center">Algorithmic Input</h4>
+              </div>
+              <div class="mb-4 noUiAlgoTimeSliderWrapper form-group row mt-4">
+                <div class="d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Expiration Time</label>
+                  <div id="noUiAlgoTimeSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
+                </div>
+              </div>
+              <div
+                class="mb-4 noUiAlgoQuantitySliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Units at a time</label>
+                  <div id="noUiAlgoQuantitySlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
+                </div>
+              </div>
+              <div class="mb-4 noUiAlgoPriceSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Price</label>
+                  <div id="noUiAlgoPriceSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
+                </div>
+              </div>
+              <div class="mb-4 noUiAlgoVolSliderWrapper form-group row mt-4">
+                <div class="d-flex w-100 justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Volume</label>
+                  <div id="noUiAlgoVolSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
+                </div>
+              </div>
+              <div class="noUiAlgoRateSliderWrapper form-group row mt-4">
+                <div class="w-100 d-flex justify-content-between sliderWrapper">
+                  <label class="mr-4" id="">Rate</label>
+                  <div id="noUiAlgoRateSlider" class="noUiSlider"
+                    style="min-width:200px;"></div>
+                </div>
+              </div>
+              <div>
+                <div class="mt-3">
+                  <button type="button" id="algo-sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy_algo()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="algo-sendAsk" class="btn btn-danger"
+                    onclick="new_sell_algo()">
+                    Send Sell
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="marginBottom minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-4 pb-1 pr-1" id="cash-bar"></div>
+      </div>
+    </div>
+
+    <div class="minWidth  col-4 fixedHeight borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
+      <div class="shadow cardWrapper graph">
+        <div class="pt-4 pl-4 pb-1 pr-1" id="inv-bar" width=""></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+{% block scripts %} {% include Constants.scripts_template %} {% endblock %}
