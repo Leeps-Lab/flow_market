@@ -21,6 +21,11 @@
     background-color: #f8fbff;
   }
 
+
+  .form-group.row {
+    /* background-color: chocolate; */
+  }
+
   .fixed {
     width: 400px;
     height: 400px;
@@ -200,6 +205,11 @@
   .noUi-marker-large {
     height: 5px !important;
   }
+
+  .cardHeader {
+    /* background-color: chartreuse !important; */
+    margin-top: -10px;
+  }
 </style>
 
 
@@ -227,7 +237,9 @@
           <div class="row justify-content-center">
             <div class="" id="BETS">
               <div class="" id="bets2">
-                <h2 class=" text-center">Active bets</h2>
+                <div class="cardHeader w-100 text-align-right">
+                  <h4 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets</h4>
+                </div>
                 <table>
                   <tr>
                     <th>Direction</th>
@@ -250,7 +262,10 @@
           <div class="row  justify-content-center">
             <div>
 
-              <h2 class="text-center" id="ACTIVE_ORDERS">Active orders</h2>
+              <div class="cardHeader w-100 text-align-right">
+                <h4 class="mb-2 text-center" id="ACTIVE_ORDERS">Active Orders
+                </h4>
+              </div>
               <table>
                 <tr>
                   <th>Direction</th>
@@ -274,30 +289,30 @@
       <div
         class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
         id="MANUAL">
-        <div class="pt-2 pb-2 pr-4 pl-4 borderRadiusFix col shadow">
+        <div class="pt-3 pb-3 pr-4 pl-4 borderRadiusFix col shadow">
           <div class="row h-100 justify-content-center">
             <div class="col">
               <div
                 class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
-                <h4>Manual Input</h4>
-                <form>
-                  <div class="mt-2 form-group row ml-1 mr-1">
+                <div class="cardHeader w-100 text-align-right">
+                  <h4 class="mb-4 text-center">Manual Input</h4>
+                </div>
+                <form class="formPadding">
+                  <div class="form-group row">
                     <div class="d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Price</label>
                       <div id="noUiPriceSlider" class="noUiSlider"
                         style="min-width:200px;"></div>
                     </div>
                   </div>
-                  <div
-                    class="noUiVolSliderWrapper form-group row ml-1 mr-1 mt-4">
+                  <div class="noUiVolSliderWrapper form-group row mt-4">
                     <div class=" d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Volume</label>
                       <div id="noUiVolSlider" class="noUiSlider"
                         style="min-width:200px;"></div>
                     </div>
                   </div>
-                  <div
-                    class="noUiRateSliderWrapper form-group row ml-1 mr-1 mt-4">
+                  <div class="noUiRateSliderWrapper form-group row mt-4">
                     <div class="d-flex justify-content-between sliderWrapper">
                       <label class="mr-4" id="">Rate</label>
                       <div id="noUiRateSlider" class="noUiSlider"
@@ -333,8 +348,10 @@
         <div class="col ">
           <div class="row pt-2 h-100 justify-content-center">
             <div
-              class="pb-4 text-center d-flex flex-column justify-content-between">
-              <h2>Algorithmic Input</h2>
+              class="pb-4 pt-2 text-center d-flex flex-column justify-content-between">
+              <div class="cardHeader w-100 text-align-right">
+                <h4 class="mb-4 text-center">Algorithmic Input</h4>
+              </div>
               <form>
                 <div class="form-group row ml-1 mr-1">
                   <div class="d-flex justify-content-between sliderWrapper">
