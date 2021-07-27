@@ -127,6 +127,10 @@
     margin-bottom: var(--cardSpacing);
   }
 
+  .marginBottomFix {
+    margin-bottom: calc(var(--cardSpacing) + 76px);
+  }
+
   @media (max-width: 1300px) {
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
@@ -426,7 +430,7 @@
     </div>
 
     <div
-      class="marginBottom minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
+      class="marginBottomFix minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3">
