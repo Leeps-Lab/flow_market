@@ -274,6 +274,7 @@ class Group(BaseGroup):
             return buy['u_max']
         elif (price > buy['p_max']):
             # Don't trade if price is higher than max willingness to buy
+            # it seems returning 0 for demand disables execution for that specific buy order, I will use this fact in part of my implementation for preventing self trades
             return 0.0
         else:
             # The price fell p_min < price < p_max
@@ -289,6 +290,7 @@ class Group(BaseGroup):
     def calcSupply(self, sell, price):
         if (price < sell['p_min']):
             # Don't trade if price is lower than min willingness to sell
+            # it seems returning 0 for supply disables execution for that specific sell order, I will use this fact in part of my implementation for preventing self trades
             return 0.0
         elif (price >= sell['p_max']):
             if (sell['q_max'] < sell['u_max']):
@@ -310,7 +312,7 @@ class Group(BaseGroup):
     def clearingPrice(self, buys, sells):
         # Get lowest and highest prices in books
         left = 0.0
-        #right = 200.0
+        # right = 200.0
         right = self.max_price()
         curr_iter = 0
         MAX_ITERS = 1000
@@ -334,11 +336,11 @@ class Group(BaseGroup):
                 # We are right of the crossing point
                 right = index
             else:
-                #print("Found cross: " + str(index))
+                # print("Found cross: " + str(index))
                 return index
 
             if (curr_iter == MAX_ITERS):
-                #print("Trouble finding cross in max iterations, got: " + str(index))
+                # print("Trouble finding cross in max iterations, got: " + str(index))
                 return index
 
     # TODO should probably write docstring for this class at some point, since it's so large
@@ -348,9 +350,10 @@ class Group(BaseGroup):
         sells = self.sells()
         payloads = {}
         if len(buys) > 0 and len(sells) > 0:
+            print("len(buys) and len(sells) > 0, executing orders")
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
-            #print("Clearing Price: " + str(clearing_price))
+            # print("Clearing Price: " + str(clearing_price))
             # Graph the clearing price
 
             for player in self.get_players():
@@ -367,7 +370,14 @@ class Group(BaseGroup):
 
             # Update the traders' profits and orders
             # seems to execute sell orders regardless of what the buy order is, by which I mean there just needs to exist >1 buy order
-            #print("----Sells in Update--------------------")
+            # TODO but what about when orders don't cross in cda? why do those orders correctly not go thru?
+            # huh, this code still runs, it just doesn't do anything
+            # DONE find where conditional for cda is implemented in this loop
+            # trader_vol = self.calcSupply(sell, clearing_price)
+            # trader_vol = self.calcDemand(buy, clearing_price)
+            # when cda doesn't cross, the loops still run, but the reason no changes is because trader_vol = 0
+            # so logic to prevent self orders from executing should be implemented in calcDemand()
+            # print("----Sells in Update--------------------")
             for sell in sells:
                 seller = self.get_player_by_id(sell['player'])
 
@@ -385,7 +395,13 @@ class Group(BaseGroup):
 
                 # decrement remaining quantity of order
                 trader_vol = self.calcSupply(sell, clearing_price)
+
+                # HERE implement trading logic here
+
                 sell['q_max'] -= trader_vol
+
+                print("")
+                print("------- debug begin sell ---------")
 
                 # READ what does this do?
                 cache = self.order_copies
@@ -410,6 +426,9 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
+                print(
+                    f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
+
                 seller.updateProfit(trader_vol * clearing_price)
                 seller.updateVolume(-trader_vol)
 
@@ -429,7 +448,7 @@ class Group(BaseGroup):
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
 
-            #print("----Buys in Update--------------------")
+            # print("----Buys in Update--------------------")
             for buy in buys:
                 buyer = self.get_player_by_id(buy['player'])
 
@@ -443,8 +462,14 @@ class Group(BaseGroup):
                       [str(buy['orderID'])])
                 print("------------------------------------------")
 
+                print("")
+                print("------- debug begin buy ---------")
+
                 # decrement remaining quantity of order
                 trader_vol = self.calcDemand(buy, clearing_price)
+
+                # HERE implement trading logic here
+
                 buy['q_max'] -= trader_vol
 
                 # READ what does this do?
@@ -473,8 +498,11 @@ class Group(BaseGroup):
                 # HERE2 check if right here
                 buyer.updateProfit(-trader_vol * clearing_price)
                 buyer.updateVolume(trader_vol)
-                #print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
-                #print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
+
+                print(
+                    f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
+                # print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
+                # print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {"type": 'none'}
@@ -484,6 +512,9 @@ class Group(BaseGroup):
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
+
+            print("------- debug end ---------")
+            print("")
         else:
             # Clear the clearing price graph
             for player in self.get_players():
@@ -527,6 +558,7 @@ class Player(BasePlayer):
                 # ENABLE reenable set_bets
                 # call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
+
                 # Begin Continuously Updating function
                 call_with_delay_infinite(
                     self.group.update_freq(), self.group.update)
