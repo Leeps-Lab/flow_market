@@ -135,13 +135,18 @@
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
     }
-  }
-
-  @media (max-width: 1300px) {
     .conditionalMargin2 {
       margin-right: var(--cardSpacing);
     }
   }
+
+  @media (max-width: 1230px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+      margin-left: -24px;
+    }
+  }
+
 
 
   .col,
@@ -240,13 +245,14 @@
 
   .table-wrapper-scroll-y {
     display: block;
+    overflow: scroll;
     /* cursor: ns-resize; */
   }
 
   .table-wrapper-scroll-y:hover {
     cursor: ns-resize;
     background-color: whitesmoke;
-  }
+  } 
 
   .moveTableUp {
     margin-top: -2px;
