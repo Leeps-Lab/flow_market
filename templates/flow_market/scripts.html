@@ -25,15 +25,23 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 ></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"
+  integrity="sha512-BCMqEPl2dokU3T/EFba7jrfL4FxgY6ryUh4rRC9feZw4yWUslZ3Uf/lPZ5/5UlEjn4prlQTRfIPYQkDrLCZJXA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
 
 {% block scripts %} {% include Constants.scripts_init_graphs_template %}
 {%endblock %}
 <script>
+  // flo-- type: regraph, buys[0].status === "expired"
   document.addEventListener('DOMContentLoaded', function() {
       if({{player.id_in_group}} == 1){
           liveSend({'direction': 'begin'});
           console.log("begin round");
       }
+
   }, false);
   const isCDA = '{{treatment}}' === 'cda';
   const isFLO = '{{treatment}}' === 'flo';
@@ -104,11 +112,6 @@
            },
        });
    }
-   slider.noUiSlider.on('change', () => {
-       console.log("hello")
-       console.log(slider.noUiSlider.get(true))
-
-   });
 
    const noUiVolSlider = document.getElementById("noUiVolSlider")
    noUiSlider.create(noUiVolSlider, {
@@ -448,6 +451,7 @@
   let order_id = 1;
 
   function liveRecv(data){
+      // console.log(data)
       if(data['type'] == 'begin'){
           console.log("Round begin");
       }
@@ -456,12 +460,18 @@
           klf_line.update();
       }
       if(data['type'] == 'buy' || data['type'] == 'sell' || data['type'] == 'regraph'){
+          console.log("received buy/sell/regraph")
           console.log(data);
+          console.log("--------------------------")
+          console.log("")
           graphBids(klf_line, data['buys']);
           graphAsks(klf_line, data['sells']);
       }
       if(data['type'] == 'clearing_price'){
+          console.log("received clearing price")
           console.log(data);
+          console.log("--------------------------")
+          console.log("")
           global_clearing_price = data['clearing_price'];
           // READ
           if('{{treatment}}' != 'cda') graphClearingPrice(klf_line, data['clearing_price'], data['buys'], data['sells']); // TEST changes
@@ -469,7 +479,10 @@
           graphAsks(klf_line, data['sells']);
       }
       if(data['type'] == 'update'){
+          console.log("received update")
           console.log(data);
+          console.log("--------------------------")
+          console.log("")
           document.getElementById("cashInfo").innerHTML ="Cash " + Number.parseFloat(data['cash']).toFixed(2);
           document.getElementById("invInfo").innerHTML = "Inventory " + Number.parseFloat( data['inventory']).toFixed(2);
           updateProfit(cash_bar, data['cash']);
@@ -479,7 +492,7 @@
 
 
 
-  function new_buy(){
+  function new_buy() {
       let maxprice;
       let minprice;
       if (isCDA || isFBA) {
@@ -489,7 +502,6 @@
            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
            minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
       }
-      console.log("noUI buy", minprice, maxprice)
 
       const volume = parseInt(document.getElementById("noUiVolSlider").noUiSlider.get())
 
@@ -500,11 +512,22 @@
             u_max = parseInt(document.getElementById("noUiRateSlider").noUiSlider.get())
       }
 
-
       if(minprice > maxprice){
           alert("Minimum Price should be less than or equal to Maximum Price")
           return;
       }
+
+      const uuid = uuidv4()
+      console.log("frontend sending data:", {
+          'p_min': minprice,
+          'p_max': maxprice,
+          'q_max': volume,
+          'u_max': u_max,
+          'direction': 'buy',
+          'status': 'active',
+          'timestamp':performance.now(),
+          'orderID': uuid
+      })
 
       liveSend({
           'p_min': minprice,
@@ -513,7 +536,8 @@
           'u_max': u_max,
           'direction': 'buy',
           'status': 'active',
-          'timestamp':performance.now()
+          'timestamp':performance.now(),
+          'orderID': uuid
       });
       order_id += 1;
   };
@@ -528,7 +552,6 @@
            maxprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[1])
            minprice = parseInt(document.getElementById("noUiPriceSlider").noUiSlider.get()[0])
       }
-      console.log("noUI sell", minprice, maxprice)
 
        const volume = parseInt(document.getElementById("noUiVolSlider").noUiSlider.get())
 
@@ -546,9 +569,9 @@
           'u_max': u_max,
           'direction': 'sell',
           'status': 'active',
-          'timestamp':performance.now()
+          'timestamp':performance.now(),
+          'orderID': uuidv4()
       });
-
   };
 
   function new_buy_algo(){
@@ -576,6 +599,8 @@
       } else {
             u_max = parseInt(document.getElementById("noUiAlgoRateSlider").noUiSlider.get())
       }
+
+      /*
       console.log({
        minprice,
        volume ,
@@ -584,6 +609,7 @@
        quantity_per,
        u_max,
       })
+      */
 
       liveSend({
           'p_min': minprice,
@@ -595,6 +621,7 @@
           'direction': 'buy_algo',
           'status': 'active',
           'timestamp':performance.now()
+          // TODO need to include uuid like in manual orders 'orderID': uuidv4()
       });
       order_id += 1;
   };
@@ -625,6 +652,7 @@
           u_max = parseInt(document.getElementById("noUiAlgoRateSlider").noUiSlider.get())
       }
 
+      /*
       console.log({
        minprice,
        volume ,
@@ -633,6 +661,7 @@
        quantity_per,
        u_max,
       })
+      */
 
 
       liveSend({
@@ -645,6 +674,7 @@
           'direction': 'sell_algo',
           'status': 'active',
           'timestamp':performance.now()
+          // TODO need to include uuid like in manual orders 'orderID': uuidv4()
       });
 
   };

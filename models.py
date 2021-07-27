@@ -22,6 +22,7 @@ from otree import live  # type: ignore
 from .delayedFunct import call_with_delay_infinite, call_with_delay
 from jsonfield import JSONField
 import time
+import uuid
 
 author = 'LeepsLab'
 
@@ -135,9 +136,10 @@ class Group(BaseGroup):
                     'timestamp': data['timestamp']
                 })
             # Send out updated orderbooks to update graph on frontend
+            # CONT see if we can get orderID into payload here
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
+                    'type': 'buy', 'buys test': self.buys(), 'sells': self.sells()}
             print("Sending orderbooks")
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
@@ -160,6 +162,7 @@ class Group(BaseGroup):
                     'timestamp': data['timestamp']
                 })
             # Send out updated orderbooks to update graph on frontend
+            # CONT see if we can get orderID into payload here
             for player in self.get_players():
                 payloads[player.participant.code] = {
                     'type': 'sell', 'buys': self.buys(), 'sells': self.sells()}
@@ -538,7 +541,7 @@ class Player(BasePlayer):
     status = models.StringField()
     updateRunning = models.BooleanField(initial=False)
 
-    currentID = models.IntegerField(initial=0)
+    currentID = models.StringField()
 
     def init_cash_inv(self):
         self.cash = self.group.start_cash()
@@ -574,13 +577,27 @@ class Player(BasePlayer):
             call_with_delay(0, self.group.new_sell_algo, data)
             return {0: {'type': 'sell_algo'}}
 
+        print("got uuid:", data["orderID"])
+
+        # BUG should be updating uuid here
+        self.updateUUID(data["orderID"])
+
         # Input new order
         self.new_order(data)
+
         return_data = {'type': data['direction'], 'buys': self.group.buys(
         ), 'sells': self.group.sells()}
 
         return {0: return_data}
 
+    def updateUUID(self, uuid):
+        self.currentID = uuid
+
+    # TODO make orderID unique for both all orders, not just within buys and within sells
+    # not possible since each player makes their own orders and inserts their own id
+    # it would be possible if Group were to make the orders
+    # so for now just use player and orderID both to identify the orders
+    # just going to use UUID in player
     def new_order(self, order):
         self.direction = order['direction']
         self.q_max = order['q_max']
@@ -606,8 +623,6 @@ class Player(BasePlayer):
 
         self.group.new_order(order, self.id_in_group, self.currentID)
 
-        self.currentID += 1
-
     def updateProfit(self, profit):
         self.cash += profit
 
@@ -618,7 +633,8 @@ class Player(BasePlayer):
 class Order(ExtraModel):
     player = models.Link(Player)
     group = models.Link(Group)
-    orderID = models.IntegerField()
+    # orderID = models.IntegerField()
+    orderID = models.StringField()
     direction = models.StringField()  # 'buy', 'sell'
     q_max = models.FloatField()
     u_max = models.FloatField()
