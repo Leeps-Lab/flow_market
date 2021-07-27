@@ -341,6 +341,8 @@ class Group(BaseGroup):
                 #print("Trouble finding cross in max iterations, got: " + str(index))
                 return index
 
+    # TODO should probably write docstring for this class at some point, since it's so large
+
     def update(self):
         buys = self.buys()
         sells = self.sells()
@@ -355,16 +357,37 @@ class Group(BaseGroup):
                 payloads[player.participant.code] = {
                     "type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells}
 
-            live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-                                 0].participant._index_in_pages, payloads)
+            # READ what does this do? What is it for?
+            # maybe send back clearing price for market graph?
+            live._live_send_back(
+                self.get_players()[0].participant._session_code,
+                self.get_players()[0].participant._index_in_pages,
+                payloads
+            )
 
             # Update the traders' profits and orders
+            # seems to execute sell orders regardless of what the buy order is, by which I mean there just needs to exist >1 buy order
             #print("----Sells in Update--------------------")
             for sell in sells:
                 seller = self.get_player_by_id(sell['player'])
-                # print(self.order_copies[str(seller.id_in_group)][str(sell['orderID'])])
+
+                print("----------------------- sell ------------------------")
+                print(f'processing sell: {sell}')
+                print(f'seller: {seller}')
+                print("")
+                print(
+                    f'self.order_copies[seller.id_in_group][sell["orderID"] = [{seller.id_in_group}] [{sell["orderID"]}]')
+                print(
+                    f'self.order_copies[sell["player"]][sell["orderID"] = [{sell["player"]}] [{sell["orderID"]}]')
+                print(self.order_copies[str(
+                    seller.id_in_group)][str(sell['orderID'])])
+                print("-----------------------------------------------")
+
+                # decrement remaining quantity of order
                 trader_vol = self.calcSupply(sell, clearing_price)
                 sell['q_max'] -= trader_vol
+
+                # READ what does this do?
                 cache = self.order_copies
                 cache[str(seller.id_in_group)][str(
                     sell['orderID'])]['q_max'] -= trader_vol
@@ -387,21 +410,17 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                # HERE1 wrong seems to be wrong here
-                # seller.updateProfit(trader_vol * clearing_price)
-                # seller.updateVolume(-trader_vol)
-
-                # from executing bets... lets copy this:
-                # player.updateProfit(-data['quantity']*data['limit_price'])
-                # player.updateVolume(data['quantity'])
-
                 seller.updateProfit(trader_vol * clearing_price)
                 seller.updateVolume(-trader_vol)
 
-                #print("Trader " + str(sell['player']) + " Cash: " + str(seller.cash))
-                #print("Trader " + str(sell['player']) + " Inventory: " + str(seller.inventory))
+                # print("Trader " + str(sell['player']
+                #                       ) + " Cash: " + str(seller.cash))
+                # print("Trader " + str(sell['player']) +
+                #       " Inventory: " + str(seller.inventory))
+
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
+                    # READ what does this do?
                     payloads[player.participant.code] = {"type": 'none'}
 
                 payloads[seller.participant.code] = {
@@ -413,10 +432,22 @@ class Group(BaseGroup):
             #print("----Buys in Update--------------------")
             for buy in buys:
                 buyer = self.get_player_by_id(buy['player'])
+
+                print("--------------------buy----------------------")
+                print(f'processing buy: {buy}')
+                print(f'buyer: {buyer}')
+                print("")
+                print(
+                    f'self.order_copies[buy["player"]][buy["orderID"] = [{buy["player"]}] [{buy["orderID"]}]')
                 print(self.order_copies[str(buy['player'])]
                       [str(buy['orderID'])])
+                print("------------------------------------------")
+
+                # decrement remaining quantity of order
                 trader_vol = self.calcDemand(buy, clearing_price)
                 buy['q_max'] -= trader_vol
+
+                # READ what does this do?
                 cache = self.order_copies
                 cache[str(buy['player'])][str(buy['orderID'])
                                           ]['q_max'] -= trader_vol
