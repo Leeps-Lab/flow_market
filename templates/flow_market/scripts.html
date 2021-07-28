@@ -158,7 +158,6 @@
     return numToBeValid;
   }
 
-  console.log();
 
   Chart.defaults.global.defaultFontFamily = 'Nunito';
 
@@ -615,23 +614,23 @@
     if (data['type'] === 'regraph') {
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
-      console.warn('should check if order has expired here', data);
+    //   console.warn('should check if order has expired here', data);
       updateOrderHistory(data);
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
-      console.log('received buy/sell/regraph');
+    //   console.log('received buy/sell/regraph');
       // console.log(data);
       // console.log('--------------------------');
-      console.log('');
+    //   console.log('');
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'clearing_price') {
-      console.log('received clearing price');
-      console.log(data);
-      console.log('--------------------------');
-      console.log('');
+    //   console.log('received clearing price');
+    //   console.log(data);
+    //   console.log('--------------------------');
+    //   console.log('');
       global_clearing_price = data['clearing_price'];
       // READ
       if ('{{treatment}}' != 'cda')
@@ -645,10 +644,10 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'update') {
-      console.log('received update');
-      console.log(data);
-      console.log('--------------------------');
-      console.log('');
+    //   console.log('received update');
+    //   console.log(data);
+    //   console.log('--------------------------');
+    //   console.log('');
       document.getElementById('cashInfo').innerHTML =
         'Cash ' + Number.parseFloat(data['cash']).toFixed(2);
       document.getElementById('invInfo').innerHTML =
@@ -710,7 +709,7 @@
     if (valueToBeat === undefined) {
       orderHistory.push(order);
 
-      console.log('frontend sending data:', order);
+    //   console.log('frontend sending data:', order);
 
       liveSend(order);
     } else {
@@ -781,7 +780,7 @@
     const valueToBeat = isNewOrderValid(order); // undefined means order is good
     if (valueToBeat === undefined) {
       orderHistory.push(order);
-      console.log('frontend sending data:', order);
+    //   console.log('frontend sending data:', order);
       liveSend(order);
     } else {
       let errorText;

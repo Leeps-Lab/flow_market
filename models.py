@@ -353,7 +353,7 @@ class Group(BaseGroup):
         sells = self.sells()
         payloads = {}
         if len(buys) > 0 and len(sells) > 0:
-            print("len(buys) and len(sells) > 0, executing orders")
+            # print("len(buys) and len(sells) > 0, executing orders")
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
             # print("Clearing Price: " + str(clearing_price))
@@ -384,17 +384,17 @@ class Group(BaseGroup):
             for sell in sells:
                 seller = self.get_player_by_id(sell['player'])
 
-                print("----------------------- sell ------------------------")
-                print(f'processing sell: {sell}')
-                print(f'seller: {seller}')
-                print("")
-                print(
-                    f'self.order_copies[seller.id_in_group][sell["orderID"] = [{seller.id_in_group}] [{sell["orderID"]}]')
-                print(
-                    f'self.order_copies[sell["player"]][sell["orderID"] = [{sell["player"]}] [{sell["orderID"]}]')
-                print(self.order_copies[str(
-                    seller.id_in_group)][str(sell['orderID'])])
-                print("-----------------------------------------------")
+                # print("----------------------- sell ------------------------")
+                # print(f'processing sell: {sell}')
+                # print(f'seller: {seller}')
+                # print("")
+                # print(
+                #     f'self.order_copies[seller.id_in_group][sell["orderID"] = [{seller.id_in_group}] [{sell["orderID"]}]')
+                # print(
+                #     f'self.order_copies[sell["player"]][sell["orderID"] = [{sell["player"]}] [{sell["orderID"]}]')
+                # print(self.order_copies[str(
+                #     seller.id_in_group)][str(sell['orderID'])])
+                # print("-----------------------------------------------")
 
                 # decrement remaining quantity of order
                 trader_vol = self.calcSupply(sell, clearing_price)
@@ -403,8 +403,8 @@ class Group(BaseGroup):
 
                 sell['q_max'] -= trader_vol
 
-                print("")
-                print("------- debug begin sell ---------")
+                # print("")
+                # print("------- debug begin sell ---------")
 
                 # READ what does this do?
                 cache = self.order_copies
@@ -429,8 +429,8 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                print(
-                    f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
+                # print(
+                    # f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
 
                 seller.updateProfit(trader_vol * clearing_price)
                 seller.updateVolume(-trader_vol)
@@ -455,18 +455,18 @@ class Group(BaseGroup):
             for buy in buys:
                 buyer = self.get_player_by_id(buy['player'])
 
-                print("--------------------buy----------------------")
-                print(f'processing buy: {buy}')
-                print(f'buyer: {buyer}')
-                print("")
-                print(
-                    f'self.order_copies[buy["player"]][buy["orderID"] = [{buy["player"]}] [{buy["orderID"]}]')
-                print(self.order_copies[str(buy['player'])]
-                      [str(buy['orderID'])])
-                print("------------------------------------------")
+                # print("--------------------buy----------------------")
+                # print(f'processing buy: {buy}')
+                # print(f'buyer: {buyer}')
+                # print("")
+                # print(
+                #     f'self.order_copies[buy["player"]][buy["orderID"] = [{buy["player"]}] [{buy["orderID"]}]')
+                # print(self.order_copies[str(buy['player'])]
+                #       [str(buy['orderID'])])
+                # print("------------------------------------------")
 
-                print("")
-                print("------- debug begin buy ---------")
+                # print("")
+                # print("------- debug begin buy ---------")
 
                 # decrement remaining quantity of order
                 trader_vol = self.calcDemand(buy, clearing_price)
@@ -498,12 +498,11 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                # HERE2 check if right here
                 buyer.updateProfit(-trader_vol * clearing_price)
                 buyer.updateVolume(trader_vol)
 
-                print(
-                    f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
+                # print(
+                # f'trader_vol: {trader_vol}, clearing_price: {clearing_price}')
                 # print("Trader " + str(buy['player']) + " Cash: " + str(buyer.cash))
                 # print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
                 # Use live send back to update buyer's frontend
@@ -516,8 +515,8 @@ class Group(BaseGroup):
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
 
-            print("------- debug end ---------")
-            print("")
+            # print("------- debug end ---------")
+            # print("")
         else:
             # Clear the clearing price graph
             for player in self.get_players():
@@ -569,7 +568,7 @@ class Player(BasePlayer):
 
         data['trader_id'] = self.id_in_group
         if data['direction'] == 'buy_algo':
-            print(data)
+            # print(data)
             call_with_delay(0, self.group.new_buy_algo, data)
             return {0: {'type': 'buy_algo'}}
 
@@ -577,7 +576,7 @@ class Player(BasePlayer):
             call_with_delay(0, self.group.new_sell_algo, data)
             return {0: {'type': 'sell_algo'}}
 
-        print("got uuid:", data["orderID"])
+        # print("got uuid:", data["orderID"])
 
         # BUG should be updating uuid here
         self.updateUUID(data["orderID"])
