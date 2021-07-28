@@ -166,8 +166,20 @@
 
     // flo: can only sell when p_min is > buy's p_max
     // flo: can only buy when p_max < sell's p_min
-    // if (isFLO) {
-    // }
+    if (isFLO) {
+      for (const order of orderHistory) {
+        if (newOrder.direction === 'buy' && order.direction === 'sell') {
+          if (!(newOrder.p_max < order.p_min)) {
+            isValid = false;
+          }
+        }
+        if (newOrder.direction === 'sell' && order.direction === 'buy') {
+          if (!(newOrder.p_min > order.p_max)) {
+            isValid = false;
+          }
+        }
+      }
+    }
   }
 
   console.log();
@@ -725,12 +737,22 @@
 
       liveSend(order);
     } else {
+      let errorText;
+      if (isCDA || isFBA) {
+        // cda/fba: can only buy when buy's p_max < sell's p_max
+        // cda/fba: can only sell when sell's p_max > buy's p_max
+        errorText =
+          'Your buy order will cross with one of your sell orders. Try decreasing the price.';
+      } else if (isFLO) {
+        // flo: can only sell when p_min is > buy's p_max
+        // flo: can only buy when p_max < sell's p_min
+        errorText =
+          'Your buy order will cross with one of your sell orders. Try decreasing the maximum price.';
+      }
       Swal.fire({
         title: 'Conflicting Orders',
         icon: 'warning',
-        // cda/fba: can only buy when buy's p_max < sell's p_max
-        // cda/fba: can only sell when sell's p_max > buy's p_max
-        text: 'Your buy order will cross with one of your sell orders.\n Try decreasing the price.',
+        text: errorText,
         showClass: {
           popup: 'animate__animated animate__fadeIn',
         },
@@ -786,12 +808,22 @@
       console.log('frontend sending data:', order);
       liveSend(order);
     } else {
+      let errorText;
+      if (isCDA || isFBA) {
+        // cda/fba: can only buy when buy's p_max < sell's p_max
+        // cda/fba: can only sell when sell's p_max > buy's p_max
+        errorText =
+          'Your sell order will cross with one of your buy orders. Try increasing the price.';
+      } else if (isFLO) {
+        // flo: can only sell when p_min is > buy's p_max
+        // flo: can only buy when p_max < sell's p_min
+        errorText =
+          'Your buy order will cross with one of your sell orders. Try increasing the minimum price.';
+      }
       Swal.fire({
         title: 'Conflicting Orders',
         icon: 'warning',
-        // cda/fba: can only buy when buy's p_max < sell's p_max
-        // cda/fba: can only sell when sell's p_max > buy's p_max
-        text: 'Your sell order will cross with one of your buy orders.\n Try increasing the price.',
+        text: errorText,
         showClass: {
           popup: 'animate__animated animate__fadeIn',
         },
