@@ -135,6 +135,7 @@
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
     }
+
     .conditionalMargin2 {
       margin-right: var(--cardSpacing);
     }
@@ -256,12 +257,26 @@
   .table-wrapper-scroll-y:hover {
     cursor: ns-resize;
     background-color: whitesmoke;
-  } 
+  }
 
   .moveTableUp {
     margin-top: -2px;
     margin-bottom: 0;
   }
+
+  .swal2-icon.swal2-warning {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .swal2-confirm.swal2-styled {
+    background-color: var(--primary);
+  }
+
+  .swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px var(--primary) !important;
+  }
+
 
 
   /* td {
@@ -446,7 +461,9 @@
                 </form>
                 <div class="mt-2">
                   <button type="button" id="sendBid"
-                    class="btn mr-3 btn-primary" onclick="new_buy()">
+                    class="btn mr-3 btn-primary" data-toggle="tooltip"
+                    data-placement="top" title="Tooltip on top"
+                    onclick="new_buy()">
                     Send Buy
                   </button>
                   <button type="button" id="sendAsk" class="btn btn-danger"

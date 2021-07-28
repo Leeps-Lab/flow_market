@@ -19,6 +19,10 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 <script
   src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"
   integrity="sha512-igVQ7hyQVijOUlfg3OmcTZLwYJIBXU63xL9RC12xBHNpmGJAktDnzl9Iw0J4yrSaQtDxTTVlwhY730vphoVqJQ=="
@@ -31,6 +35,7 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 ></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% block scripts %} {% include Constants.scripts_init_graphs_template %}
 {%endblock %}
@@ -48,6 +53,11 @@
     },
     false
   );
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
   const isCDA = '{{treatment}}' === 'cda';
   const isFLO = '{{treatment}}' === 'flo';
   const isFBA = '{{treatment}}' === 'fba';
@@ -715,7 +725,16 @@
 
       liveSend(order);
     } else {
-      alert('conflicting orders');
+      Swal.fire({
+        title: 'Conflicting Orders',
+        icon: 'warning',
+        // cda/fba: can only buy when buy's p_max < sell's p_max
+        // cda/fba: can only sell when sell's p_max > buy's p_max
+        text: 'Your buy order will cross with one of your sell orders.\n Try decreasing the price.',
+        showClass: {
+          popup: 'animate__animated animate__fadeIn',
+        },
+      });
     }
   }
 
@@ -767,7 +786,16 @@
       console.log('frontend sending data:', order);
       liveSend(order);
     } else {
-      alert('conflicting orders');
+      Swal.fire({
+        title: 'Conflicting Orders',
+        icon: 'warning',
+        // cda/fba: can only buy when buy's p_max < sell's p_max
+        // cda/fba: can only sell when sell's p_max > buy's p_max
+        text: 'Your sell order will cross with one of your buy orders.\n Try increasing the price.',
+        showClass: {
+          popup: 'animate__animated animate__fadeIn',
+        },
+      });
     }
   }
 
