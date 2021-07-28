@@ -163,12 +163,14 @@
       if (newOrder.direction === 'buy') {
         const minPriceToBeat = orderHistory.reduce((minPrice, order) => {
           if (order.direction === 'sell') {
-            console.log('order.p_max < minPrice', order.p_max, minPrice);
+            console.log('order.p_max < minPrice a', order.p_max, minPrice);
             return order.p_max < minPrice ? order.p_max : minPrice;
+          } else {
+            return minPrice;
           }
         }, Number.POSITIVE_INFINITY);
         console.error(
-          '!(newOrder.p_max > maxPriceInHistory)',
+          '!(newOrder.p_max > maxPriceInHistory) a',
           newOrder.p_max,
           minPriceToBeat
         );
@@ -182,10 +184,12 @@
         const maxPriceToBeat = orderHistory.reduce((maxPrice, order) => {
           if (order.direction === 'buy') {
             return order.p_max > maxPrice ? order.p_max : maxPrice;
+          } else {
+            return maxPrice;
           }
         }, Number.NEGATIVE_INFINITY);
         console.error(
-          '!(newOrder.p_max < maxPriceInHistory)',
+          '!(newOrder.p_max < maxPriceInHistory) b',
           newOrder.p_max,
           maxPriceToBeat
         );
@@ -240,34 +244,78 @@
     }
     console.error('got numToBeValid: c', numToBeValid);
 
+    // if (isFLO) {
+    //   for (const order of orderHistory) {
+    //     if (newOrder.direction === 'buy' && order.direction === 'sell') {
+    //       if (!(newOrder.p_max < order.p_min)) {
+    //         if (
+    //           numToBeValid === undefined ||
+    //           numToBeValid.p_min < order.p_min
+    //         ) {
+    //           numToBeValid = order.p_min;
+    //         }
+    //       }
+    //     }
+    //     if (newOrder.direction === 'sell' && order.direction === 'buy') {
+    //       if (!(newOrder.p_min > order.p_max)) {
+    //         if (
+    //           numToBeValid === undefined ||
+    //           numToBeValid.p_max < order.p_max
+    //         ) {
+    //           numToBeValid = order.p_max;
+    //         }
+    //       }
+    //     }
+    //   }
+
     // flo: can only sell when p_min is > buy's p_max
     // flo: can only buy when p_max < sell's p_min
     if (isFLO) {
-      for (const order of orderHistory) {
-        if (newOrder.direction === 'buy' && order.direction === 'sell') {
-          if (!(newOrder.p_max < order.p_min)) {
-            if (
-              numToBeValid === undefined ||
-              numToBeValid.p_min < order.p_min
-            ) {
-              numToBeValid = order.p_min;
-            }
+      if (newOrder.direction === 'sell') {
+        const maxPriceToBeat = orderHistory.reduce((maxPrice, order) => {
+          if (order.direction === 'buy') {
+            return order.p_max > maxPrice ? order.p_max : maxPrice;
+          } else {
+            return maxPrice;
           }
+        }, Number.NEGATIVE_INFINITY);
+        console.error(
+          '!(newOrder.p_max < maxPriceInHistory) d',
+          newOrder.p_min,
+          maxPriceToBeat
+        );
+        if (!(newOrder.p_min > maxPriceToBeat)) {
+          numToBeValid = maxPriceToBeat;
+          console.error('got numToBeValid: d', numToBeValid);
         }
-        if (newOrder.direction === 'sell' && order.direction === 'buy') {
-          if (!(newOrder.p_min > order.p_max)) {
-            if (
-              numToBeValid === undefined ||
-              numToBeValid.p_max < order.p_max
-            ) {
-              numToBeValid = order.p_max;
-            }
+      }
+
+      // BUG sell, sell, valid buy, invalid buy -> leads to transaction
+      // seems to be confusing buy with sell
+
+      if (newOrder.direction === 'buy') {
+        const minPriceToBeat = orderHistory.reduce((minPrice, order) => {
+          if (order.direction === 'sell') {
+            console.log('history: ', orderHistory);
+            console.log('order.p_max < minPrice', order.p_min, minPrice);
+            return order.p_min < minPrice ? order.p_min : minPrice;
+          } else {
+            return minPrice;
           }
+        }, Number.POSITIVE_INFINITY);
+        console.error(
+          '!(newOrder.p_max > maxPriceInHistory) e',
+          newOrder.p_max,
+          minPriceToBeat
+        );
+        if (!(newOrder.p_max < minPriceToBeat)) {
+          numToBeValid = minPriceToBeat;
+          console.error('got numToBeValid: e', numToBeValid);
         }
       }
     }
 
-    console.error('got numToBeValid: ', numToBeValid);
+    console.error('got numToBeValid: f', numToBeValid);
     return numToBeValid;
   }
 
