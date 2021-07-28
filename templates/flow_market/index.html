@@ -282,6 +282,18 @@
     padding-right: 20px;
   }
 
+  h4, h5, label {
+    color: #595959;
+  }
+
+  h5 {
+    font-weight: 600;
+  }
+
+  /* h2, h4 { */
+    /* color: black !important; */
+  /* } */
+
 
 
   /* td {
@@ -315,7 +327,7 @@
             <div class="" id="BETS">
               <div class="" id="bets2">
                 <div class="cardHeader w-100 text-align-right">
-                  <h4 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets</h4>
+                  <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets</h5>
                 </div>
                 <table class="table mb-0">
                   <thead class="thead-light">
@@ -371,9 +383,9 @@
           <div class=" row justify-content-center">
             <div>
               <div class="cardHeader w-100 text-align-right">
-                <h4 class="mb-2 text-center" id="ACTIVE_ORDERS">
+                <h5 class="mb-2 text-center" id="ACTIVE_ORDERS">
                   Active Orders
-                </h4>
+                </h5>
               </div>
               <table class="table mb-0">
                 <thead class="thead-light">
@@ -436,7 +448,7 @@
               <div
                 class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
                 <div class="cardHeader w-100 text-align-right">
-                  <h4 class="mb-4 pt-1 text-center">Manual Input</h4>
+                  <h5 class="mb-4 pt-1 text-center">Manual Input</h5>
                 </div>
                 <form class="formPadding">
                   <div class="form-group row w-75">
@@ -466,9 +478,7 @@
                 </form>
                 <div class="mt-2">
                   <button type="button" id="sendBid"
-                    class="btn mr-3 btn-primary" data-toggle="tooltip"
-                    data-placement="top" title="Tooltip on top"
-                    onclick="new_buy()">
+                    class="btn mr-3 btn-primary" onclick="new_buy()">
                     Send Buy
                   </button>
                   <button type="button" id="sendAsk" class="btn btn-danger"
@@ -485,7 +495,7 @@
     <div class="col-8 shadow market cardWrapper conditionalMargin" id="MARKET">
       <div class="pb-5 pl-4 pr-4 w-100 h-100"
         style="padding-top: 14px !important;">
-        <h4 class="mb-2 text-center">Market</h4>
+        <h5 class="mb-2 text-center">Market</h5>
         <canvas id="klf-line" class="h-100 pb-2"></canvas>
       </div>
     </div>
@@ -499,7 +509,7 @@
           <div class="row pt-2 h-100 justify-content-center">
             <div class="text-center d-flex flex-column justify-content-between">
               <div class="cardHeader w-100 text-align-right">
-                <h4 class="mb-2 text-center">Algorithmic Input</h4>
+                <h5 class="mb-2 text-center">Algorithmic Input</h5>
               </div>
               <div class="mb-4 noUiAlgoTimeSliderWrapper form-group row mt-4">
                 <div class="d-flex justify-content-between sliderWrapper">
@@ -561,7 +571,7 @@
       <div class="shadow minWidth cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3">
           <div class="w-100 text-align-right">
-            <h4 class="text-center mb-3">Cash</h4>
+            <h5 class="text-center mb-3">Cash</h5>
           </div>
           <div class="" id="cash-bar"></div>
         </div>
@@ -573,7 +583,7 @@
       <div class="shadow cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3">
           <div class="w-100 text-align-right">
-            <h4 class="text-center mb-3">Inventory</h4>
+            <h5 class="text-center mb-3">Inventory</h5>
           </div>
           <div class="" id="inv-bar"></div>
         </div>

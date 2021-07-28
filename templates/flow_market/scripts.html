@@ -54,10 +54,6 @@
     false
   );
 
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-
   const isCDA = '{{treatment}}' === 'cda';
   const isFLO = '{{treatment}}' === 'flo';
   const isFBA = '{{treatment}}' === 'fba';
@@ -67,44 +63,44 @@
   function debug() {
     console.log('orderHistory: ', orderHistory);
     /*
-        0:
-            direction: "buy"
-            orderID: "9379e538-c84f-4231-a49e-3003f8ba46ef"
-            p_max: 10
-            p_min: 6
-            q_max: 50
-            status: "active"
-            timestamp: 2626.0999999940395
-            u_max: 5
-        */
+          0:
+              direction: "buy"
+              orderID: "9379e538-c84f-4231-a49e-3003f8ba46ef"
+              p_max: 10
+              p_min: 6
+              q_max: 50
+              status: "active"
+              timestamp: 2626.0999999940395
+              u_max: 5
+          */
   }
 
   // update order history if an order has expired
   function updateOrderHistory(data) {
     /*
-        buys: Array(1)
-            0:
-                direction: "buy"
-                orderID: "9379e538-c84f-4231-a49e-3003f8ba46ef"
-                p_max: 10
-                p_min: 6
-                player: 1
-                q_max: 0
-                status: "expired"
-                u_max: 5
+          buys: Array(1)
+              0:
+                  direction: "buy"
+                  orderID: "9379e538-c84f-4231-a49e-3003f8ba46ef"
+                  p_max: 10
+                  p_min: 6
+                  player: 1
+                  q_max: 0
+                  status: "expired"
+                  u_max: 5
 
-        sells: Array(1)
-            0:
-                direction: "sell"
-                orderID: "19777e35-043a-4cb0-9c53-2ffdc8c1be30"
-                p_max: 10
-                p_min: 6
-                player: 2
-                q_max: 0
-                status: "expired"
-                u_max: 5
+          sells: Array(1)
+              0:
+                  direction: "sell"
+                  orderID: "19777e35-043a-4cb0-9c53-2ffdc8c1be30"
+                  p_max: 10
+                  p_min: 6
+                  player: 2
+                  q_max: 0
+                  status: "expired"
+                  u_max: 5
 
-        */
+          */
     // for every order "order" in orderHistory
     // select proper array (buy/sell)
     // go thru every item of array
@@ -140,29 +136,109 @@
 
   // check if potential order does not conflict with any orders in orderHistory
   function isNewOrderValid(newOrder) {
-    if (orderHistory.length === 0) return true;
+    if (orderHistory.length === 0) return undefined;
 
     // cda/fba: can only buy when buy's p_max < sell's p_max
     // cda/fba: can only sell when sell's p_max > buy's p_max
-    let isValid = true;
+    let numToBeValid;
     if (isCDA || isFBA) {
-      for (const order of orderHistory) {
-        if (newOrder.direction === 'buy' && order.direction === 'sell') {
-          if (!(newOrder.p_max < order.p_max)) {
-            isValid = false;
+      //   const maxPriceInHistory = orderHistory.reduce((maxPrice, order) => {
+      //     if (newOrder.direction === 'buy' && order.direction === 'sell') {
+      //       if (order.p_max < maxPrice) {
+      //         return order.p_max;
+      //       } else {
+      //         return maxPrice;
+      //       }
+      //     }
+      //     if (newOrder.direction === 'sell' && order.direction === 'buy') {
+      //       console.error('bug order.p_max, maxPrice', order.p_max, maxPrice);
+      //       if (order.p_max > maxPrice) {
+      //         return order.p_max;
+      //       } else {
+      //         return maxPrice;
+      //       }
+      //     }
+      //   }, Number.NEGATIVE_INFINITY);
+
+      if (newOrder.direction === 'buy') {
+        const minPriceToBeat = orderHistory.reduce((minPrice, order) => {
+          if (order.direction === 'sell') {
+            console.log('order.p_max < minPrice', order.p_max, minPrice);
+            return order.p_max < minPrice ? order.p_max : minPrice;
           }
-        }
-        if (newOrder.direction === 'sell' && order.direction === 'buy') {
-          if (!(newOrder.p_max > order.p_max)) {
-            isValid = false;
-          }
+        }, Number.POSITIVE_INFINITY);
+        console.error(
+          '!(newOrder.p_max > maxPriceInHistory)',
+          newOrder.p_max,
+          minPriceToBeat
+        );
+        if (!(newOrder.p_max < minPriceToBeat)) {
+          numToBeValid = minPriceToBeat;
+          console.error('got numToBeValid: a', numToBeValid);
         }
       }
+
+      if (newOrder.direction === 'sell') {
+        const maxPriceToBeat = orderHistory.reduce((maxPrice, order) => {
+          if (order.direction === 'buy') {
+            return order.p_max > maxPrice ? order.p_max : maxPrice;
+          }
+        }, Number.NEGATIVE_INFINITY);
+        console.error(
+          '!(newOrder.p_max < maxPriceInHistory)',
+          newOrder.p_max,
+          maxPriceToBeat
+        );
+        if (!(newOrder.p_max > maxPriceToBeat)) {
+          numToBeValid = maxPriceToBeat;
+          console.error('got numToBeValid: b', numToBeValid);
+        }
+      }
+      //   console.error('max: ', maxPriceInHistory);
+      //   if (newOrder.direction === 'buy') {
+      //     console.error(
+      //       '!(newOrder.p_max > maxPriceInHistory)',
+      //       newOrder.p_max,
+      //       maxPriceInHistory
+      //     );
+      //     if (!(newOrder.p_max < maxPriceInHistory)) {
+      //       numToBeValid = maxPriceInHistory;
+      //       console.error('got numToBeValid: a', numToBeValid);
+      //     }
+      //   } else if (newOrder.direction === 'sell') {
+      //     console.error(
+      //       '!(newOrder.p_max < maxPriceInHistory)',
+      //       newOrder.p_max,
+      //       maxPriceInHistory
+      //     );
+      //     if (!(newOrder.p_max > maxPriceInHistory)) {
+      //       numToBeValid = maxPriceInHistory;
+      //       console.error('got numToBeValid: b', numToBeValid);
+      //     }
+      //   }
+      //   for (const order of orderHistory) {
+      // if (newOrder.direction === 'buy' && order.direction === 'sell') {
+      //   if (!(newOrder.p_max < order.p_max)) {
+      //     if (
+      //       numToBeValid === undefined ||
+      //       numToBeValid.p_max < order.p_max
+      //     ) {
+      //       numToBeValid = order.p_max;
+      //     }
+      //   }
+      // }
+      // if (newOrder.direction === 'sell' && order.direction === 'buy') {
+      //   if (!(newOrder.p_max > order.p_max)) {
+      //     if (
+      //       numToBeValid === undefined ||
+      //       numToBeValid.p_max < order.p_max
+      //     ) {
+      //       numToBeValid = order.p_max;
+      //     }
+      //   }
+      // }
     }
-
-    return isValid;
-
-    console.error('got isValid: ', isValid);
+    console.error('got numToBeValid: c', numToBeValid);
 
     // flo: can only sell when p_min is > buy's p_max
     // flo: can only buy when p_max < sell's p_min
@@ -170,16 +246,29 @@
       for (const order of orderHistory) {
         if (newOrder.direction === 'buy' && order.direction === 'sell') {
           if (!(newOrder.p_max < order.p_min)) {
-            isValid = false;
+            if (
+              numToBeValid === undefined ||
+              numToBeValid.p_min < order.p_min
+            ) {
+              numToBeValid = order.p_min;
+            }
           }
         }
         if (newOrder.direction === 'sell' && order.direction === 'buy') {
           if (!(newOrder.p_min > order.p_max)) {
-            isValid = false;
+            if (
+              numToBeValid === undefined ||
+              numToBeValid.p_max < order.p_max
+            ) {
+              numToBeValid = order.p_max;
+            }
           }
         }
       }
     }
+
+    console.error('got numToBeValid: ', numToBeValid);
+    return numToBeValid;
   }
 
   console.log();
@@ -730,7 +819,8 @@
     };
 
     // HERE implement checking logic
-    if (isNewOrderValid(order)) {
+    const valueToBeat = isNewOrderValid(order); // undefined means order is valid
+    if (valueToBeat === undefined) {
       orderHistory.push(order);
 
       console.log('frontend sending data:', order);
@@ -741,16 +831,14 @@
       if (isCDA || isFBA) {
         // cda/fba: can only buy when buy's p_max < sell's p_max
         // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText =
-          'Your buy order will cross with one of your sell orders. Try decreasing the price.';
+        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
       } else if (isFLO) {
         // flo: can only sell when p_min is > buy's p_max
         // flo: can only buy when p_max < sell's p_min
-        errorText =
-          'Your buy order will cross with one of your sell orders. Try decreasing the maximum price.';
+        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
       }
       Swal.fire({
-        title: 'Conflicting Orders',
+        title: 'Cannot Trade With Yourself',
         icon: 'warning',
         text: errorText,
         showClass: {
@@ -803,7 +891,8 @@
     };
 
     // HERE implement checking logic
-    if (isNewOrderValid(order)) {
+    const valueToBeat = isNewOrderValid(order); // undefined means order is good
+    if (valueToBeat === undefined) {
       orderHistory.push(order);
       console.log('frontend sending data:', order);
       liveSend(order);
@@ -812,16 +901,14 @@
       if (isCDA || isFBA) {
         // cda/fba: can only buy when buy's p_max < sell's p_max
         // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText =
-          'Your sell order will cross with one of your buy orders. Try increasing the price.';
+        errorText = `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
       } else if (isFLO) {
         // flo: can only sell when p_min is > buy's p_max
         // flo: can only buy when p_max < sell's p_min
-        errorText =
-          'Your buy order will cross with one of your sell orders. Try increasing the minimum price.';
+        errorText = `Your sell order will cross with one of your sell orders. Try increasing the minimum price above ${valueToBeat}.`;
       }
       Swal.fire({
-        title: 'Conflicting Orders',
+        title: 'Cannot Trade With Yourself',
         icon: 'warning',
         text: errorText,
         showClass: {
@@ -870,15 +957,15 @@
     }
 
     /*
-          console.log({
-           minprice,
-           volume ,
-           maxprice,
-           time ,
-           quantity_per,
-           u_max,
-          })
-          */
+            console.log({
+             minprice,
+             volume ,
+             maxprice,
+             time ,
+             quantity_per,
+             u_max,
+            })
+            */
 
     liveSend({
       p_min: minprice,
@@ -933,15 +1020,15 @@
     }
 
     /*
-          console.log({
-           minprice,
-           volume ,
-           maxprice,
-           time ,
-           quantity_per,
-           u_max,
-          })
-          */
+            console.log({
+             minprice,
+             volume ,
+             maxprice,
+             time ,
+             quantity_per,
+             u_max,
+            })
+            */
 
     liveSend({
       p_min: minprice,
