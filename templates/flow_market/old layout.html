@@ -25,14 +25,18 @@
     height: 550px;
   }
 
+
+  /* .form-group.row { */
+  /* background-color: chocolate; */
+  /* } */
+
   .fixed {
     width: 400px;
     height: 400px;
   }
 
   .market {
-    /* height: 800px; */
-    height: 400px;
+    height: 800px;
     min-width: 400px;
     /* padding: 20px !important; */
     /* padding-right: 32px !important; */
@@ -68,15 +72,6 @@
   }
 
 
-  #inv-bar,
-  #cash-bar {
-    height: 328px;
-  }
-
-
-  .marginLeft {
-    margin-left: var(--cardSpacing)
-  }
 
   #inv-bar,
   #cash-bar,
@@ -131,8 +126,7 @@
   }
 
   .fixedHeightModified {
-    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
-    height: 400px !important;
+    height: calc(400px - var(--cardSpacing) - (800px - 800px));
     /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
     /* height: 350px; */
   }
@@ -150,21 +144,10 @@
   }
 
   .marginBottomFix {
-    margin-bottom: calc(var(--cardSpacing));
+    margin-bottom: calc(var(--cardSpacing) + 76px);
   }
 
-  @media (max-width: 878px) {
-    .conditionalMarginBot {
-      margin-bottom: var(--cardSpacing);
-      /* margin-bottom: 1000px !important; */
-    }
-
-    .conditionalMarginLeft {
-      margin-left: var(--cardSpacing);
-    }
-  }
-
-  @media (max-width: 1302px) {
+  @media (max-width: 1300px) {
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
       margin-right: var(--cardSpacing);
@@ -314,7 +297,6 @@
   .table-wrapper-scroll-y:hover {
     cursor: ns-resize;
     background-color: whitesmoke;
-    overflow-y: scroll;
   }
 
   .moveTableUp {
@@ -383,7 +365,7 @@
   <div class="row justify-content-center">
     <div
       class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
-      <div class="col ">
+      <div class="col cardSpacingBottom">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
           id="HISTORY">
@@ -461,8 +443,7 @@
                   </tr>
                 </thead>
               </table>
-              <div id="activeOrdersTableWrapper" style="min-width: 242px;"
-                class="table-wrapper-scroll-y my-custom-scrollbar">
+              <div id="activeOrdersTableWrapper" style="min-width: 242px;" class="table-wrapper-scroll-y my-custom-scrollbar">
                 <table class="table moveTableUp">
                   <tbody id="activeOrdersTable">
                     {% for bet in bets %}
@@ -479,6 +460,58 @@
           </div>
         </div>
       </div>
+      <div
+        class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+        id="MANUAL">
+        <div class="p-4 borderRadiusFix col shadow">
+          <div class="row h-100 justify-content-center">
+            <div class="col">
+              <div
+                class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-4 pt-1 text-center">Manual Input</h5>
+                </div>
+                <form class="formPadding">
+                  <div class="form-group row w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Price</label>
+                      <div id="noUiPriceSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                  <div class="noUiVolSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Volume</label>
+                      <div id="noUiVolSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                  <div class="noUiRateSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Rate</label>
+                      <div id="noUiRateSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                </form>
+                <div class="mt-2">
+                  <button type="button" id="sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="sendAsk" class="btn btn-danger"
+                    onclick="new_sell()">
+                    Send Sell
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-8 shadow market minWidth cardWrapper conditionalMargin"
       id="MARKET">
@@ -489,87 +522,8 @@
       </div>
     </div>
   </div>
-  <div class="row   justify-content-center ">
-    <div
-      class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
-      id="MANUAL">
-      <div class="p-4 borderRadiusFix col shadow">
-        <div class="row h-100 justify-content-center">
-          <div class="col">
-            <div
-              class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
-              <div class="cardHeader w-100 text-align-right">
-                <h5 class="mb-4 pt-1 text-center">Manual Input</h5>
-              </div>
-              <form class="formPadding">
-                <div class="form-group row w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Price</label>
-                    <div id="noUiPriceSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
-                </div>
-                <div class="noUiVolSliderWrapper form-group row mt-4 w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Volume</label>
-                    <div id="noUiVolSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
-                </div>
-                <div class="noUiRateSliderWrapper form-group row mt-4 w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Rate</label>
-                    <div id="noUiRateSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
-                  </div>
-                </div>
-              </form>
-              <div class="mt-2">
-                <button type="button" id="sendBid" class="btn mr-3 btn-primary"
-                  onclick="new_buy()">
-                  Send Buy
-                </button>
-                <button type="button" id="sendAsk" class="btn btn-danger"
-                  onclick="new_sell()">
-                  Send Sell
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-      id="CASH">
-      <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Cash</h5>
-          </div>
-          <div class="" id="cash-bar"></div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
-      id="INVENTORY">
-      <div class="shadow cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Inventory</h5>
-          </div>
-          <div class="" id="inv-bar"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="cardSpacingRight marginBottom  marginLeftModified">
+  <div class="row justify-content-center  ">
+    <div class="cardSpacingRight marginBottom ">
       <div
         class="shadow d-flex align-items-center minWidth fixedAlgoInputHeight  cardWrapper"
         id="ALGORITHM">
@@ -632,9 +586,31 @@
         </div>
       </div>
     </div>
-    <div class="col-4 minWidth"></div>
-    <div class="col-4 minWidth"></div>
 
+    <div
+      class="marginBottomFix minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="minWidth  col-4 fixedHeight borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
+      <div class="shadow cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Inventory</h5>
+          </div>
+          <div class="" id="inv-bar"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
