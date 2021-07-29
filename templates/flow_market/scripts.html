@@ -1,45 +1,12 @@
 {% load otree %}
 
-<!--
-            Code heavily adopted from Jason Vranek (github.com/JasonVranek)
-        -->
+<!-- Code heavily adopted from Jason Vranek (github.com/JasonVranek) (https://people.ucsc.edu/~jvranek/flow_viz.html) -->
+<!-- not sure market.js is even needed anymore -->
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"
-  integrity="sha512-jWNpWAWx86B/GZV4Qsce63q5jxx/rpWnw812vh0RE+SBIo/mmepwOSQkY2eVQnMuE28pzUEO7ux0a5sJX91g8A=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"
-  integrity="sha512-40vN6DdyQoxRJCw0klEUwZfTTlcwkOLKpP8K8125hy9iF4fi8gPpWZp60qKC6MYAFaond8yQds7cTMVU8eMbgA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-/>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"
-  integrity="sha512-igVQ7hyQVijOUlfg3OmcTZLwYJIBXU63xL9RC12xBHNpmGJAktDnzl9Iw0J4yrSaQtDxTTVlwhY730vphoVqJQ=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"
-  integrity="sha512-BCMqEPl2dokU3T/EFba7jrfL4FxgY6ryUh4rRC9feZw4yWUslZ3Uf/lPZ5/5UlEjn4prlQTRfIPYQkDrLCZJXA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<!-- prettier-ignore -->
+{% block imports %} {% include Constants.scripts_imports_template %} {% endblock %}
 <!-- prettier-ignore -->
 {% block init_graphs %} {% include Constants.scripts_init_graphs_template %} {% endblock %}
-
 <!-- pretter-ignore -->
 {% block init_sliders %} {% include Constants.scripts_init_sliders_template %}
 {% endblock %}
@@ -411,7 +378,7 @@
           data['clearing_price'],
           data['buys'],
           data['sells']
-        ); 
+        );
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
