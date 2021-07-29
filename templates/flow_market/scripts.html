@@ -9,32 +9,19 @@
 <script
   src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"
   integrity="sha512-jWNpWAWx86B/GZV4Qsce63q5jxx/rpWnw812vh0RE+SBIo/mmepwOSQkY2eVQnMuE28pzUEO7ux0a5sJX91g8A=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<link
-  rel="stylesheet"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"
   integrity="sha512-40vN6DdyQoxRJCw0klEUwZfTTlcwkOLKpP8K8125hy9iF4fi8gPpWZp60qKC6MYAFaond8yQds7cTMVU8eMbgA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-/>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"
   integrity="sha512-igVQ7hyQVijOUlfg3OmcTZLwYJIBXU63xL9RC12xBHNpmGJAktDnzl9Iw0J4yrSaQtDxTTVlwhY730vphoVqJQ=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"
   integrity="sha512-BCMqEPl2dokU3T/EFba7jrfL4FxgY6ryUh4rRC9feZw4yWUslZ3Uf/lPZ5/5UlEjn4prlQTRfIPYQkDrLCZJXA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% block scripts %} {% include Constants.scripts_init_graphs_template %}
@@ -66,7 +53,8 @@
       let arrayToSearch;
       if (order.direction === 'buy') arrayToSearch = data.buys;
       if (order.direction === 'sell') arrayToSearch = data.sells;
-      if (arrayToSearch === undefined) console.error('updateOrderHistory()');
+      if (arrayToSearch === undefined) console.error(
+      'updateOrderHistory()');
 
       const orderInData = arrayToSearch.find((orderInData) => {
         return orderInData.orderID === order.orderID;
@@ -695,7 +683,8 @@
     };
 
     // HERE implement checking logic
-    const valueToBeat = isNewOrderValid(order); // undefined means order is valid
+    const valueToBeat = isNewOrderValid(
+    order); // undefined means order is valid
     if (valueToBeat === undefined) {
       orderHistory.push(order);
       appendActiveOrdersTable(order);
@@ -708,11 +697,13 @@
       if (isCDA || isFBA) {
         // cda/fba: can only buy when buy's p_max < sell's p_max
         // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
+        errorText =
+          `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
       } else if (isFLO) {
         // flo: can only sell when p_min is > buy's p_max
         // flo: can only buy when p_max < sell's p_min
-        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
+        errorText =
+          `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
       }
       Swal.fire({
         title: 'Cannot Trade With Yourself',
@@ -779,11 +770,13 @@
       if (isCDA || isFBA) {
         // cda/fba: can only buy when buy's p_max < sell's p_max
         // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText = `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
+        errorText =
+          `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
       } else if (isFLO) {
         // flo: can only sell when p_min is > buy's p_max
         // flo: can only buy when p_max < sell's p_min
-        errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
+        errorText =
+          `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
       }
       Swal.fire({
         title: 'Cannot Trade With Yourself',
@@ -937,9 +930,9 @@
 
     const price = document.createElement('td');
     price.innerHTML =
-      order.p_min === order.p_max
-        ? `${order.p_max}`
-        : `${order.p_min}-${order.p_max}`;
+      order.p_min === order.p_max ?
+      `${order.p_max}` :
+      `${order.p_min}-${order.p_max}`;
 
     const quantity = document.createElement('td');
     quantity.innerHTML = order.q_max;
@@ -971,6 +964,7 @@
   if (isCDA || isFBA) {
     hideRateColumnActiveOrdersTable();
   }
+
   function removeActiveOrderTable(orderID) {
     document.querySelector(`#a${orderID}`).remove();
   }
