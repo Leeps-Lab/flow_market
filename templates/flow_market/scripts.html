@@ -606,7 +606,7 @@
       console.log('Round begin');
     }
     if (data['type'] == 'clear') {
-      // console.error('cleared data:', data);
+      console.error('cleared data:', data);
       // update cash and inventory bar regardless
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
@@ -624,18 +624,10 @@
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
-      //   console.log('received buy/sell/regraph');
-      // console.error('got buy/sell', data);
-      // console.log('--------------------------');
-      //   console.log('');
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'clearing_price') {
-      //   console.log('received clearing price');
-      //   console.log(data);
-      //   console.log('--------------------------');
-      //   console.log('');
       global_clearing_price = data['clearing_price'];
       // READ
       if ('{{treatment}}' != 'cda')
@@ -649,11 +641,7 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'update') {
-      //   console.log('received update');
-      //   console.log(data);
-      // console.error('got update', data);
-      //   console.log('--------------------------');
-      //   console.log('');
+      console.error('got update', data);
       document.getElementById('cashInfo').innerHTML =
         'Cash ' + Number.parseFloat(data['cash']).toFixed(2);
       document.getElementById('invInfo').innerHTML =

@@ -442,11 +442,11 @@ class Group(BaseGroup):
 
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
-                    # READ what does this do?
-                    payloads[player.participant.code] = {"type": 'none'}
+                    payloads[player.participant.code] = {
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory}
 
-                payloads[seller.participant.code] = {
-                    "type": 'update', "cash": seller.cash, "inventory": seller.inventory}
+                # payloads[seller.participant.code] = {
+                #     "type": 'update', "cash": seller.cash, "inventory": seller.inventory}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
@@ -507,10 +507,12 @@ class Group(BaseGroup):
                 # print("Trader " + str(buy['player']) +" Inventory: " + str(buyer.inventory))
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():
-                    payloads[player.participant.code] = {"type": 'none'}
+                    payloads[player.participant.code] = {
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory}
+                    # payloads[player.participant.code] = {"type": 'none'}
 
-                payloads[buyer.participant.code] = {
-                    "type": 'update', "cash": buyer.cash, "inventory": buyer.inventory}
+                # payloads[buyer.participant.code] = {
+                #     "type": 'update', "cash": buyer.cash, "inventory": buyer.inventory}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
