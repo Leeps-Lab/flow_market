@@ -40,6 +40,7 @@ class Constants(BaseConstants):
 
     scripts_template = 'flow_market/scripts.html'
     scripts_init_graphs_template = 'flow_market/helperFuncs/init_graphs.html'
+    scripts_init_sliders_template = 'flow_market/helperFuncs/init_sliders.html'
 
     style_template = 'flow_market/style.html'
 
