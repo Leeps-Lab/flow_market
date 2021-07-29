@@ -45,7 +45,6 @@
 {% endblock %}
 
 <script>
-  // flo-- type: regraph, buys[0].status === "expired"
   document.addEventListener(
     'DOMContentLoaded',
     function () {
@@ -167,243 +166,15 @@
   const cash_bar = graphs[0];
   const inventory_bar = graphs[1];
 
-  // Initialize the manual inputs
-  // const minpriceSliderVal = 6;
-  // const maxpriceSliderVal = 10;
-  // const volSliderVal = 50;
-  // const rateSliderVal = 3;
   const slider = createNoUiPriceSlider();
-
-  // const slider = document.getElementById('noUiPriceSlider');
-  // if (isCDA || isFBA) {
-  //   noUiSlider.create(slider, {
-  //     start: [maxpriceSliderVal],
-  //     connect: [true, false],
-  //     pips: {
-  //       mode: 'count',
-  //       values: 3,
-  //       density: 10,
-  //     },
-  //     step: 1,
-  //     tooltips: [
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //     ],
-  //     range: {
-  //       min: 1,
-  //       max: parseInt('{{max_price}}'),
-  //     },
-  //   });
-  // } else if (isFLO) {
-  //   noUiSlider.create(slider, {
-  //     start: [minpriceSliderVal, maxpriceSliderVal],
-  //     connect: true,
-  //     pips: {
-  //       mode: 'count',
-  //       values: 3,
-  //       density: 10,
-  //     },
-  //     step: 1,
-  //     tooltips: [
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //     ],
-  //     range: {
-  //       min: 1,
-  //       max: parseInt('{{max_price}}'),
-  //     },
-  //   });
-  // }
-
-  // const noUiVolSlider = document.getElementById('noUiVolSlider');
   const noUiVolSlider = createNoUiVolSlider();
-  // createNoUIVolSlider();
-  // noUiSlider.create(noUiVolSlider, {
-  //   start: [volSliderVal],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'values',
-  //     values: [1, 50, parseInt('{{max_q_max}})')],
-  //     density: 5,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 1,
-  //     max: parseInt('{{max_q_max}}'),
-  //   },
-  // });
-
   const noUiRateSlider = createNoUiRateSlider();
-  // const noUiRateSlider = document.getElementById('noUiRateSlider');
-  // noUiSlider.create(noUiRateSlider, {
-  //   start: [volSliderVal],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'values',
-  //     values: [1, 3, parseInt('{{max_u_max}}')],
-  //     density: 30,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 1,
-  //     max: parseInt('{{max_u_max}}'),
-  //   },
-  // });
-
-  // Initialize the algorithm inputs
-  // min="2" max="20" value="10"
-  // const algo_timeSliderVal = 3;
-  // const algo_quantitySliderVal = 6;
 
   const noUiAlgoTimeSlider = createNoUiAlgoTimeSlider();
-  // const noUiAlgoTimeSlider = document.getElementById('noUiAlgoTimeSlider');
-  // noUiSlider.create(noUiAlgoTimeSlider, {
-  //   start: [algo_timeSliderVal],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'count',
-  //     values: 3,
-  //     density: 10,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 2,
-  //     max: 20,
-  //   },
-  // });
   const noUiAlgoQuantitySlider = createNoUiAlgoQuantitySlider();
-  // const noUiAlgoQuantitySlider = document.getElementById(
-  //   'noUiAlgoQuantitySlider'
-  // );
-  // noUiSlider.create(noUiAlgoQuantitySlider, {
-  //   start: [algo_quantitySliderVal],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'count',
-  //     values: 3,
-  //     density: 10,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 1,
-  //     max: 10,
-  //   },
-  // });
   const noUiAlgoPriceSlider = createNoUiAlgoPriceSlider();
-  // const noUiAlgoPriceSlider = document.getElementById('noUiAlgoPriceSlider');
-  // if (isCDA || isFBA) {
-  //   noUiSlider.create(noUiAlgoPriceSlider, {
-  //     start: [10],
-  //     connect: [true, false],
-  //     pips: {
-  //       mode: 'count',
-  //       values: 3,
-  //       density: 10,
-  //     },
-  //     step: 1,
-  //     tooltips: [
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //     ],
-  //     range: {
-  //       min: 1,
-  //       max: parseInt('{{max_price}}'),
-  //     },
-  //   });
-  // } else if (isFLO) {
-  //   noUiSlider.create(noUiAlgoPriceSlider, {
-  //     start: [minpriceSliderVal, maxpriceSliderVal],
-  //     connect: true,
-  //     pips: {
-  //       mode: 'count',
-  //       values: 3,
-  //       density: 10,
-  //     },
-  //     step: 1,
-  //     tooltips: [
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //       wNumb({
-  //         decimals: 0,
-  //       }),
-  //     ],
-  //     range: {
-  //       min: 1,
-  //       max: parseInt('{{max_price}}'),
-  //     },
-  //   });
-  // }
-
   const noUiAlgoVolSlider = createnoUiAlgoVolSlider();
-  // document.getElementById('noUiAlgoVolSlider');
-  // noUiSlider.create(noUiAlgoVolSlider, {
-  //   start: [50],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'values',
-  //     values: [1, 50, parseInt('{{max_q_max}}')],
-  //     density: 5,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 1,
-  //     max: parseInt('{{max_q_max}}'),
-  //   },
-  // });
-
   const noUiAlgoRateSlider = createNoUiAlgoRateSlider();
-  //  document.getElementById('noUiAlgoRateSlider');
-  // noUiSlider.create(noUiAlgoRateSlider, {
-  //   start: [3],
-  //   connect: [true, false],
-  //   pips: {
-  //     mode: 'count',
-  //     values: 3,
-  //     density: 30,
-  //   },
-  //   step: 1,
-  //   tooltips: [
-  //     wNumb({
-  //       decimals: 0,
-  //     }),
-  //   ],
-  //   range: {
-  //     min: 1,
-  //     max: parseInt('{{max_u_max}}'),
-  //   },
-  // });
 
   if ('{{treatment}}' != 'flo') {
     // Because cda and fba has a fixed u_max
@@ -487,8 +258,6 @@
   function graphBids(chart, buys) {
     buys = buys.filter((buy) => buy['status'] == 'active');
     if ('{{treatment}}' != 'cda') {
-      // TEST changes
-      // READ
       // if treatment is fba/flo, calculate aggregate supply and graph x, y as price, aggregate supply
       if (buys.length == 0) {
         chart.data.datasets[0].data = [];
@@ -544,8 +313,6 @@
   function graphAsks(chart, sells) {
     sells = sells.filter((sell) => sell['status'] == 'active');
     if ('{{treatment}}' != 'cda') {
-      // TEST changes
-      // READ
       if (sells.length == 0) {
         chart.data.datasets[1].data = [];
         chart.update();
@@ -638,14 +405,13 @@
     }
     if (data['type'] == 'clearing_price') {
       global_clearing_price = data['clearing_price'];
-      // READ
       if ('{{treatment}}' != 'cda')
         graphClearingPrice(
           klf_line,
           data['clearing_price'],
           data['buys'],
           data['sells']
-        ); // TEST changes
+        ); 
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
@@ -706,14 +472,10 @@
       orderID: uuidv4(),
     };
 
-    // HERE implement checking logic
     const valueToBeat = isNewOrderValid(order); // undefined means order is valid
     if (valueToBeat === undefined) {
       orderHistory.push(order);
       appendActiveOrdersTable(order);
-
-      //   console.log('frontend sending data:', order);
-
       liveSend(order);
     } else {
       let errorText;
@@ -779,12 +541,10 @@
       orderID: uuidv4(),
     };
 
-    // HERE implement checking logic
     const valueToBeat = isNewOrderValid(order); // undefined means order is good
     if (valueToBeat === undefined) {
       orderHistory.push(order);
       appendActiveOrdersTable(order);
-      //   console.log('frontend sending data:', order);
       liveSend(order);
     } else {
       let errorText;
@@ -846,17 +606,6 @@
       );
     }
 
-    /*
-            console.log({
-             minprice,
-             volume ,
-             maxprice,
-             time ,
-             quantity_per,
-             u_max,
-            })
-            */
-
     liveSend({
       p_min: minprice,
       p_max: maxprice,
@@ -908,17 +657,6 @@
         document.getElementById('noUiAlgoRateSlider').noUiSlider.get()
       );
     }
-
-    /*
-            console.log({
-             minprice,
-             volume ,
-             maxprice,
-             time ,
-             quantity_per,
-             u_max,
-            })
-            */
 
     liveSend({
       p_min: minprice,
