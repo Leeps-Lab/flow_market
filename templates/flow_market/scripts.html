@@ -124,7 +124,6 @@
       }
     }
 
-
     // flo: can only sell when p_min is > buy's p_max
     // flo: can only buy when p_max < sell's p_min
     if (isFLO) {
@@ -157,8 +156,6 @@
 
     return numToBeValid;
   }
-
-  console.log();
 
   Chart.defaults.global.defaultFontFamily = 'Nunito';
 
@@ -589,7 +586,8 @@
   function updateProfit(chart, profit) {
     //chart.data.datasets[0].data[0] = profit;
     let dataset = chart.series[0];
-    dataset.addPoint(profit);
+    const profitFormatted = parseFloat(profit.toFixed(2));
+    dataset.addPoint(profitFormatted);
     //chart.update();
   }
 
@@ -597,7 +595,8 @@
   function updateVolume(chart, volume) {
     //chart.data.datasets[0].data[0] = volume;
     let dataset = chart.series[0];
-    dataset.addPoint(volume);
+    const volumeFormated = parseFloat(volume.toFixed(2));
+    dataset.addPoint(volumeFormated);
     //chart.update();
   }
 
@@ -607,6 +606,11 @@
       console.log('Round begin');
     }
     if (data['type'] == 'clear') {
+      console.error('cleared data:', data);
+      // update cash and inventory bar regardless
+      updateProfit(cash_bar, data['cash']);
+      updateVolume(inventory_bar, data['inventory']);
+      // clear book graph
       klf_line.data.datasets[2].data = [];
       klf_line.update();
     }
@@ -615,23 +619,15 @@
     if (data['type'] === 'regraph') {
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
-      console.warn('should check if order has expired here', data);
+      //   console.warn('should check if order has expired here', data);
       updateOrderHistory(data);
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
-      console.log('received buy/sell/regraph');
-      // console.log(data);
-      // console.log('--------------------------');
-      console.log('');
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'clearing_price') {
-      console.log('received clearing price');
-      console.log(data);
-      console.log('--------------------------');
-      console.log('');
       global_clearing_price = data['clearing_price'];
       // READ
       if ('{{treatment}}' != 'cda')
@@ -645,10 +641,7 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'update') {
-      console.log('received update');
-      console.log(data);
-      console.log('--------------------------');
-      console.log('');
+      console.error('got update', data);
       document.getElementById('cashInfo').innerHTML =
         'Cash ' + Number.parseFloat(data['cash']).toFixed(2);
       document.getElementById('invInfo').innerHTML =
@@ -710,7 +703,7 @@
     if (valueToBeat === undefined) {
       orderHistory.push(order);
 
-      console.log('frontend sending data:', order);
+      //   console.log('frontend sending data:', order);
 
       liveSend(order);
     } else {
@@ -781,7 +774,7 @@
     const valueToBeat = isNewOrderValid(order); // undefined means order is good
     if (valueToBeat === undefined) {
       orderHistory.push(order);
-      console.log('frontend sending data:', order);
+      //   console.log('frontend sending data:', order);
       liveSend(order);
     } else {
       let errorText;
@@ -792,7 +785,7 @@
       } else if (isFLO) {
         // flo: can only sell when p_min is > buy's p_max
         // flo: can only buy when p_max < sell's p_min
-        errorText = `Your sell order will cross with one of your sell orders. Try increasing the minimum price above ${valueToBeat}.`;
+        errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
       }
       Swal.fire({
         title: 'Cannot Trade With Yourself',

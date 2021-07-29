@@ -94,6 +94,22 @@
     /* border: solid; */
   }
 
+  .header {
+    background-color: #fff;
+    font-family: Nunito;
+    color: black;
+    border-radius: var(--borderRadius);
+    background-color: #fff;
+    word-wrap: break-word;
+    margin-bottom: 24px !important;
+
+    position: fixed;
+    width: 100vw;
+    z-index: 200;
+    top: 0;
+    border-radius: 0 !important;
+  }
+
   .borderRadiusFix {
     border-radius: var(--borderRadius);
   }
@@ -134,6 +150,7 @@
   @media (max-width: 1300px) {
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
+      margin-right: var(--cardSpacing);
     }
 
     .conditionalMargin2 {
@@ -141,14 +158,37 @@
     }
   }
 
-  @media (max-width: 1230px) {
+  @media (max-width: 1261px) {
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
-      margin-left: -24px;
+      margin-left: -0px;
+    }
+
+    .marginTop {
+      margin-top: 70px !important;
     }
 
     .roundFixMargin {
       width: 100vw;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+      margin-left: -84 !important;
+    }
+
+    .marginTop {
+      margin-top: 116px !important;
+    }
+
+
+  }
+
+  @media (max-width: 448px) {
+    .marginTop {
+      margin-top: 154px !important;
     }
   }
 
@@ -282,7 +322,8 @@
     padding-right: 20px;
   }
 
-  h4, h5, label {
+  h4,
+  label {
     color: #595959;
   }
 
@@ -291,7 +332,7 @@
   }
 
   /* h2, h4 { */
-    /* color: black !important; */
+  /* color: black !important; */
   /* } */
 
 
@@ -299,23 +340,28 @@
   /* td {
     width: 46px;
   } */
+
+  .marginTop {
+    margin-top: 70px;
+  }
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
-<div class="container-fluid noMargin hideDebug">
-  <div class="mt-2 mb-2 row justify-content-center fixMargin " id="HEADER">
-    <div class="text-center minWidth roundFixMargin">
-      <h2 onclick="debug()">Round {{subsession.round_number}}</h1>
-    </div>
-    <div class="col-xl-4  col-6 text-center ">
-      <h2 id="cashInfo" class="">Cash
-        {{ player.cash|floatformat:1 }}
-      </h2>
-    </div>
-    <div class="col-xl-4  col-6 text-center ">
-      <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
-    </div>
+<div class=" mt-0 mb-2 header shadow row justify-content-center fixMargin "
+  id="HEADER">
+  <div class=" col-xl-4  col-12 text-center  roundFixMargin">
+    <h2 onclick="debug()">Round {{subsession.round_number}}</h1>
   </div>
+  <div class="col-xl-4  col-6 text-center ">
+    <h2 id="cashInfo" class="">Cash
+      {{ player.cash|floatformat:1 }}
+    </h2>
+  </div>
+  <div class="col-xl-4  col-6 text-center ">
+    <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
+  </div>
+</div>
+<div class="container-fluid marginTop hideDebug">
   <div class="row justify-content-center">
     <div
       class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
@@ -492,7 +538,7 @@
         </div>
       </div>
     </div>
-    <div class="col-8 shadow market cardWrapper conditionalMargin" id="MARKET">
+    <div class="col-8 shadow market minWidth cardWrapper conditionalMargin" id="MARKET">
       <div class="pb-5 pl-4 pr-4 w-100 h-100"
         style="padding-top: 14px !important;">
         <h5 class="mb-2 text-center">Market</h5>
