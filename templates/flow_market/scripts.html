@@ -944,11 +944,22 @@
     const quantity = document.createElement('td');
     quantity.innerHTML = order.q_max;
 
-    direction.style.width = '91px';
-    price.style.width = '61px';
-    quantity.style.width = '88px';
+    if (isFLO) {
+      const rate = document.createElement('td');
+      rate.innerHTML = order.u_max;
 
-    newRow.append(direction, price, quantity);
+      direction.style.width = '92px';
+      price.style.width = '62px';
+      quantity.style.width = '90px';
+      rate.style.width = '59px';
+      newRow.append(direction, price, quantity, rate);
+    } else {
+      direction.style.width = '91px';
+      price.style.width = '61px';
+      quantity.style.width = '88px';
+      newRow.append(direction, price, quantity);
+    }
+
     // since id's cannot start with letter
     newRow.id = 'a' + order.orderID;
     // newRow.style.width = '326.4px';
