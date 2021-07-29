@@ -60,10 +60,6 @@
 
   let orderHistory = [];
 
-  function debug() {
-    console.log('orderHistory: ', orderHistory);
-  }
-
   // update order history if an order has expired
   function updateOrderHistory(data) {
     orderHistory = orderHistory.filter((order) => {
@@ -82,6 +78,8 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
+        // also remove from active orders table
+        removeActiveOrderTable(order.orderID);
         return false;
       } else {
         return true;
@@ -606,7 +604,6 @@
       console.log('Round begin');
     }
     if (data['type'] == 'clear') {
-      console.error('cleared data:', data);
       // update cash and inventory bar regardless
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
@@ -641,7 +638,6 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'update') {
-      console.error('got update', data);
       document.getElementById('cashInfo').innerHTML =
         'Cash ' + Number.parseFloat(data['cash']).toFixed(2);
       document.getElementById('invInfo').innerHTML =
@@ -702,6 +698,7 @@
     const valueToBeat = isNewOrderValid(order); // undefined means order is valid
     if (valueToBeat === undefined) {
       orderHistory.push(order);
+      appendActiveOrdersTable(order);
 
       //   console.log('frontend sending data:', order);
 
@@ -774,6 +771,7 @@
     const valueToBeat = isNewOrderValid(order); // undefined means order is good
     if (valueToBeat === undefined) {
       orderHistory.push(order);
+      appendActiveOrdersTable(order);
       //   console.log('frontend sending data:', order);
       liveSend(order);
     } else {
@@ -922,5 +920,63 @@
       timestamp: performance.now(),
       // TODO need to include uuid like in manual orders 'orderID': uuidv4()
     });
+  }
+
+  function debug() {
+    console.log('orderHistory: ', orderHistory);
+    appendActiveOrdersTable(null);
+  }
+
+  function appendActiveOrdersTable(order) {
+    console.error(order);
+    const table = document.querySelector('#activeOrdersTable');
+    const newRow = document.createElement('tr');
+
+    const direction = document.createElement('td');
+    direction.innerHTML = order.direction === 'buy' ? 'Buy' : 'Sell';
+
+    const price = document.createElement('td');
+    price.innerHTML =
+      order.p_min === order.p_max
+        ? `${order.p_max}`
+        : `${order.p_min}-${order.p_max}`;
+
+    const quantity = document.createElement('td');
+    quantity.innerHTML = order.q_max;
+
+    if (isFLO) {
+      const rate = document.createElement('td');
+      rate.innerHTML = order.u_max;
+
+      direction.style.width = '92px';
+      price.style.width = '62px';
+      quantity.style.width = '90px';
+      rate.style.width = '59px';
+      newRow.append(direction, price, quantity, rate);
+    } else {
+      direction.style.width = '91px';
+      price.style.width = '61px';
+      quantity.style.width = '88px';
+      newRow.append(direction, price, quantity);
+    }
+
+    // since id's cannot start with letter
+    newRow.id = 'a' + order.orderID;
+    // newRow.style.width = '326.4px';
+    const tableWrapper = document.querySelector('#activeOrdersTableWrapper');
+
+    table.appendChild(newRow);
+  }
+
+  if (isCDA || isFBA) {
+    hideRateColumnActiveOrdersTable();
+  }
+  function removeActiveOrderTable(orderID) {
+    document.querySelector(`#a${orderID}`).remove();
+  }
+
+  function hideRateColumnActiveOrdersTable() {
+    document.querySelector('#activeOrdersRate').remove();
+    document.querySelector('#activeOrdersDirection').style.width = '0';
   }
 </script>
