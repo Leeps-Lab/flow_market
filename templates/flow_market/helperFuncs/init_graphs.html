@@ -1,170 +1,186 @@
 {% load otree %}
 <script>
-   function init_graphs() {
-       var cash_ctx = document.getElementById('cash-bar');
-       var cash_bar = Highcharts.chart('cash-bar', {
-           credits: {enabled: false},
-           title: {
-               // text: 'Cash'
-               text: undefined
-           },
+  function init_graphs() {
+    var cash_ctx = document.getElementById('cash-bar');
+    var cash_bar = Highcharts.chart('cash-bar', {
+      credits: {enabled: false},
+      title: {
+        // text: 'Cash'
+        text: undefined,
+      },
 
-           yAxis: {
-               title: {
-                   // text: 'Cash'
-                   text: undefined
-               }
-           },
+      yAxis: {
+        title: {
+          // text: 'Cash'
+          text: undefined,
+        },
+      },
 
-           xAxis: {
-               title: {
-                   text: 'Time'
-               }
-           },
+      xAxis: {
+        title: {
+          text: 'Time',
+        },
+        min: 0,
+        max: 180,
+      },
 
-           legend: {
-               layout: 'vertical',
-               align: 'right',
-               verticalAlign: 'middle'
-           },
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle',
+      },
 
-           plotOptions: {
-               series: {
-                   label: {
-                       connectorAllowed: false
-                   },
-                   marker: {
-                       enabled: false
-                   }
-               }
-           },
+      plotOptions: {
+        series: {
+          label: {
+            connectorAllowed: false,
+          },
+          marker: {
+            enabled: false,
+          },
+        },
+      },
 
-           series: [{
-               name: 'Cash',
-               data: [{{player.cash}}],
-               showInLegend: false,
-               color: '#17a2b8',
-           }],
+      series: [
+        {
+          name: 'Cash',
+          data: [parseInt('{{player.cash}}')],
+          showInLegend: false,
+          color: '#17a2b8',
+        },
+      ],
 
-           responsive: {
-               rules: [{
-                   condition: {
-                       maxWidth: 500
-                   }
-               }]
-           }
-       });
+      responsive: {
+        rules: [
+          {
+            condition: {
+              maxWidth: 500,
+            },
+          },
+        ],
+      },
+    });
 
+    var inv_ctx = document.getElementById('inv-bar');
+    var inventory_bar = Highcharts.chart('inv-bar', {
+      credits: {
+        enabled: false,
+      },
+      title: {
+        // text: 'Inventory'
+        text: undefined,
+      },
 
-       var inv_ctx = document.getElementById('inv-bar');
-       var inventory_bar = Highcharts.chart('inv-bar', {
-           credits: {
-    enabled: false
-  },
-           title: {
-               // text: 'Inventory'
-               text: undefined
-           },
+      yAxis: {
+        title: {
+          // text: 'Units'
+          text: undefined,
+        },
+      },
 
-           yAxis: {
-               title: {
-                   // text: 'Units'
-                   text: undefined
-               }
-           },
+      xAxis: {
+        title: {
+          text: 'Time',
+        },
+        min: 0,
+        max: 180,
+      },
 
-           xAxis: {
-               title: {
-                   text: 'Time'
-               }
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle',
+      },
 
-           },
+      plotOptions: {
+        series: {
+          label: {
+            connectorAllowed: false,
+          },
+          marker: {
+            enabled: false,
+          },
+        },
+      },
 
-           legend: {
-               layout: 'vertical',
-               align: 'right',
-               verticalAlign: 'middle'
-           },
+      series: [
+        {
+          name: 'Inventory',
+          showInLegend: false,
+          color: '#17a2b8',
+          data: [parseInt('{{player.inventory}}')],
+        },
+      ],
 
-           plotOptions: {
-               series: {
-                   label: {
-                       connectorAllowed: false
-                   },
-                   marker: {
-                       enabled: false
-                   }
-               }
-           },
+      responsive: {
+        rules: [
+          {
+            condition: {
+              maxWidth: 500,
+            },
+          },
+        ],
+      },
+    });
 
-           series: [{
-               name: 'Inventory',
-               showInLegend: false,
-               color: '#17a2b8',
-               data: [{{player.inventory}}],
-           }],
+    var klf_line_ctx = document.getElementById('klf-line');
+    var klf_line = new Chart(klf_line_ctx, {
+      type: 'scatter',
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                // beginAtZero: true,
+              },
+            },
+          ],
+        },
+        title: {
+          display: false,
+          text: 'Market',
+        },
+        elements: {
+          point: {
+            radius: 3,
+            pointStyle: 'dash',
+          },
+        },
+      },
+      data: {
+        datasets: [
+          {
+            label: 'Bids',
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            fill: false,
+            showLine: true,
+            lineTension: 0,
+            data: [],
+          },
+          {
+            label: 'Asks',
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            fill: false,
+            showLine: true,
+            lineTension: 0,
+            data: [],
+          },
+          {
+            label: 'Clearing Price',
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            fill: false,
+            showLine: true,
+            lineTension: 0,
+            data: [],
+          },
+        ],
+      },
+    });
 
-           responsive: {
-               rules: [{
-                   condition: {
-                       maxWidth: 500
-                   }
-               }]
-           }
-       });
-
-       var klf_line_ctx = document.getElementById('klf-line');
-       var klf_line = new Chart(klf_line_ctx, {
-           type: 'scatter',
-           options: {
-               maintainAspectRatio: false,
-               scales: {
-                   yAxes: [{
-                       ticks: {
-                           // beginAtZero: true,
-                       },
-                   }]
-               },
-               title: {
-                   display: false,
-                   text: 'Market',
-               },
-               elements: {
-                   point: {
-                       radius: 3,
-                       pointStyle: 'dash',
-                   },
-               },
-           },
-           data: {
-               datasets: [{
-                   label: 'Bids',
-                   borderColor: "#007bff",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }, {
-                   label: 'Asks',
-                   borderColor: "#dc3545",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }, {
-                   label: 'Clearing Price',
-                   borderColor: "#28a745",
-                   backgroundColor: 'rgba(0, 0, 0, 0)',
-                   fill: false,
-                   showLine: true,
-                   lineTension: 0,
-                   data: [],
-               }]
-           },
-       });
-
-       return [cash_bar, inventory_bar, klf_line];
-   }
+    return [cash_bar, inventory_bar, klf_line];
+  }
 </script>

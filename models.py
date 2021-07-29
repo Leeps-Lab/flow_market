@@ -519,11 +519,21 @@ class Group(BaseGroup):
             # print("")
         else:
             # Clear the clearing price graph
+            # for player in self.get_players():
+            #     payloads[player.participant.code] = {"type": 'clear'}
+
+            # live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+            #                      0].participant._index_in_pages, payloads)
+
             for player in self.get_players():
-                payloads[player.participant.code] = {"type": 'clear'}
+                payloads[player.participant.code] = {
+                    "type": 'clear', "cash": player.cash, "inventory": player.inventory}
+
+            # payloads[seller.participant.code] = {
+            #     "type": 'update', "cash": seller.cash, "inventory": seller.inventory}
 
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-                                 0].participant._index_in_pages, payloads)
+                0].participant._index_in_pages, payloads)
 
 
 class Player(BasePlayer):

@@ -604,6 +604,11 @@
       console.log('Round begin');
     }
     if (data['type'] == 'clear') {
+      console.error('cleared data:', data);
+      // update cash and inventory bar regardless
+      updateProfit(cash_bar, data['cash']);
+      updateVolume(inventory_bar, data['inventory']);
+      // clear book graph
       klf_line.data.datasets[2].data = [];
       klf_line.update();
     }
@@ -618,7 +623,7 @@
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
       //   console.log('received buy/sell/regraph');
-      // console.log(data);
+      console.error('got buy/sell', data);
       // console.log('--------------------------');
       //   console.log('');
       graphBids(klf_line, data['buys']);
@@ -644,6 +649,7 @@
     if (data['type'] == 'update') {
       //   console.log('received update');
       //   console.log(data);
+      console.error('got update', data);
       //   console.log('--------------------------');
       //   console.log('');
       document.getElementById('cashInfo').innerHTML =
