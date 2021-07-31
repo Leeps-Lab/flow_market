@@ -143,6 +143,8 @@
   const noUiAlgoVolSlider = createnoUiAlgoVolSlider();
   const noUiAlgoRateSlider = createNoUiAlgoRateSlider();
 
+  const [cashOdometer, invOdometer] = intializeOdometers();
+
   if ('{{treatment}}' != 'flo') {
     // Because cda and fba has a fixed u_max
     document.querySelector('.noUiRateSliderWrapper').remove();
@@ -344,54 +346,6 @@
     //chart.update();
   }
 
-  // const cashOdometer = new Odometer({
-  //   el: document.querySelector('#cashInfo'),
-  //   value: 5000,
-  //   duration: 1 * 1000,
-  //   format: '(,ddd)',
-  //   // theme: 'default',
-  //   theme: 'minimal',
-  // });
-  // cashOdometer.render();
-
-  // const invOdometer = new Odometer({
-  //   el: document.querySelector('#invInfo'),
-  //   value: 500,
-  //   duration: 1 * 1000,
-  //   format: '(,ddd)',
-  //   theme: 'default',
-  //   theme: 'minimal',
-  // });
-  // invOdometer.render();
-  const [cashOdometer, invOdometer] = intializeOdometers();
-
-  function intializeOdometers() {
-    odometerOptions = {auto: false};
-    window.odometerOptions = {
-      duration: 1 * 1000,
-    };
-    const cashOdometer = new Odometer({
-      el: document.querySelector('#cashInfo'),
-      value: 5000,
-      duration: 1 * 1000,
-      format: '(,ddd)',
-      // theme: 'default',
-      theme: 'minimal',
-    });
-    cashOdometer.render();
-
-    const invOdometer = new Odometer({
-      el: document.querySelector('#invInfo'),
-      value: 500,
-      duration: 1 * 1000,
-      format: '(,ddd)',
-      theme: 'default',
-      theme: 'minimal',
-    });
-    invOdometer.render();
-
-    return [cashOdometer, invOdometer];
-  }
 
   function liveRecv(data) {
     // console.log(data)
