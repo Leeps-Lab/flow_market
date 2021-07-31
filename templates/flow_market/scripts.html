@@ -344,6 +344,55 @@
     //chart.update();
   }
 
+  // const cashOdometer = new Odometer({
+  //   el: document.querySelector('#cashInfo'),
+  //   value: 5000,
+  //   duration: 1 * 1000,
+  //   format: '(,ddd)',
+  //   // theme: 'default',
+  //   theme: 'minimal',
+  // });
+  // cashOdometer.render();
+
+  // const invOdometer = new Odometer({
+  //   el: document.querySelector('#invInfo'),
+  //   value: 500,
+  //   duration: 1 * 1000,
+  //   format: '(,ddd)',
+  //   theme: 'default',
+  //   theme: 'minimal',
+  // });
+  // invOdometer.render();
+  const [cashOdometer, invOdometer] = intializeOdometers();
+
+  function intializeOdometers() {
+    odometerOptions = {auto: false};
+    window.odometerOptions = {
+      duration: 1 * 1000,
+    };
+    const cashOdometer = new Odometer({
+      el: document.querySelector('#cashInfo'),
+      value: 5000,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      // theme: 'default',
+      theme: 'minimal',
+    });
+    cashOdometer.render();
+
+    const invOdometer = new Odometer({
+      el: document.querySelector('#invInfo'),
+      value: 500,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      theme: 'default',
+      theme: 'minimal',
+    });
+    invOdometer.render();
+
+    return [cashOdometer, invOdometer];
+  }
+
   function liveRecv(data) {
     // console.log(data)
     if (data['type'] == 'begin') {
@@ -383,14 +432,25 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'update') {
-      document.getElementById('cashInfo').innerHTML =
-        'Cash ' + Number.parseFloat(data['cash']).toFixed(2);
-      document.getElementById('invInfo').innerHTML =
-        'Inventory ' + Number.parseFloat(data['inventory']).toFixed(2);
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
+      cachedData = data;
+      // updateCashAndInventoryDisplay(data);
     }
   }
+
+  // console.error(parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2)));
+  // console.error(
+  //   typeof parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2))
+  // );
+  let cachedData;
+  function updateCashAndInventoryDisplay(data) {
+    if (cachedData === undefined) return;
+    cashOdometer.update(parseFloat(data['cash']).toFixed(2));
+    invOdometer.update(parseFloat(data['inventory']).toFixed(2));
+    console.error(parseFloat(data['cash']).toFixed(2));
+  }
+  setInterval(() => updateCashAndInventoryDisplay(cachedData), 1000);
 
   function new_buy() {
     let maxprice;
