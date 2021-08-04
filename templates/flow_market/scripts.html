@@ -10,6 +10,8 @@
 <!-- pretter-ignore -->
 {% block init_sliders %} {% include Constants.scripts_init_sliders_template %}
 {% endblock %}
+<!-- prettier-ignore -->
+{% block InputDropdown %} {% include Constants.scripts_InputDropdown_template %} {% endblock %}
 
 <script>
   document.addEventListener(
@@ -21,6 +23,9 @@
         });
         console.log('begin round');
       }
+
+      InputDropdown.hideAlgorithmicInputDropdown();
+      // InputDropdown.hideManualInputDropdown();
     },
     false
   );
@@ -346,7 +351,6 @@
     //chart.update();
   }
 
-
   function liveRecv(data) {
     // console.log(data)
     if (data['type'] == 'begin') {
@@ -654,8 +658,11 @@
   }
 
   function debug() {
+    InputDropdown.hideAlgorithmicInputDropdown();
+    // InputDropdown.hideManualInputDropdown();
     // console.log('orderHistory: ', orderHistory);
     // appendActiveOrdersTable(null);
+    InputDropdown.test();
     test();
   }
 

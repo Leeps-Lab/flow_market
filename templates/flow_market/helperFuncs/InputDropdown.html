@@ -1,0 +1,67 @@
+{% load otree %}
+<script>
+  class InputDropdown {
+    static test(e) {
+      if (e.target.innerHTML.includes('Manual')) {
+        InputDropdown.#changeCurrentSelection('Manual Input');
+      }
+      if (e.target.innerHTML.includes('Algorithmic')) {
+        InputDropdown.#changeCurrentSelection('Algorithmic Input');
+      }
+    }
+
+    static #changeCurrentSelection(selectionText) {
+      InputDropdown.#changeText(selectionText);
+      InputDropdown.#changeUI(selectionText);
+    }
+
+    static hideAlgorithmicInputDropdown() {
+      document.querySelector('#ALGORITHMIC_INPUT').style.display = 'none';
+    }
+
+    static hideManualInputDropdown() {
+      document.querySelector('#MANUAL_INPUT').style.display = 'none';
+    }
+
+    static #changeText(selectionText) {
+      document.querySelectorAll('.inputDropdown').forEach((node) => {
+        node.innerHTML = selectionText;
+      });
+
+      if (selectionText === 'Algorithmic Input') {
+        document.querySelector('#MANUAL_INPUT').style.display = 'none';
+        document.querySelector('#ALGORITHMIC_INPUT').style.display = 'block';
+
+        document.querySelectorAll('.manualInputDropdown').forEach((node) => {
+          node.classList.remove('active');
+        });
+
+        document
+          .querySelectorAll('.algorithmicInputDropdown')
+          .forEach((node) => {
+            node.classList.add('active');
+          });
+      }
+
+      if (selectionText === 'Manual Input') {
+        console.log('should remove algo, show manual');
+        document.querySelector('#ALGORITHMIC_INPUT').style.display = 'none';
+        document.querySelector('#MANUAL_INPUT').style.display = 'block';
+
+        document
+          .querySelectorAll('.algorithmicInputDropdown')
+          .forEach((node) => {
+            node.classList.remove('active');
+          });
+
+        document.querySelectorAll('.manualInputDropdown').forEach((node) => {
+          node.classList.add('active');
+        });
+      }
+    }
+
+    static #changeUI(selectionText) {
+      console.log('changing ui');
+    }
+  }
+</script>

@@ -21,6 +21,12 @@
     background-color: #f8fbff;
   }
 
+  #MANUAL {
+    display: none;
+  }
+
+
+
   .fixedAlgoInputHeight {
     height: 550px;
   }
@@ -211,7 +217,7 @@
       margin-top: 154px !important;
     }
   }
-  
+
   @media (max-width: 596px) {
     .conditionalMarginTop {
       margin-top: 162px !important;
@@ -387,17 +393,62 @@
     -o-transition-duration: 1s !important;
     transition-duration: 1s !important
   }
+
+  .dropdown-item {
+    cursor: pointer;
+  }
+
+  .active {
+    color: white !important;
+  }
+
+  .copyH5:hover {
+    cursor: grab;
+    filter: brightness(95%);
+  }
+
+  .copyH5 {
+    background-color: white !important;
+    color: black !important;
+    border: none !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --cardSpacing: 24px;
+    --borderRadius: .7rem;
+    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+    --animate-duration: 1s;
+    --animate-delay: 1s;
+    --animate-repeat: 1;
+    word-wrap: break-word;
+    -webkit-box-direction: normal !important;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.2;
+    color: inherit;
+    font-size: 1.25rem;
+    margin-top: 0;
+    font-weight: 600;
+    padding-top: .25rem !important;
+    text-align: center !important;
+  }
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
-  <div class=" col-xl-4  col-12 text-center  roundFixMargin" style="padding-top: 2px;">
+  <div class=" col-xl-4  col-12 text-center  roundFixMargin"
+    style="padding-top: 2px;">
     <h2 onclick="debug()">Round {{subsession.round_number}}</h1>
   </div>
   <div class="col-xl-4  col-6 text-center ">
     <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
-    <h2 id="" class="" style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+    <h2 id="" class=""
+      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Cash&nbsp;
     </h2>
     <h2 id="cashInfo" class=""
@@ -406,7 +457,8 @@
     </h2>
   </div>
   <div class="col-xl-4  col-6 text-center ">
-    <h2 id="" class="mt-0" style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+    <h2 id="" class="mt-0"
+      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Inventory&nbsp;
     </h2>
     <h2 id="invInfo" class=""
@@ -525,87 +577,81 @@
       </div>
     </div>
   </div>
-  <div class="row   justify-content-center ">
-    <div
-      class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
-      id="MANUAL">
-      <div class="p-4 borderRadiusFix col shadow">
-        <div class="row h-100 justify-content-center">
-          <div class="col">
-            <div
-              class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
-              <div class="cardHeader w-100 text-align-right">
-                <h5 class="mb-4 pt-1 text-center">Manual Input</h5>
-              </div>
-              <form class="formPadding">
-                <div class="form-group row w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Price</label>
-                    <div id="noUiPriceSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
+  <div class="row justify-content-center ">
+    <div id="MANUAL_INPUT">
+
+      <div
+        class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+        id="MANUAL">
+        <div class="p-4 borderRadiusFix col shadow">
+          <div class="row h-100 justify-content-center">
+            <div class="col">
+              <div
+                class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
+                <div class="cardHeader w-100 text-align-right">
+                  <div class="dropdown show">
+                    <a class="inputDropdown copyH5 btn btn-secondary dropdown-toggle"
+                      href="#" role="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false">
+                      Manual Input
+                    </a>
+                    <div class="dropdown-menu">
+                      <a class="active dropdown-item manualInputDropdown"
+                        onclick="InputDropdown.test(event)">Manual Input</a>
+                      <a class="dropdown-item algorithmicInputDropdown"
+                        onclick="InputDropdown.test(event)">Algorithmic
+                        Input</a>
+                    </div>
                   </div>
                 </div>
-                <div class="noUiVolSliderWrapper form-group row mt-4 w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Volume</label>
-                    <div id="noUiVolSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
+                <form class="formPadding">
+                  <div class="form-group row w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Price</label>
+                      <div id="noUiPriceSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
                   </div>
-                </div>
-                <div class="noUiRateSliderWrapper form-group row mt-4 w-75">
-                  <div
-                    class="w-100 d-flex justify-content-between sliderWrapper">
-                    <label class="mr-4" id="">Rate</label>
-                    <div id="noUiRateSlider" class="noUiSlider"
-                      style="min-width:200px;"></div>
+                  <div class="noUiVolSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Volume</label>
+                      <div id="noUiVolSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
                   </div>
+                  <div class="noUiRateSliderWrapper form-group row mt-4 w-75">
+                    <div
+                      class="w-100 d-flex justify-content-between sliderWrapper">
+                      <label class="mr-4" id="">Rate</label>
+                      <div id="noUiRateSlider" class="noUiSlider"
+                        style="min-width:200px;"></div>
+                    </div>
+                  </div>
+                </form>
+                <div class="mt-2">
+                  <button type="button" id="sendBid"
+                    class="btn mr-3 btn-primary" onclick="new_buy()">
+                    Send Buy
+                  </button>
+                  <button type="button" id="sendAsk" class="btn btn-danger"
+                    onclick="new_sell()">
+                    Send Sell
+                  </button>
                 </div>
-              </form>
-              <div class="mt-2">
-                <button type="button" id="sendBid" class="btn mr-3 btn-primary"
-                  onclick="new_buy()">
-                  Send Buy
-                </button>
-                <button type="button" id="sendAsk" class="btn btn-danger"
-                  onclick="new_sell()">
-                  Send Sell
-                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-      id="CASH">
-      <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Cash</h5>
-          </div>
-          <div class="" id="cash-bar"></div>
-        </div>
-      </div>
+
     </div>
 
-    <div
-      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
-      id="INVENTORY">
-      <div class="shadow cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Inventory</h5>
-          </div>
-          <div class="" id="inv-bar"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="cardSpacingRight marginBottom  marginLeftModified">
+
+
+
+    <div id="ALGORITHMIC_INPUT" class="marginBottom  marginLeftModified">
       <div
         class="shadow d-flex align-items-center minWidth fixedAlgoInputHeight  cardWrapper"
         id="ALGORITHM">
@@ -613,7 +659,19 @@
           <div class="row pt-2 h-100 justify-content-center">
             <div class="text-center d-flex flex-column justify-content-between">
               <div class="cardHeader w-100 text-align-right">
-                <h5 class="mb-2 text-center">Algorithmic Input</h5>
+                <div class="dropdown show">
+                  <a class="mb-0 inputDropdown copyH5 btn btn-secondary dropdown-toggle"
+                    href="#" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Algorithmic Input
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class=" dropdown-item manualInputDropdown"
+                      onclick="InputDropdown.test(event)">Manual Input</a>
+                    <a class="active dropdown-item algorithmicInputDropdown"
+                      onclick="InputDropdown.test(event)">Algorithmic Input</a>
+                  </div>
+                </div>
               </div>
               <div class="mb-4 noUiAlgoTimeSliderWrapper form-group row mt-4">
                 <div class="d-flex justify-content-between sliderWrapper">
@@ -668,6 +726,35 @@
         </div>
       </div>
     </div>
+
+
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
+      <div class="shadow cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Inventory</h5>
+          </div>
+          <div class="" id="inv-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
     <div class="col-4 minWidth"></div>
     <div class="col-4 minWidth"></div>
 
