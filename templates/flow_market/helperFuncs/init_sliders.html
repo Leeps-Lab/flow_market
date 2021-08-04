@@ -1,0 +1,260 @@
+{% load otree %}
+<script>
+  // Initialize the manual inputs
+  const minpriceSliderVal = 6;
+  const maxpriceSliderVal = 10;
+  const volSliderVal = 50;
+  const rateSliderVal = 3;
+
+  function createNoUiPriceSlider() {
+    const slider = document.getElementById('noUiPriceSlider');
+    if (isCDA || isFBA) {
+      noUiSlider.create(slider, {
+        start: [maxpriceSliderVal],
+        connect: [true, false],
+        pips: {
+          mode: 'count',
+          values: 3,
+          density: 10,
+        },
+        step: 1,
+        tooltips: [
+          wNumb({
+            decimals: 0,
+          }),
+        ],
+        range: {
+          min: 1,
+          max: parseInt('{{max_price}}'),
+        },
+      });
+    } else if (isFLO) {
+      noUiSlider.create(slider, {
+        start: [minpriceSliderVal, maxpriceSliderVal],
+        connect: true,
+        pips: {
+          mode: 'count',
+          values: 3,
+          density: 10,
+        },
+        step: 1,
+        tooltips: [
+          wNumb({
+            decimals: 0,
+          }),
+          wNumb({
+            decimals: 0,
+          }),
+        ],
+        range: {
+          min: 1,
+          max: parseInt('{{max_price}}'),
+        },
+      });
+    }
+    return slider;
+  }
+
+  function createNoUiVolSlider() {
+    const noUiVolSlider = document.getElementById('noUiVolSlider');
+    noUiSlider.create(noUiVolSlider, {
+      start: [volSliderVal],
+      connect: [true, false],
+      pips: {
+        mode: 'values',
+        values: [1, 50, parseInt('{{max_q_max}})')],
+        density: 5,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 1,
+        max: parseInt('{{max_q_max}}'),
+      },
+    });
+
+    return noUiVolSlider;
+  }
+
+  function createNoUiRateSlider() {
+    const noUiRateSlider = document.getElementById('noUiRateSlider');
+    noUiSlider.create(noUiRateSlider, {
+      start: [volSliderVal],
+      connect: [true, false],
+      pips: {
+        mode: 'values',
+        values: [1, 3, parseInt('{{max_u_max}}')],
+        density: 30,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 1,
+        max: parseInt('{{max_u_max}}'),
+      },
+    });
+    return noUiRateSlider;
+  }
+
+  const algo_timeSliderVal = 3;
+  const algo_quantitySliderVal = 6;
+
+  function createNoUiAlgoTimeSlider() {
+    const noUiAlgoTimeSlider = document.getElementById('noUiAlgoTimeSlider');
+    noUiSlider.create(noUiAlgoTimeSlider, {
+      start: [algo_timeSliderVal],
+      connect: [true, false],
+      pips: {
+        mode: 'count',
+        values: 3,
+        density: 10,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 2,
+        max: 20,
+      },
+    });
+    return noUiAlgoTimeSlider;
+  }
+
+  function createNoUiAlgoQuantitySlider() {
+    const noUiAlgoQuantitySlider = document.getElementById(
+      'noUiAlgoQuantitySlider'
+    );
+    noUiSlider.create(noUiAlgoQuantitySlider, {
+      start: [algo_quantitySliderVal],
+      connect: [true, false],
+      pips: {
+        mode: 'count',
+        values: 3,
+        density: 10,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 1,
+        max: 10,
+      },
+    });
+    return noUiAlgoQuantitySlider;
+  }
+
+  function createNoUiAlgoPriceSlider() {
+    const noUiAlgoPriceSlider = document.getElementById('noUiAlgoPriceSlider');
+    if (isCDA || isFBA) {
+      noUiSlider.create(noUiAlgoPriceSlider, {
+        start: [10],
+        connect: [true, false],
+        pips: {
+          mode: 'count',
+          values: 3,
+          density: 10,
+        },
+        step: 1,
+        tooltips: [
+          wNumb({
+            decimals: 0,
+          }),
+        ],
+        range: {
+          min: 1,
+          max: parseInt('{{max_price}}'),
+        },
+      });
+    } else if (isFLO) {
+      noUiSlider.create(noUiAlgoPriceSlider, {
+        start: [minpriceSliderVal, maxpriceSliderVal],
+        connect: true,
+        pips: {
+          mode: 'count',
+          values: 3,
+          density: 10,
+        },
+        step: 1,
+        tooltips: [
+          wNumb({
+            decimals: 0,
+          }),
+          wNumb({
+            decimals: 0,
+          }),
+        ],
+        range: {
+          min: 1,
+          max: parseInt('{{max_price}}'),
+        },
+      });
+    }
+    return noUiAlgoPriceSlider;
+  }
+
+  function createnoUiAlgoVolSlider() {
+    const noUiAlgoVolSlider = document.getElementById('noUiAlgoVolSlider');
+    noUiSlider.create(noUiAlgoVolSlider, {
+      start: [50],
+      connect: [true, false],
+      pips: {
+        mode: 'values',
+        values: [1, 50, parseInt('{{max_q_max}}')],
+        density: 5,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 1,
+        max: parseInt('{{max_q_max}}'),
+      },
+    });
+    return noUiAlgoVolSlider;
+  }
+
+  function createNoUiAlgoRateSlider() {
+    const noUiAlgoRateSlider = document.getElementById('noUiAlgoRateSlider');
+    noUiSlider.create(noUiAlgoRateSlider, {
+      start: [3],
+      connect: [true, false],
+      pips: {
+        mode: 'count',
+        values: 3,
+        density: 30,
+      },
+      step: 1,
+      tooltips: [
+        wNumb({
+          decimals: 0,
+        }),
+      ],
+      range: {
+        min: 1,
+        max: parseInt('{{max_u_max}}'),
+      },
+    });
+    return noUiAlgoRateSlider;
+  }
+
+  function test() {
+    console.error('testing');
+  }
+</script>

@@ -21,15 +21,14 @@
     background-color: #f8fbff;
   }
 
-  #MANUAL {
-    display: none;
-  }
-
-
-
   .fixedAlgoInputHeight {
     height: 550px;
   }
+
+
+  /* .form-group.row { */
+  /* background-color: chocolate; */
+  /* } */
 
   .fixed {
     width: 400px;
@@ -37,8 +36,7 @@
   }
 
   .market {
-    /* height: 800px; */
-    height: 400px;
+    height: 800px;
     min-width: 400px;
     /* padding: 20px !important; */
     /* padding-right: 32px !important; */
@@ -74,15 +72,6 @@
   }
 
 
-  #inv-bar,
-  #cash-bar {
-    height: 328px;
-  }
-
-
-  .marginLeft {
-    margin-left: var(--cardSpacing)
-  }
 
   #inv-bar,
   #cash-bar,
@@ -112,6 +101,7 @@
     border-radius: var(--borderRadius);
     background-color: #fff;
     word-wrap: break-word;
+    margin-bottom: 24px !important;
 
     position: fixed;
     width: 100vw;
@@ -136,8 +126,7 @@
   }
 
   .fixedHeightModified {
-    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
-    height: 400px !important;
+    height: calc(400px - var(--cardSpacing) - (800px - 800px));
     /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
     /* height: 350px; */
   }
@@ -155,21 +144,10 @@
   }
 
   .marginBottomFix {
-    margin-bottom: calc(var(--cardSpacing));
+    margin-bottom: calc(var(--cardSpacing) + 76px);
   }
 
-  @media (max-width: 878px) {
-    .conditionalMarginBot {
-      margin-bottom: var(--cardSpacing);
-      /* margin-bottom: 1000px !important; */
-    }
-
-    .conditionalMarginLeft {
-      margin-left: var(--cardSpacing);
-    }
-  }
-
-  @media (max-width: 1302px) {
+  @media (max-width: 1300px) {
     .conditionalMargin {
       margin-bottom: var(--cardSpacing);
       margin-right: var(--cardSpacing);
@@ -178,7 +156,6 @@
     .conditionalMargin2 {
       margin-right: var(--cardSpacing);
     }
-
   }
 
   @media (max-width: 1261px) {
@@ -206,21 +183,12 @@
       margin-top: 116px !important;
     }
 
-    .conditionalMarginTop {
-      margin-top: 130px !important;
-    }
 
   }
 
   @media (max-width: 448px) {
     .marginTop {
       margin-top: 154px !important;
-    }
-  }
-
-  @media (max-width: 596px) {
-    .conditionalMarginTop {
-      margin-top: 162px !important;
     }
   }
 
@@ -329,7 +297,6 @@
   .table-wrapper-scroll-y:hover {
     cursor: ns-resize;
     background-color: whitesmoke;
-    overflow-y: scroll;
   }
 
   .moveTableUp {
@@ -377,101 +344,28 @@
   .marginTop {
     margin-top: 70px;
   }
-
-  .containerMargin {
-    margin-top: 84px;
-  }
-
-
-  .odometer.odometer-auto-theme.odometer-animating-up .odometer-ribbon-inner,
-  .odometer.odometer-theme-minimal.odometer-animating-up .odometer-ribbon-inner,
-  .odometer.odometer-auto-theme.odometer-animating-down.odometer-animating .odometer-ribbon-inner,
-  .odometer.odometer-theme-minimal.odometer-animating-down.odometer-animating .odometer-ribbon-inner {
-    -webkit-transition-duration: 1s !important;
-    -moz-transition-duration: 1s !important;
-    -ms-transition-duration: 1s !important;
-    -o-transition-duration: 1s !important;
-    transition-duration: 1s !important
-  }
-
-  .dropdown-item {
-    cursor: pointer;
-  }
-
-  .active {
-    color: white !important;
-  }
-
-  .copyH5:hover {
-    cursor: grab;
-    filter: brightness(95%);
-  }
-
-  .copyH5 {
-    background-color: white !important;
-    color: black !important;
-    border: none !important;
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-    --breakpoint-xs: 0;
-    --breakpoint-sm: 576px;
-    --breakpoint-md: 768px;
-    --breakpoint-lg: 992px;
-    --breakpoint-xl: 1200px;
-    --cardSpacing: 24px;
-    --borderRadius: .7rem;
-    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
-    --animate-duration: 1s;
-    --animate-delay: 1s;
-    --animate-repeat: 1;
-    word-wrap: break-word;
-    -webkit-box-direction: normal !important;
-    box-sizing: border-box;
-    font-family: inherit;
-    line-height: 1.2;
-    color: inherit;
-    font-size: 1.25rem;
-    margin-top: 0;
-    font-weight: 600;
-    padding-top: .25rem !important;
-    text-align: center !important;
-  }
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
-<div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
+<div class=" mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
-  <div class=" col-xl-4  col-12 text-center  roundFixMargin"
-    style="padding-top: 2px;">
+  <div class=" col-xl-4  col-12 text-center  roundFixMargin">
     <h2 onclick="debug()">Round {{subsession.round_number}}</h1>
   </div>
   <div class="col-xl-4  col-6 text-center ">
-    <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
-    <h2 id="" class=""
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Cash&nbsp;
-    </h2>
-    <h2 id="cashInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
+    <h2 id="cashInfo" class="">Cash
       {{ player.cash|floatformat:1 }}
     </h2>
   </div>
   <div class="col-xl-4  col-6 text-center ">
-    <h2 id="" class="mt-0"
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Inventory&nbsp;
-    </h2>
-    <h2 id="invInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
-      {{ player.inventory|floatformat:1 }}
-    </h2>
+    <h2 id="invInfo">Inventory {{ player.inventory|floatformat:1 }}</h2>
   </div>
 </div>
-<div class="container-fluid containerMargin hideDebug conditionalMarginTop">
+<div class="container-fluid marginTop hideDebug">
   <div class="row justify-content-center">
     <div
       class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
-      <div class="col ">
+      <div class="col cardSpacingBottom">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
           id="HISTORY">
@@ -549,8 +443,7 @@
                   </tr>
                 </thead>
               </table>
-              <div id="activeOrdersTableWrapper" style="min-width: 242px;"
-                class="table-wrapper-scroll-y my-custom-scrollbar">
+              <div id="activeOrdersTableWrapper" style="min-width: 242px;" class="table-wrapper-scroll-y my-custom-scrollbar">
                 <table class="table moveTableUp">
                   <tbody id="activeOrdersTable">
                     {% for bet in bets %}
@@ -567,21 +460,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-8 shadow market minWidth cardWrapper conditionalMargin"
-      id="MARKET">
-      <div class="pb-5 pl-4 pr-4 w-100 h-100"
-        style="padding-top: 14px !important;">
-        <h5 class="mb-2 text-center">Market</h5>
-        <canvas id="klf-line" class="h-100 pb-2"></canvas>
-      </div>
-    </div>
-  </div>
-  <div class="row justify-content-center ">
-    <div id="MANUAL_INPUT">
-
       <div
-        class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
+        class=" cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
         id="MANUAL">
         <div class="p-4 borderRadiusFix col shadow">
           <div class="row h-100 justify-content-center">
@@ -589,20 +469,7 @@
               <div
                 class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
                 <div class="cardHeader w-100 text-align-right">
-                  <div class="dropdown show">
-                    <a class="inputDropdown copyH5 btn btn-secondary dropdown-toggle"
-                      href="#" role="button" data-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="false">
-                      Manual Input
-                    </a>
-                    <div class="dropdown-menu">
-                      <a class="active dropdown-item manualInputDropdown"
-                        onclick="InputDropdown.test(event)">Manual Input</a>
-                      <a class="dropdown-item algorithmicInputDropdown"
-                        onclick="InputDropdown.test(event)">Algorithmic
-                        Input</a>
-                    </div>
-                  </div>
+                  <h5 class="mb-4 pt-1 text-center">Manual Input</h5>
                 </div>
                 <form class="formPadding">
                   <div class="form-group row w-75">
@@ -645,13 +512,18 @@
           </div>
         </div>
       </div>
-
     </div>
-
-
-
-
-    <div id="ALGORITHMIC_INPUT" class="marginBottom  marginLeftModified">
+    <div class="col-8 shadow market minWidth cardWrapper conditionalMargin"
+      id="MARKET">
+      <div class="pb-5 pl-4 pr-4 w-100 h-100"
+        style="padding-top: 14px !important;">
+        <h5 class="mb-2 text-center">Market</h5>
+        <canvas id="klf-line" class="h-100 pb-2"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center  ">
+    <div class="cardSpacingRight marginBottom ">
       <div
         class="shadow d-flex align-items-center minWidth fixedAlgoInputHeight  cardWrapper"
         id="ALGORITHM">
@@ -659,19 +531,7 @@
           <div class="row pt-2 h-100 justify-content-center">
             <div class="text-center d-flex flex-column justify-content-between">
               <div class="cardHeader w-100 text-align-right">
-                <div class="dropdown show">
-                  <a class="mb-0 inputDropdown copyH5 btn btn-secondary dropdown-toggle"
-                    href="#" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    Algorithmic Input
-                  </a>
-                  <div class="dropdown-menu">
-                    <a class=" dropdown-item manualInputDropdown"
-                      onclick="InputDropdown.test(event)">Manual Input</a>
-                    <a class="active dropdown-item algorithmicInputDropdown"
-                      onclick="InputDropdown.test(event)">Algorithmic Input</a>
-                  </div>
-                </div>
+                <h5 class="mb-2 text-center">Algorithmic Input</h5>
               </div>
               <div class="mb-4 noUiAlgoTimeSliderWrapper form-group row mt-4">
                 <div class="d-flex justify-content-between sliderWrapper">
@@ -727,12 +587,11 @@
       </div>
     </div>
 
-
     <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+      class="marginBottomFix minWidth conditionalMargin2 fixedHeight col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
+        <div class="pt-4 pl-3 pb-2 pr-3">
           <div class="w-100 text-align-right">
             <h5 class="text-center mb-3">Cash</h5>
           </div>
@@ -741,8 +600,7 @@
       </div>
     </div>
 
-    <div
-      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
+    <div class="minWidth  col-4 fixedHeight borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3">
@@ -753,11 +611,6 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-4 minWidth"></div>
-    <div class="col-4 minWidth"></div>
-
   </div>
 </div>
 

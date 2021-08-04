@@ -183,4 +183,32 @@
 
     return [cash_bar, inventory_bar, klf_line];
   }
+
+  function intializeOdometers() {
+    odometerOptions = {auto: false};
+    window.odometerOptions = {
+      duration: 1 * 1000,
+    };
+    const cashOdometer = new Odometer({
+      el: document.querySelector('#cashInfo'),
+      value: 5000,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      // theme: 'default',
+      theme: 'minimal',
+    });
+    cashOdometer.render();
+
+    const invOdometer = new Odometer({
+      el: document.querySelector('#invInfo'),
+      value: 500,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      theme: 'default',
+      theme: 'minimal',
+    });
+    invOdometer.render();
+
+    return [cashOdometer, invOdometer];
+  }
 </script>
