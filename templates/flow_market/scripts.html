@@ -352,8 +352,8 @@
   }
 
   function liveRecv(data) {
-    console.timeEnd(`timing`);
-    console.time(`timing`);
+    // console.timeEnd(`timing`);
+    // console.time(`timing`);
     if (data['type'] == 'begin') {
       console.log('Round begin');
     }
@@ -391,6 +391,13 @@
       }
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
+    }
+    if (data['type'] == 'bets update') {
+      console.log('bet');
+      updateProfit(cash_bar, data['cash']);
+      updateVolume(inventory_bar, data['inventory']);
+      cachedData = data;
+      // updateCashAndInventoryDisplay(data);
     }
     if (data['type'] == 'update') {
       updateProfit(cash_bar, data['cash']);
@@ -710,7 +717,12 @@
   }
 
   function removeActiveOrderTable(orderID) {
+    const rowCopy = document.querySelector(`#a${orderID}`).cloneNode(true);
     document.querySelector(`#a${orderID}`).remove();
+
+    const table = document.querySelector('#executedOrdersTable');
+    table.appendChild(rowCopy);
+    console.log('removed and appended');
   }
 
   function hideRateColumnActiveOrdersTable() {

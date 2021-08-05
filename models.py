@@ -212,7 +212,7 @@ class Group(BaseGroup):
             payloads[player_ref.participant.code] = {"type": 'none'}
 
         payloads[player.participant.code] = {
-            "type": 'update', "cash": player.cash, "inventory": player.inventory}
+            "type": 'bets update', "cash": player.cash, "inventory": player.inventory}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
 
@@ -363,7 +363,7 @@ class Group(BaseGroup):
             # print("len(buys) and len(sells) > 0, executing orders")
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
-            print("clearing price:", clearing_price)
+            # print("clearing price:", clearing_price)
             # print("Clearing Price: " + str(clearing_price))
             # Graph the clearing price
 
@@ -578,7 +578,7 @@ class Player(BasePlayer):
                 # Setup Bets and File input
                 self.group.init_order_copies()
                 # ENABLE reenable set_bets
-                # call_with_delay(0, self.group.set_bets)
+                call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 
                 # Begin Continuously Updating function
