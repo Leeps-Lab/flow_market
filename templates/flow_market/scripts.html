@@ -351,6 +351,27 @@
     //chart.update();
   }
 
+  class BetsUI {
+    static #currentBet = null;
+
+    static updateBets(bet) {
+      const id = bet.bet_id;
+      console.log('removing betID:', id);
+      this.#removeFromActive(id);
+      this.#appendToExpired();
+    }
+
+    static #removeFromActive(id) {
+      this.#currentBet = document.querySelector(`#a${id}`).cloneNode(true);
+      document.querySelector(`#a${id}`).remove();
+    }
+
+    static #appendToExpired() {
+      const table = document.querySelector('#executedBetsTable');
+      table.appendChild(this.#currentBet);
+    }
+  }
+
   function liveRecv(data) {
     // console.timeEnd(`timing`);
     // console.time(`timing`);
@@ -393,10 +414,11 @@
       graphAsks(klf_line, data['sells']);
     }
     if (data['type'] == 'bets update') {
-      console.log('bet');
+      console.log('bet:', data);
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
+      BetsUI.updateBets(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
     if (data['type'] == 'update') {

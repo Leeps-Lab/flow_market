@@ -94,6 +94,10 @@ class Group(BaseGroup):
     def min_price_delta(self):
         return 0.1
 
+    # was going to map uuid to row number of individual bet, but realized row number is unique itself
+    def get_bet_id(self, rowNum):
+        return rowNum
+
     def start_inv(self):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['start_inv']
 
@@ -184,21 +188,25 @@ class Group(BaseGroup):
         with open('flow_market/bets/' + bet_file) as f:
             rows = list(csv.DictReader(f))
 
+        rowNum = 0
         for row in rows:
             data = {
                 'trader_id': int(row['trader_id']),
                 'direction': str(row['direction']),
                 'limit_price': int(row['limit_price']),
                 'quantity': int(row['quantity']),
-                'deadline': int(row['deadline'])
+                'deadline': int(row['deadline']),
+                'bet_id': self.get_bet_id(rowNum),
             }
             call_with_delay((int(row['deadline'])/1000),
                             self.execute_bet, data)
+            rowNum += 1
         return
 
     # seems to be updating price and inv correctly here for executing bets
     # HERE works execute_bet
     def execute_bet(self, data):
+        print("executing bet:", data)
         player = self.get_player_by_id(data['trader_id'])
         if data['direction'] == 'buy':
             player.updateProfit(data['quantity']*data['limit_price'])
@@ -212,7 +220,7 @@ class Group(BaseGroup):
             payloads[player_ref.participant.code] = {"type": 'none'}
 
         payloads[player.participant.code] = {
-            "type": 'bets update', "cash": player.cash, "inventory": player.inventory}
+            "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
 

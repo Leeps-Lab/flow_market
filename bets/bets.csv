@@ -1,6 +1,10 @@
 trader_id,direction,limit_price,quantity,deadline
 1,buy,10,5,5000
-1,buy,1,2,10000
+1,buy,20,1,10000
+1,buy,30,2,15000
+1,buy,40,3,20000
+1,buy,50,4,25000
+1,buy,60,5,30000
 2,sell,13,7,2000
 3,buy,12,9,1500
 4,buy,8,8,1200
