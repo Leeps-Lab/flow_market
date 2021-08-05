@@ -43,6 +43,7 @@ class Constants(BaseConstants):
     scripts_init_sliders_template = 'flow_market/helperFuncs/init_sliders.html'
     scripts_imports_template = 'flow_market/helperFuncs/imports.html'
     scripts_InputDropdown_template = 'flow_market/helperFuncs/InputDropdown.html'
+    scripts_constants_template = 'flow_market/helperFuncs/constants.html'
 
     style_template = 'flow_market/style.html'
 

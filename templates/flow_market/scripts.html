@@ -4,6 +4,8 @@
 <!-- not sure market.js is even needed anymore -->
 <script type="module" src="{% static 'flow_market/market.js' %}"></script>
 <!-- prettier-ignore -->
+{% block constants %} {% include Constants.scripts_constants_template %} {% endblock %}
+<!-- prettier-ignore -->
 {% block imports %} {% include Constants.scripts_imports_template %} {% endblock %}
 <!-- prettier-ignore -->
 {% block init_graphs %} {% include Constants.scripts_init_graphs_template %} {% endblock %}
@@ -29,10 +31,6 @@
     },
     false
   );
-
-  const isCDA = '{{treatment}}' === 'cda';
-  const isFLO = '{{treatment}}' === 'flo';
-  const isFBA = '{{treatment}}' === 'fba';
 
   let orderHistory = [];
 

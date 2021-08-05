@@ -134,12 +134,20 @@
               ticks: {
                 beginAtZero: true,
               },
+              scaleLabel: {
+                display: true,
+                labelString: isCDA || isFBA ? 'Price' : 'Rate',
+              },
             },
           ],
           xAxes: [
             {
               ticks: {
                 beginAtZero: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: isCDA || isFBA ? 'Volume' : 'Price',
               },
             },
           ],
@@ -218,4 +226,5 @@
 
     return [cashOdometer, invOdometer];
   }
+  console.log('init graphs', isCDA);
 </script>
