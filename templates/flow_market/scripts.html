@@ -27,7 +27,6 @@
       }
 
       InputDropdown.hideAlgorithmicInputDropdown();
-      // InputDropdown.hideManualInputDropdown();
     },
     false
   );
@@ -209,7 +208,6 @@
       agg_supply += calcSupply(sell, price);
     });
     var points = [];
-
     points.push({
       x: 0.0,
       y: agg_supply,
@@ -228,6 +226,7 @@
   }
 
   function graphBids(chart, buys) {
+    // console.log('graphBids() buys:', buys);
     buys = buys.filter((buy) => buy['status'] == 'active');
     if ('{{treatment}}' != 'cda') {
       // if treatment is fba/flo, calculate aggregate supply and graph x, y as price, aggregate supply
@@ -247,6 +246,7 @@
         buys.forEach(function (buy, _index, _array) {
           agg_supply += calcDemand(buy, price);
         });
+        // console.log('graphBids() plotting x:', price, 'y:', agg_supply);
         points.push({
           x: price,
           y: agg_supply,
@@ -298,11 +298,13 @@
         sells.forEach(function (sell, _index, _array) {
           agg_supply += calcSupply(sell, price);
         });
+        // console.log('graphSells() plotting x:', price, 'y:', agg_supply);
         points.push({
           x: price,
           y: agg_supply,
         });
       });
+      // console.log('graphSells() points', points);
     } else {
       sells.sort((a, b) => (a['p_max'] > b['p_max'] ? 1 : -1));
       var volume = 0.0;
@@ -350,7 +352,6 @@
   }
 
   function liveRecv(data) {
-    // console.log(data)
     if (data['type'] == 'begin') {
       console.log('Round begin');
     }
@@ -377,13 +378,15 @@
     }
     if (data['type'] == 'clearing_price') {
       global_clearing_price = data['clearing_price'];
-      if ('{{treatment}}' != 'cda')
+      if ('{{treatment}}' != 'cda') {
+        // console.error('data: ', data);
         graphClearingPrice(
           klf_line,
           data['clearing_price'],
           data['buys'],
           data['sells']
         );
+      }
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
@@ -404,7 +407,7 @@
     if (cachedData === undefined) return;
     cashOdometer.update(parseFloat(data['cash']).toFixed(2));
     invOdometer.update(parseFloat(data['inventory']).toFixed(2));
-    console.error(parseFloat(data['cash']).toFixed(2));
+    // console.error(parseFloat(data['cash']).toFixed(2));
   }
   setInterval(() => updateCashAndInventoryDisplay(cachedData), 1000);
 
@@ -417,10 +420,10 @@
       );
       minprice = maxprice;
     } else if (isFLO) {
-      maxprice = parseInt(
+      maxprice = parseFloat(
         document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
       );
-      minprice = parseInt(
+      minprice = parseFloat(
         document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
       );
     }
@@ -491,10 +494,10 @@
       );
       minprice = maxprice;
     } else if (isFLO) {
-      maxprice = parseInt(
+      maxprice = parseFloat(
         document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
       );
-      minprice = parseInt(
+      minprice = parseFloat(
         document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
       );
     }
@@ -656,16 +659,11 @@
   }
 
   function debug() {
-    InputDropdown.hideAlgorithmicInputDropdown();
-    // InputDropdown.hideManualInputDropdown();
-    // console.log('orderHistory: ', orderHistory);
-    // appendActiveOrdersTable(null);
-    InputDropdown.test();
-    test();
+    console.log('mindelta: {{min_price_delta}}');
   }
 
   function appendActiveOrdersTable(order) {
-    console.error(order);
+    // console.error('appendActiveOrdersTable: ', order);
     const table = document.querySelector('#activeOrdersTable');
     const newRow = document.createElement('tr');
 

@@ -91,6 +91,9 @@ class Group(BaseGroup):
         self.order_copies = {str(i): {}
                              for i in range(1, self.num_players()+1)}
 
+    def min_price_delta(self):
+        return 0.1
+
     def start_inv(self):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['start_inv']
 
@@ -360,6 +363,7 @@ class Group(BaseGroup):
             # print("len(buys) and len(sells) > 0, executing orders")
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
+            print("clearing price:", clearing_price)
             # print("Clearing Price: " + str(clearing_price))
             # Graph the clearing price
 

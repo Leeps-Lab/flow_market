@@ -40,6 +40,7 @@ class Decision(Page):
             'max_price': self.group.max_price(),
             'max_u_max': self.group.max_u_max(),
             'max_q_max': self.group.max_q_max(),
+            'min_price_delta': self.group.min_price_delta(),
         }
 
 

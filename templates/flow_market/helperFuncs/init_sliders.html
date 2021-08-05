@@ -37,13 +37,14 @@
           values: 3,
           density: 10,
         },
-        step: 1,
+        margin: parseFloat('{{min_price_delta}}'),
+        step: parseFloat('{{min_price_delta}}'),
         tooltips: [
           wNumb({
-            decimals: 0,
+            decimals: 1,
           }),
           wNumb({
-            decimals: 0,
+            decimals: 1,
           }),
         ],
         range: {
