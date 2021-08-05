@@ -352,6 +352,8 @@
   }
 
   function liveRecv(data) {
+    console.timeEnd(`timing`);
+    console.time(`timing`);
     if (data['type'] == 'begin') {
       console.log('Round begin');
     }
@@ -659,6 +661,7 @@
   }
 
   function debug() {
+    console.log('update: {{update_freq}}');
     console.log('mindelta: {{min_price_delta}}');
   }
 

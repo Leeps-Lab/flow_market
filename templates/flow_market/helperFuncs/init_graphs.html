@@ -3,6 +3,11 @@
   function init_graphs() {
     var cash_ctx = document.getElementById('cash-bar');
     var cash_bar = Highcharts.chart('cash-bar', {
+      chart: {
+        animation: {
+          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
+        },
+      },
       credits: {enabled: false},
       title: {
         // text: 'Cash'
@@ -21,7 +26,7 @@
           text: 'Time',
         },
         min: 0,
-        max: 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180,
       },
 
       legend: {
@@ -63,6 +68,11 @@
 
     var inv_ctx = document.getElementById('inv-bar');
     var inventory_bar = Highcharts.chart('inv-bar', {
+      chart: {
+        animation: {
+          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
+        },
+      },
       credits: {
         enabled: false,
       },
@@ -83,7 +93,7 @@
           text: 'Time',
         },
         min: 0,
-        max: 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180,
       },
 
       legend: {
