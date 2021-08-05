@@ -241,6 +241,7 @@
       // Generate range(70, 130) the domain based on sliders values
       // var prices = Array.from(new Array(0), (x,i) => i + 20);
       var prices = [...Array(20).keys()];
+      // prices = [0 to 20 integers]
       prices.forEach(function (price, _index, _array) {
         var agg_supply = 0.0;
         buys.forEach(function (buy, _index, _array) {
