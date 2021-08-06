@@ -493,14 +493,14 @@
                 </table>
                 <div class="table-wrapper-scroll-y my-custom-scrollbar">
                   <table class="tableHeightFix table moveTableUp">
-                    <tbody>
+                    <tbody id="activeBets">
                       {% for bet in bets %}
                       <tr id="a{{bet.bet_id}}">
                         <td style="width:91px; height:23px;">{{bet.direction}}
                         </td>
                         <td style="width:61px;">{{bet.limit_price}}</td>
                         <td style="width:88px;">{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
+                        <td class="betDeadline">{{bet.deadline}} ms</td>
                       </tr>
                       {% endfor %}
                     </tbody>

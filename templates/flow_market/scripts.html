@@ -18,7 +18,7 @@
 <script>
   document.addEventListener(
     'DOMContentLoaded',
-    function () {
+    () => {
       if ('{{player.id_in_group}}' == 1) {
         liveSend({
           direction: 'begin',
@@ -27,6 +27,11 @@
       }
 
       InputDropdown.hideAlgorithmicInputDropdown();
+      BetsUI.convertDeadlinesToSeconds();
+      setInterval(() => {
+        updateCashAndInventoryDisplay(cachedData);
+        BetsUI.decrementDeadlines();
+      }, 1000);
     },
     false
   );
@@ -355,7 +360,7 @@
   class BetsUI {
     static #currentBet = null;
 
-    static updateBets(bet) {
+    static moveExpiredBet(bet) {
       const id = bet.bet_id;
       console.log('removing betID:', id);
       this.#removeFromActive(id);
@@ -371,6 +376,32 @@
       const table = document.querySelector('#executedBetsTable');
       table.appendChild(this.#currentBet);
     }
+
+    static convertDeadlinesToSeconds() {
+      const rows = [...document.getElementsByClassName('betDeadline')];
+      rows.forEach((row) => {
+        const ms = math.unit(row.textContent);
+        const s = ms.to('s').toString();
+        row.textContent = s;
+      });
+    }
+
+    static decrementDeadlines() {
+      const rows = [...document.getElementsByClassName('betDeadline')];
+      const zeroSeconds = math.unit('0s');
+
+      rows.forEach((row) => {
+        const s = math.unit(row.textContent);
+        if (s.equals(zeroSeconds)) return;
+
+        const updatedS = math.subtract(s, math.unit('1s'));
+        row.textContent = updatedS.toString();
+      });
+    }
+  }
+
+  function debug() {
+    BetsUI.decrementDeadlines();
   }
 
   function liveRecv(data) {
@@ -419,7 +450,7 @@
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
-      BetsUI.updateBets(data['bet']);
+      BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
     if (data['type'] == 'update') {
@@ -441,7 +472,6 @@
     invOdometer.update(parseFloat(data['inventory']).toFixed(2));
     // console.error(parseFloat(data['cash']).toFixed(2));
   }
-  setInterval(() => updateCashAndInventoryDisplay(cachedData), 1000);
 
   function new_buy() {
     let maxprice;
@@ -688,11 +718,6 @@
       timestamp: performance.now(),
       // TODO need to include uuid like in manual orders 'orderID': uuidv4()
     });
-  }
-
-  function debug() {
-    console.log('update: {{update_freq}}');
-    console.log('mindelta: {{min_price_delta}}');
   }
 
   function appendActiveOrdersTable(order) {

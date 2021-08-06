@@ -502,7 +502,7 @@ class Player(BasePlayer):
                 # Setup Bets and File input
                 self.group.init_order_copies()
                 # ENABLE reenable set_bets
-                # call_with_delay(0, self.group.set_bets)
+                call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 
                 # Begin Continuously Updating function
