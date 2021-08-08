@@ -8,7 +8,7 @@
           duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
         },
       },
-      credits: {enabled: false},
+      credits: { enabled: false },
       title: {
         // text: 'Cash'
         text: undefined,
@@ -26,7 +26,13 @@
           text: 'Time',
         },
         min: 0,
-        max: (1 / parseFloat('{{update_freq}}')) * 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        labels: {
+          formatter: function () { // fix time tick values
+            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            return seconds
+          }
+        }
       },
 
       legend: {
@@ -93,7 +99,13 @@
           text: 'Time',
         },
         min: 0,
-        max: (1 / parseFloat('{{update_freq}}')) * 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        labels: {
+          formatter: function () { // fix time tick values
+            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            return seconds
+          }
+        }
       },
 
       legend: {
@@ -210,7 +222,7 @@
   }
 
   function intializeOdometers() {
-    odometerOptions = {auto: false};
+    odometerOptions = { auto: false };
     window.odometerOptions = {
       duration: 1 * 1000,
     };
