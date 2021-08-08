@@ -471,7 +471,7 @@
   <div class="row justify-content-center">
     <div
       class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
-      <div class="col ">
+      <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
           id="HISTORY">
@@ -493,37 +493,14 @@
                 </table>
                 <div class="table-wrapper-scroll-y my-custom-scrollbar">
                   <table class="tableHeightFix table moveTableUp">
-                    <tbody>
+                    <tbody id="activeBets">
                       {% for bet in bets %}
-                      <tr>
-                        <td style="width:91px;">{{bet.direction}}</td>
+                      <tr id="a{{bet.bet_id}}">
+                        <td style="width:91px; height:23px;">{{bet.direction}}
+                        </td>
                         <td style="width:61px;">{{bet.limit_price}}</td>
                         <td style="width:88px;">{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
-                      </tr>
-                      <tr>
-                        <td>{{bet.direction}}</td>
-                        <td>{{bet.limit_price}}</td>
-                        <td>{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
-                      </tr>
-                      <tr>
-                        <td>{{bet.direction}}</td>
-                        <td>{{bet.limit_price}}</td>
-                        <td>{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
-                      </tr>
-                      <tr>
-                        <td>{{bet.direction}}</td>
-                        <td>{{bet.limit_price}}</td>
-                        <td>{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
-                      </tr>
-                      <tr>
-                        <td>{{bet.direction}}</td>
-                        <td>{{bet.limit_price}}</td>
-                        <td>{{bet.quantity}}</td>
-                        <td>{{bet.deadline}} ms</td>
+                        <td class="betDeadline">{{bet.deadline}} ms</td>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -553,13 +530,6 @@
                 class="table-wrapper-scroll-y my-custom-scrollbar">
                 <table class="table moveTableUp">
                   <tbody id="activeOrdersTable">
-                    {% for bet in bets %}
-                    {% comment %} <tr>
-                      <td style="width:91px;">{{bet.direction}}</td>
-                      <td style="width:62px;">{{bet.limit_price}}</td>
-                      <td style="width:88px;">{{bet.quantity}}</td>
-                    </tr> {% endcomment %}
-                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -588,7 +558,7 @@
             <div class="col">
               <div
                 class="h-100 text-center d-flex align-items-center flex-column justify-content-between">
-                <div class="cardHeader w-100 text-align-right">
+                <div class="mb-1 cardHeader w-100 text-align-right">
                   <div class="dropdown show">
                     <a class="inputDropdown copyH5 btn btn-secondary dropdown-toggle"
                       href="#" role="button" data-toggle="dropdown"
@@ -755,17 +725,76 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col-4 minWidth"></div>
-    <div class="col-4 minWidth"></div>
-
+    <div
+      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+      <div class="col">
+        <div
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
+          id="EXECUTED_HISTORY">
+          <div class="row justify-content-center">
+            <div class="" id="EXECUTEDBETS">
+              <div class="" id="bets2">
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed Bets
+                  </h5>
+                </div>
+                <table class="table mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Direction</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Deadline</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="tableHeightFix table moveTableUp">
+                    <tbody id="executedBetsTable">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class=" row justify-content-center">
+            <div>
+              <div class="cardHeader w-100 text-align-right">
+                <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
+                  Executed Orders
+                </h5>
+              </div>
+              <table class="table mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col" id="executedOrdersDirection">Direction</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" id="executedOrdersRate">Rate</th>
+                  </tr>
+                </thead>
+              </table>
+              <div id="executedOrdersTableWrapper" style="min-width: 242px;"
+                class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table moveTableUp">
+                  <tbody id="executedOrdersTable">
+                    {% for bet in bets %}
+                    {% comment %} <tr>
+                      <td style="width:91px;">{{bet.direction}}</td>
+                      <td style="width:62px;">{{bet.limit_price}}</td>
+                      <td style="width:88px;">{{bet.quantity}}</td>
+                    </tr> {% endcomment %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8 minWidth conditionalMargin">
+    </div>
   </div>
-</div>
-
-
-
-
-
-
-
-{% block scripts %} {% include Constants.scripts_template %}
-{% endblock %}
+</div> {% block scripts %}
+{% include Constants.scripts_template %} {% endblock %}

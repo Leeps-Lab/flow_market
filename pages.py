@@ -1,6 +1,6 @@
 from otree.api import Currency as c, currency_range  # type: ignore
 from ._builtin import Page, WaitPage
-from .models import Constants
+from .models import Constants, Group
 import csv
 
 
@@ -26,20 +26,26 @@ class Decision(Page):
             rows = list(csv.DictReader(f))
 
         bets = []
+        rowNum = 0
         for row in rows:
             if (int(row['trader_id']) == self.player.id_in_group):
                 bets.append({
                     'direction': str(row['direction']).upper(),
                     'limit_price': int(row['limit_price']),
                     'quantity': int(row['quantity']),
-                    'deadline': int(row['deadline'])
+                    'deadline': int(row['deadline']),
+                    'bet_id': self.group.get_bet_id(rowNum),
                 })
+            rowNum += 1
+        print("sending bets", bets)
         return {
             'bets': bets,
             'treatment': self.group.treatment(),
             'max_price': self.group.max_price(),
             'max_u_max': self.group.max_u_max(),
             'max_q_max': self.group.max_q_max(),
+            'min_price_delta': self.group.min_price_delta(),
+            'update_freq': self.group.update_freq(),
         }
 
 

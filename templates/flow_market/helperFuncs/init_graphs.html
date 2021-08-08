@@ -3,7 +3,12 @@
   function init_graphs() {
     var cash_ctx = document.getElementById('cash-bar');
     var cash_bar = Highcharts.chart('cash-bar', {
-      credits: {enabled: false},
+      chart: {
+        animation: {
+          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
+        },
+      },
+      credits: { enabled: false },
       title: {
         // text: 'Cash'
         text: undefined,
@@ -21,7 +26,13 @@
           text: 'Time',
         },
         min: 0,
-        max: 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        labels: {
+          formatter: function () { // fix time tick values
+            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            return seconds
+          }
+        }
       },
 
       legend: {
@@ -63,6 +74,11 @@
 
     var inv_ctx = document.getElementById('inv-bar');
     var inventory_bar = Highcharts.chart('inv-bar', {
+      chart: {
+        animation: {
+          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
+        },
+      },
       credits: {
         enabled: false,
       },
@@ -83,7 +99,13 @@
           text: 'Time',
         },
         min: 0,
-        max: 180,
+        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        labels: {
+          formatter: function () { // fix time tick values
+            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            return seconds
+          }
+        }
       },
 
       legend: {
@@ -132,7 +154,22 @@
           yAxes: [
             {
               ticks: {
-                // beginAtZero: true,
+                beginAtZero: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: isCDA || isFBA ? 'Price' : 'Rate',
+              },
+            },
+          ],
+          xAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: isCDA || isFBA ? 'Volume' : 'Price',
               },
             },
           ],
@@ -185,7 +222,7 @@
   }
 
   function intializeOdometers() {
-    odometerOptions = {auto: false};
+    odometerOptions = { auto: false };
     window.odometerOptions = {
       duration: 1 * 1000,
     };
@@ -211,4 +248,5 @@
 
     return [cashOdometer, invOdometer];
   }
+  console.log('init graphs', isCDA);
 </script>
