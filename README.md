@@ -25,5 +25,8 @@ start postgres server
 redis-server
 
 otree resetdb
+(for some reason I need to rerun my bash-profile to set the REDIS_URL env var every time I restart my computer..
+source ~/.bash-profile
+)
 otree prodserver 80
 ```

@@ -20,6 +20,8 @@
 {% endblock %}
 
 <script>
+  const DISABLE_ALGO_FLO = true
+
   document.addEventListener(
     'DOMContentLoaded',
     () => {
@@ -406,6 +408,7 @@
 
   function debug() {
     BetsUI.decrementDeadlines();
+    console.log("disable:", "{{disable_algo_flo}}")
   }
 
   function liveRecv(data) {
