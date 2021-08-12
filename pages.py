@@ -46,6 +46,7 @@ class Decision(Page):
             'max_q_max': self.group.max_q_max(),
             'min_price_delta': self.group.min_price_delta(),
             'update_freq': self.group.update_freq(),
+            "disable_algo_flo": 'true',
         }
 
 

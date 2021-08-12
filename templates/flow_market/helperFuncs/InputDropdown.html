@@ -1,7 +1,7 @@
 {% load otree %}
 <script>
   class InputDropdown {
-    static test(e) {
+    static handleClick(e) {
       if (e.target.innerHTML.includes('Manual')) {
         InputDropdown.#changeCurrentSelection('Manual Input');
       }
@@ -11,6 +11,7 @@
     }
 
     static #changeCurrentSelection(selectionText) {
+      if ("{{disable_algo_flo}}" === "true" && isFLO) return
       InputDropdown.#changeText(selectionText);
       InputDropdown.#changeUI(selectionText);
     }
