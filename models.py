@@ -302,6 +302,25 @@ class Group(BaseGroup):
             return trade_vol
 
     def calcSupply(self, sell, price):
+        # print("sell:", type(sell), "price", type(price))
+        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'float'>
+        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'float'>
+        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'NoneType'>
+        # 14:07:09 asgiserver    | Exception in thread Thread-19:
+        # 14:07:09 asgiserver    | Traceback (most recent call last):
+        # 14:07:09 asgiserver    |   File "/opt/homebrew/Cellar/python@3.8/3.8.11/Frameworks/Python.framework/Versions/3.8/lib/python3.8/threading.py", line 932, in _bootstrap_inner
+        # 14:07:09 asgiserver    |     self.run()
+        # 14:07:09 asgiserver    |   File "/opt/homebrew/Cellar/python@3.8/3.8.11/Frameworks/Python.framework/Versions/3.8/lib/python3.8/threading.py", line 1254, in run
+        # 14:07:09 asgiserver    |     self.function(*self.args, **self.kwargs)
+        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/infiniteTimer.py", line 15, in _handle_target
+        # 14:07:09 asgiserver    |     self.target()
+        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/delayedFunct.py", line 22, in query_and_call
+        # 14:07:09 asgiserver    |     callback.__func__.__get__(new_model, cls)(*args, **kwargs)
+        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/models.py", line 393, in update
+        # 14:07:09 asgiserver    |     trader_vol = self.calcSupply(sell, clearing_price)
+        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/models.py", line 311, in calcSupply
+        # 14:07:09 asgiserver    |     if (price < sell['p_min']):
+        # 14:07:09 asgiserver    | TypeError: '<' not supported between instances of 'NoneType' and 'int'
         if (price < sell['p_min']):
             # Don't trade if price is lower than min willingness to sell
             # it seems returning 0 for supply disables execution for that specific sell order, I will use this fact in part of my implementation for preventing self trades
@@ -354,11 +373,16 @@ class Group(BaseGroup):
                 right = index
             else:
                 # print("Found cross: " + str(index))
+                # print("index 1:", index, type(index))
                 return index
 
             if (curr_iter == MAX_ITERS):
                 # print("Trouble finding cross in max iterations, got: " + str(index))
+                # print("index 2:", index, type(index))
                 return index
+        # BUG, situation #50 ends up here
+        # print("index 3:", index, type(index))
+        return index
 
     def update(self):
         buys = self.buys()
@@ -367,6 +391,7 @@ class Group(BaseGroup):
         if len(buys) > 0 and len(sells) > 0:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
+            # BUG clearing_price gets noneType
 
             # Graph the clearing price
             for player in self.get_players():
@@ -502,7 +527,7 @@ class Player(BasePlayer):
                 # Setup Bets and File input
                 self.group.init_order_copies()
                 # ENABLE reenable set_bets
-                call_with_delay(0, self.group.set_bets)
+                # call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 
                 # Begin Continuously Updating function
