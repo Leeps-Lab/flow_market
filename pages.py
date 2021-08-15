@@ -37,7 +37,7 @@ class Decision(Page):
                     'bet_id': self.group.get_bet_id(rowNum),
                 })
             rowNum += 1
-        print("sending bets", bets)
+        # print("sending bets", bets)
         return {
             'bets': bets,
             'treatment': self.group.treatment(),

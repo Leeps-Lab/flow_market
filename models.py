@@ -15,6 +15,7 @@ from .delayedFunct import call_with_delay_infinite, call_with_delay
 from jsonfield import JSONField
 import time
 import uuid
+import copy
 
 author = 'LeepsLab'
 
@@ -76,6 +77,7 @@ def init_copies():
 
 
 class Group(BaseGroup):
+    treatment_val = models.StringField()
     # order_copies[player_id_in_group][order_id]
     order_copies = JSONField(null=True, default=init_copies)
 
@@ -97,7 +99,11 @@ class Group(BaseGroup):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['start_cash']
 
     def treatment(self):
-        return parse_config(self.session.config['config_file'])[self.round_number-1]['treatment']
+        treatment = parse_config(self.session.config['config_file'])[
+            self.round_number-1]['treatment']
+        self.treatment_val = treatment
+        self.save()
+        return treatment
 
     def round_length(self):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['round_length']
@@ -144,7 +150,6 @@ class Group(BaseGroup):
             for player in self.get_players():
                 payloads[player.participant.code] = {
                     'type': 'buy', 'buys test': self.buys(), 'sells': self.sells()}
-            print("Sending orderbooks")
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
 
@@ -179,7 +184,6 @@ class Group(BaseGroup):
             time.sleep(2)
 
     def set_bets(self):
-        print("setting up bets")
         bet_file = self.bet_file()
         with open('flow_market/bets/' + bet_file) as f:
             rows = list(csv.DictReader(f))
@@ -202,7 +206,6 @@ class Group(BaseGroup):
     # seems to be updating price and inv correctly here for executing bets
     # HERE works execute_bet
     def execute_bet(self, data):
-        print("executing bet:", data)
         player = self.get_player_by_id(data['trader_id'])
         if data['direction'] == 'buy':
             player.updateProfit(data['quantity']*data['limit_price'])
@@ -222,7 +225,6 @@ class Group(BaseGroup):
                              0].participant._index_in_pages, payloads)
 
     def input_order_file(self):
-        print("setting up order")
         order_file = self.order_file()
         with open('flow_market/orders/' + order_file) as f:
             rows = list(csv.DictReader(f))
@@ -280,47 +282,42 @@ class Group(BaseGroup):
         return sells_list
 
     def calcDemand(self, buy, price):
+        # print("")
+        # print("calcDemand")
+        # print("buy:", buy)
+        # print("price:", price)
         if (price <= buy['p_min']):
+            # print(" 1")
+
             if (buy['q_max'] < buy['u_max']):
+                # print(" 1.1")
                 # Don't trade more than q_max
                 return buy['q_max']
             # Trade at max rate if p <= p_min
             return buy['u_max']
         elif (price > buy['p_max']):
+            # print(" 2")
             # Don't trade if price is higher than max willingness to buy
             # it seems returning 0 for demand disables execution for that specific buy order, I will use this fact in part of my implementation for preventing self trades
             return 0.0
         else:
+            print(" 3")
             # The price fell p_min < price < p_max
             if((buy['p_max'] - buy['p_min']) == 0):
+                print(" 3.1")
                 return buy['q_max']
+
             trade_vol = buy['u_max'] * \
                 ((buy['p_max'] - price) / (buy['p_max'] - buy['p_min']))
             if (trade_vol > buy['q_max']):
+                print(" 3.2")
                 # Saturate to q_max if trade_vol will exceed q_max
                 return buy['q_max']
+            print(" 3.3")
             return trade_vol
 
     def calcSupply(self, sell, price):
         # print("sell:", type(sell), "price", type(price))
-        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'float'>
-        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'float'>
-        # 14:07:09 asgiserver    | sell: <class 'dict'> price <class 'NoneType'>
-        # 14:07:09 asgiserver    | Exception in thread Thread-19:
-        # 14:07:09 asgiserver    | Traceback (most recent call last):
-        # 14:07:09 asgiserver    |   File "/opt/homebrew/Cellar/python@3.8/3.8.11/Frameworks/Python.framework/Versions/3.8/lib/python3.8/threading.py", line 932, in _bootstrap_inner
-        # 14:07:09 asgiserver    |     self.run()
-        # 14:07:09 asgiserver    |   File "/opt/homebrew/Cellar/python@3.8/3.8.11/Frameworks/Python.framework/Versions/3.8/lib/python3.8/threading.py", line 1254, in run
-        # 14:07:09 asgiserver    |     self.function(*self.args, **self.kwargs)
-        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/infiniteTimer.py", line 15, in _handle_target
-        # 14:07:09 asgiserver    |     self.target()
-        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/delayedFunct.py", line 22, in query_and_call
-        # 14:07:09 asgiserver    |     callback.__func__.__get__(new_model, cls)(*args, **kwargs)
-        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/models.py", line 393, in update
-        # 14:07:09 asgiserver    |     trader_vol = self.calcSupply(sell, clearing_price)
-        # 14:07:09 asgiserver    |   File "/Users/giang/otreeLeeps/flow_market/models.py", line 311, in calcSupply
-        # 14:07:09 asgiserver    |     if (price < sell['p_min']):
-        # 14:07:09 asgiserver    | TypeError: '<' not supported between instances of 'NoneType' and 'int'
         if (price < sell['p_min']):
             # Don't trade if price is lower than min willingness to sell
             # it seems returning 0 for supply disables execution for that specific sell order, I will use this fact in part of my implementation for preventing self trades
@@ -373,25 +370,22 @@ class Group(BaseGroup):
                 right = index
             else:
                 # print("Found cross: " + str(index))
-                # print("index 1:", index, type(index))
                 return index
 
             if (curr_iter == MAX_ITERS):
                 # print("Trouble finding cross in max iterations, got: " + str(index))
-                # print("index 2:", index, type(index))
                 return index
-        # BUG, situation #50 ends up here
-        # print("index 3:", index, type(index))
+        # situation #50 ends up here
         return index
 
     def update(self):
         buys = self.buys()
         sells = self.sells()
         payloads = {}
+        should_update_market_graph = False
         if len(buys) > 0 and len(sells) > 0:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
-            # BUG clearing_price gets noneType
 
             # Graph the clearing price
             for player in self.get_players():
@@ -404,20 +398,72 @@ class Group(BaseGroup):
                 payloads
             )
 
+            # TODO start here sell
+            print("treatment:", self.treatment_val)
+            print("sells 0:", sells)
+            print("buys:", buys)
+            max_price = float('-inf')
+            best_bid = None
+            for obj in buys:
+                if (obj["p_max"] > max_price):
+                    max_price = obj["p_max"]
+                    best_bid = obj
+
+            print("max:", max_price)
+            print("obj:", best_bid)
+            print("clearing:", clearing_price)
+
+            # highest_bid =
+            # sort bids
+            # how to find out condition?
+            sells_copy = copy.deepcopy(sells)
+
             # Update the traders' profits and orders
             for sell in sells:
                 seller = self.get_player_by_id(sell['player'])
 
-                # decrement remaining quantity of order
-                trader_vol = self.calcSupply(sell, clearing_price)
+                if (self.treatment_val == "cda"):
+                    print("in cda old sell:", sell["q_max"])
+                    if sell['q_max'] > best_bid["q_max"]:
+                        sell['q_max'] -= best_bid['q_max']
+                    elif sell['q_max'] == best_bid["q_max"]:
+                        sell['q_max'] -= best_bid['q_max']
+                        pass
+                        # can't do this here, since shouldn't update player that owns best_bid here
+                        # best_bid['q_max'] -= sell['q_max']
+                    else:
+                        sell['q_max'] -= best_bid['q_max']
+                        pass
+                        # can't do this here, since shouldn't update player that owns best_bid here
+                        # best_bid['q_max'] -= sell['q_max']
+                    print("new sell[q_max]:", sell["q_max"])
+                    print("sells 1:", sells)
+                else:
+                    print("in flo")
+                    # decrement remaining quantity of order
+                    trader_vol = self.calcSupply(sell, clearing_price)
+                    sell['q_max'] -= trader_vol
 
-                sell['q_max'] -= trader_vol
-
+                # TODO add flo vs cda
+                # TODO insert fix above cache code
+                print("out")
+                print("sells 2a:", sells)
                 cache = self.order_copies
-                cache[str(seller.id_in_group)][str(
-                    sell['orderID'])]['q_max'] -= trader_vol
+                print("sells 2a1:", sells)
+                if (self.treatment_val == "cda"):
+                    print("sells 2a2:", sells)
+                    # TODO not sure why doing this updates sells
+                    # cache[str(seller.id_in_group)][str(
+                    #     sell['orderID'])]['q_max'] -= best_bid["q_max"]
+                    print("sells 2aa:", sells)
+                else:
+                    cache[str(seller.id_in_group)][str(
+                        sell['orderID'])]['q_max'] -= trader_vol
+                    print("sells 2ab:", sells)
                 self.order_copies = cache
+                print("sells 2ba:", sells)
                 self.save()
+                print("sells 2b:", sells)
 
                 # remove the order if q_max <= 0
                 if sell['q_max'] <= 0.0:
@@ -428,6 +474,7 @@ class Group(BaseGroup):
                     self.save()
                     sell['status'] = 'expired'
                     # ReGraph KLF market since order expired
+                    should_update_market_graph = True
                     for player in self.get_players():
                         payloads[player.participant.code] = {
                             "type": 'regraph', "buys": buys, "sells": sells}
@@ -435,8 +482,14 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                seller.updateProfit(trader_vol * clearing_price)
-                seller.updateVolume(-trader_vol)
+                if (self.treatment_val == "cda"):
+                    print("sell update price old:", player.cash)
+                    seller.updateProfit(best_bid["p_max"] * clearing_price)
+                    seller.updateVolume(-best_bid["p_max"])
+                    print("sell update price new:", player.cash)
+                else:
+                    seller.updateProfit(trader_vol * clearing_price)
+                    seller.updateVolume(-trader_vol)
 
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
@@ -446,16 +499,58 @@ class Group(BaseGroup):
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
 
+            min_price = float('inf')
+            best_ask = None
+            for obj in sells_copy:
+                if (obj["p_max"] < min_price):
+                    min_price = obj["p_max"]
+                    best_ask = obj
+
+            print("")
+            print("min:", min_price)
+            print("obj:", best_ask)
+
             for buy in buys:
+                print("in buys")
                 buyer = self.get_player_by_id(buy['player'])
-                # decrement remaining quantity of order
-                trader_vol = self.calcDemand(buy, clearing_price)
 
-                buy['q_max'] -= trader_vol
+                if (self.treatment_val == "cda"):
+                    print("in cda old buy:", buy["q_max"])
+                    print("best ask", best_ask["q_max"])
+                    if buy['q_max'] > best_ask["q_max"]:
+                        buy['q_max'] -= best_ask['q_max']
+                    elif buy['q_max'] == best_ask["q_max"]:
+                        buy['q_max'] -= best_ask['q_max']
+                        pass
+                        # can't do this here, since shouldn't update player that owns best_ask here
+                        # best_ask['q_max'] -= buy['q_max']
+                    else:
+                        buy['q_max'] -= best_ask['q_max']
+                        pass
+                        # can't do this here, since shouldn't update player that owns best_ask here
+                        # best_ask['q_max'] -= buy['q_max']
+                    print("new buy[q_max]:", buy["q_max"])
+                else:
+                    print("in flo")
+                    # decrement remaining quantity of order
+                    trader_vol = self.calcDemand(buy, clearing_price)
+                    buy['q_max'] -= trader_vol
+                    # BUG trader vol is 100, when it should be 50
+                    # TODO insert fix above cache code
 
+                # TODO flo/cda
+                # trader_vol = self.calcDemand(buy, clearing_price)
+                print("buys 0:", buys)
                 cache = self.order_copies
-                cache[str(buy['player'])][str(buy['orderID'])
-                                          ]['q_max'] -= trader_vol
+                if (self.treatment_val == "cda"):
+                    # TODO not sure why doing this updates buys
+                    # cache[str(buy['player'])][str(buy['orderID'])
+                    #                           ]['q_max'] -= best_ask["q_max"]
+                    print("buys 1:", buys)
+                else:
+                    cache[str(buy['player'])][str(buy['orderID'])
+                                              ]['q_max'] -= trader_vol
+
                 self.order_copies = cache
                 self.save()
 
@@ -474,9 +569,22 @@ class Group(BaseGroup):
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
+                elif should_update_market_graph:
+                    for player in self.get_players():
+                        payloads[player.participant.code] = {
+                            "type": 'regraph', "buys": buys, "sells": sells}
 
-                buyer.updateProfit(-trader_vol * clearing_price)
-                buyer.updateVolume(trader_vol)
+                    live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+                                         0].participant._index_in_pages, payloads)
+
+                if (self.treatment_val == "cda"):
+                    print("buy update price old:", player.cash)
+                    buyer.updateProfit(-best_ask["p_max"] * clearing_price)
+                    buyer.updateVolume(best_ask["p_max"])
+                    print("buy update price new:", player.cash)
+                else:
+                    buyer.updateProfit(-trader_vol * clearing_price)
+                    buyer.updateVolume(trader_vol)
 
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():
@@ -537,15 +645,12 @@ class Player(BasePlayer):
 
         data['trader_id'] = self.id_in_group
         if data['direction'] == 'buy_algo':
-            # print(data)
             call_with_delay(0, self.group.new_buy_algo, data)
             return {0: {'type': 'buy_algo'}}
 
         if data['direction'] == 'sell_algo':
             call_with_delay(0, self.group.new_sell_algo, data)
             return {0: {'type': 'sell_algo'}}
-
-        # print("got uuid:", data["orderID"])
 
         # BUG should be updating uuid here
         self.updateUUID(data["orderID"])
