@@ -394,6 +394,7 @@ class Group(BaseGroup):
 
         condition = None
         if (self.treatment_val == "cda"):
+            # to fix Multiple remaining buy test 2, should include check if there are crossing orders
             condition = len(buys) > 0 or len(sells) > 0
         if (self.treatment_val == "flo"):
             condition = len(buys) > 0 and len(sells) > 0
@@ -540,7 +541,7 @@ class Group(BaseGroup):
                     self.save()
                     sell['status'] = 'expired'
                     # ReGraph KLF market since order expired
-                    should_update_market_graph = True  # BUG think this is causing a bug
+                    # should_update_market_graph = True  # BUG think this is causing a bug
                     for player in self.get_players():
                         payloads[player.participant.code] = {
                             "type": 'regraph', "buys": buys, "sells": sells}

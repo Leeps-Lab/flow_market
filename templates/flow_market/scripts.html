@@ -274,7 +274,12 @@
           x: buy['p_max'],
           y: volume,
         });
-        volume += buy['q_max'];
+        console.error('buy q copy', buy['q_max_cda_copy'], buy['q_max'])
+        if (buy['q_max_cda_copy'] !== undefined) {
+          volume += buy['q_max_cda_copy'];
+        } else {
+          volume += buy['q_max'];
+        }
         points.push({
           x: buy['p_max'],
           y: volume,
@@ -325,7 +330,12 @@
           x: sell['p_max'],
           y: volume,
         });
-        volume += sell['q_max'];
+        console.error('sell q copy', sell['q_max_cda_copy'], sell['q_max'])
+        if (sell['q_max_cda_copy'] !== undefined) {
+          volume += sell['q_max_cda_copy'];
+        } else {
+          volume += sell['q_max'];
+        }
         points.push({
           x: sell['p_max'],
           y: volume,
