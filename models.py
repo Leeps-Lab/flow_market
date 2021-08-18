@@ -422,25 +422,6 @@ class Group(BaseGroup):
             print("treatment:", self.treatment_val)
             print("original sells:", sells)
             print("original buys:", buys)
-            # TODO copy
-            # max_price = float('-inf')
-            # best_bid = None
-            # for obj in buys:
-            #     if (obj["p_max"] > max_price):
-            #         max_price = obj["p_max"]
-            #         best_bid = obj
-
-            # print("max:", max_price)
-            # print("obj:", best_bid)
-            # print("clearing:", clearing_price)
-
-            # highest_bid =
-            # sort bids
-            # how to find out condition?
-
-            # should add new flag something like "expired by cda sell" and "expired by cda buy", instead of relying on expired flag
-            # buys_copy = copy.deepcopy(buys)
-            # sells_copy = copy.deepcopy(sells)
 
             # Update the traders' profits and orders
             for sell in sells:
@@ -464,7 +445,8 @@ class Group(BaseGroup):
 
                 seller = self.get_player_by_id(sell['player'])
 
-                if (self.treatment_val == "cda" and best_bid != None):  # TODO copy
+                # TODO copy
+                if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
 
                         print("1")
@@ -549,7 +531,8 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                if (self.treatment_val == "cda" and best_bid != None):  # TODO copy
+                # TODO copy
+                if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     print("sell update price old:", player.cash)
                     seller.updateProfit(best_bid["p_max"] * clearing_price)
                     seller.updateVolume(-best_bid["p_max"])
@@ -565,16 +548,6 @@ class Group(BaseGroup):
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
-
-            # min_price = float('inf')
-            # best_ask = None
-            # for obj in sells_copy:
-            #     if (obj["p_max"] < min_price):
-            #         min_price = obj["p_max"]
-            #         best_ask = obj
-            # print("")
-            # print("min:", min_price)
-            # print("obj:", best_ask)
 
             for buy in buys:
                 min_price = float('inf')
@@ -597,7 +570,7 @@ class Group(BaseGroup):
 
                 buyer = self.get_player_by_id(buy['player'])
 
-                if (self.treatment_val == "cda" and best_ask != None):
+                if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:  # TODO look into
 
                         print("1")
@@ -609,6 +582,7 @@ class Group(BaseGroup):
                         best_ask['expired_by_cda_buy'] = True
 
                     elif buy['q_max_cda_copy'] == best_ask["q_max_cda_copy"]:
+
                         print("2")
                         print("should remove here sells copy old 0:", sells)
                         print("should remove here buys copy old 0:", buys)
@@ -626,6 +600,7 @@ class Group(BaseGroup):
                         # can't do this here, since shouldn't update player that owns best_ask here
                         # best_ask['q_max'] -= buy['q_max']
                     else:  # TODO look into
+
                         print("3")
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
@@ -644,7 +619,10 @@ class Group(BaseGroup):
                     buy['q_max'] -= trader_vol
                     # BUG trader vol is 100, when it should be 50
                     # TODO insert fix above cache code
-
+                else:
+                    if (best_ask != None):
+                        print("debug buy_p_max",
+                              buy['p_max'], "best_ask_p_max", best_ask['q_max'])
                 # TODO flo/cda
                 # trader_vol = self.calcDemand(buy, clearing_price)
                 print("buys 0:", buys)
@@ -685,7 +663,7 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                if (self.treatment_val == "cda" and best_ask != None):
+                if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     print("buy update price old:", player.cash)
                     buyer.updateProfit(-best_ask["p_max"] * clearing_price)
                     buyer.updateVolume(best_ask["p_max"])
