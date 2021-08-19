@@ -425,6 +425,7 @@
     if (data['type'] == 'begin') {
       console.log('Round begin');
     }
+
     if (data['type'] == 'clear') {
       // update cash and inventory bar regardless
       updateProfit(cash_bar, data['cash']);
@@ -432,7 +433,33 @@
       // clear book graph
       klf_line.data.datasets[2].data = [];
       klf_line.update();
+
+      console.log("payoff from clear")
+      console.log(data["payoff_data"])
+      const d = data["payoff_data"]
+
+      const payoff = document.querySelectorAll(".payoff")
+      for (let i = 0; i < payoff.length; i++) payoff[i].innerText = d["payoff"]
+
+      const a = document.querySelectorAll(".a")
+      for (let i = 0; i < a.length; i++) a[i].innerText = d["endowment"] + d["money_gained_in_market"] - d["money_lost_in_market"]
+
+      const b = document.querySelectorAll(".b")
+      for (let i = 0; i < b.length; i++) b[i].innerText = d["money_gained_from_buy_bets"] - d["money_lost_from_sell_bets"]
+
+      const c = document.querySelectorAll(".c")
+      for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
+
+      document.querySelector(".endowment").innerText = d["endowment"]
+      document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
+      document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]
+      document.querySelector(".money_gained_from_buy_bets").innerText = d["money_gained_from_buy_bets"]
+      document.querySelector(".money_lost_from_sell_bets").innerText = d["money_lost_from_sell_bets"]
+      document.querySelector(".c_bar").innerText = d["c_bar"]
+      document.querySelector(".negative_inventory").innerText = d["negative_inventory"]
+      console.log("")
     }
+
     // check if any orders in our orderHistory have expired
     // if so, then get rid of it
     if (data['type'] === 'regraph') {
@@ -446,6 +473,7 @@
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
+
     if (data['type'] == 'clearing_price') {
       global_clearing_price = data['clearing_price'];
       if ('{{treatment}}' != 'cda') {
@@ -460,6 +488,7 @@
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
+
     if (data['type'] == 'bets update') {
       console.log('bet:', data);
       updateProfit(cash_bar, data['cash']);
@@ -468,11 +497,37 @@
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
+
     if (data['type'] == 'update') {
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
       // updateCashAndInventoryDisplay(data);
+
+      console.log("payoff from clear")
+      console.log(data["payoff_data"])
+      const d = data["payoff_data"]
+
+      const payoff = document.querySelectorAll(".payoff")
+      for (let i = 0; i < payoff.length; i++) payoff[i].innerText = d["payoff"]
+
+      const a = document.querySelectorAll(".a")
+      for (let i = 0; i < a.length; i++) a[i].innerText = d["endowment"] + d["money_gained_in_market"] - d["money_lost_in_market"]
+
+      const b = document.querySelectorAll(".b")
+      for (let i = 0; i < b.length; i++) b[i].innerText = d["money_gained_from_buy_bets"] - d["money_lost_from_sell_bets"]
+
+      const c = document.querySelectorAll(".c")
+      for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
+
+      document.querySelector(".endowment").innerText = d["endowment"]
+      document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
+      document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]
+      document.querySelector(".money_gained_from_buy_bets").innerText = d["money_gained_from_buy_bets"]
+      document.querySelector(".money_lost_from_sell_bets").innerText = d["money_lost_from_sell_bets"]
+      document.querySelector(".c_bar").innerText = d["c_bar"]
+      document.querySelector(".negative_inventory").innerText = d["negative_inventory"]
+      console.log("")
     }
   }
 

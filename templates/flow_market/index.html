@@ -799,5 +799,79 @@
     <div class="col-8 minWidth conditionalMargin">
     </div>
   </div>
+  <p class="h1">Payoff = <span class="payoff">payoff</span></p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Payoff = () + [] - {}</th>
+        <th scope="col">()</th>
+        <th scope="col">[]</th>
+        <th scope="col">{}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="payoff">a</td>
+        <td class="a">b</td>
+        <td class="b">test</td>
+        <td class="c">test2</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">() = endowment + money gained in market - money lost in
+          market</th>
+        <th scope="col">endowment</th>
+        <th scope="col">money gained in market</th>
+        <th scope="col">money lost in market</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="a">why no change?</td>
+        <td class="endowment">endowment</td>
+        <td class="money_gained_in_market">money gained in market</td>
+        <td class="money_lost_in_market">money lost in market</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">[] = money_gained_from_buy_bets -
+          money_lost_from_sell_bets</th>
+        <th scope="col">money_gained_from_buy_bets</th>
+        <th scope="col">money_lost_from_sell_bets</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="b">b</td>
+        <td class="money_gained_from_buy_bets">money_gained_from_buy_bets</td>
+        <td class="money_lost_from_sell_bets">money_gained_in_market</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">{} = c_bar * negative_inventory</th>
+        <th scope="col">c_bar</th>
+        <th scope="col">negative_inventory</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="c">c</td>
+        <td class="c_bar">c_bar</td>
+        <td class="negative_inventory">negative_inventory</td>
+      </tr>
+    </tbody>
+  </table>
 </div> {% block scripts %}
 {% include Constants.scripts_template %} {% endblock %}
