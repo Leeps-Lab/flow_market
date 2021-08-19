@@ -376,7 +376,6 @@
 
     static moveExpiredBet(bet) {
       const id = bet.bet_id;
-      console.log('removing betID:', id);
       this.#removeFromActive(id);
       this.#appendToExpired();
     }
@@ -416,7 +415,6 @@
 
   function debug() {
     BetsUI.decrementDeadlines();
-    console.log("disable:", "{{disable_algo_flo}}")
   }
 
   function liveRecv(data) {
@@ -434,8 +432,6 @@
       klf_line.data.datasets[2].data = [];
       klf_line.update();
 
-      console.log("payoff from clear")
-      console.log(data["payoff_data"])
       const d = data["payoff_data"]
 
       const payoff = document.querySelectorAll(".payoff")
@@ -457,7 +453,6 @@
       document.querySelector(".money_lost_from_sell_bets").innerText = d["money_lost_from_sell_bets"]
       document.querySelector(".c_bar").innerText = d["c_bar"]
       document.querySelector(".negative_inventory").innerText = d["negative_inventory"]
-      console.log("")
     }
 
     // check if any orders in our orderHistory have expired
@@ -490,7 +485,6 @@
     }
 
     if (data['type'] == 'bets update') {
-      console.log('bet:', data);
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
@@ -504,8 +498,6 @@
       cachedData = data;
       // updateCashAndInventoryDisplay(data);
 
-      console.log("payoff from clear")
-      console.log(data["payoff_data"])
       const d = data["payoff_data"]
 
       const payoff = document.querySelectorAll(".payoff")
@@ -527,7 +519,6 @@
       document.querySelector(".money_lost_from_sell_bets").innerText = d["money_lost_from_sell_bets"]
       document.querySelector(".c_bar").innerText = d["c_bar"]
       document.querySelector(".negative_inventory").innerText = d["negative_inventory"]
-      console.log("")
     }
   }
 
@@ -840,7 +831,6 @@
 
     const table = document.querySelector('#executedOrdersTable');
     table.appendChild(rowCopy);
-    console.log('removed and appended');
   }
 
   function hideRateColumnActiveOrdersTable() {
