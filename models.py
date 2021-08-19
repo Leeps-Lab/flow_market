@@ -533,9 +533,10 @@ class Group(BaseGroup):
 
                 # TODO copy
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    print("sell update price old:", player.cash)
-                    seller.updateProfit(best_bid["p_max"] * clearing_price)
-                    seller.updateVolume(-best_bid["p_max"])
+                    print("sell update price old:", player.cash, "best_bid:",
+                          best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
+                    seller.updateProfit(best_bid["q_max"] * clearing_price)
+                    seller.updateVolume(-best_bid["q_max"])
                     print("sell update price new:", player.cash)
                 elif self.treatment_val == 'flo':
                     seller.updateProfit(trader_vol * clearing_price)
@@ -664,9 +665,10 @@ class Group(BaseGroup):
                                          0].participant._index_in_pages, payloads)
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    print("buy update price old:", player.cash)
-                    buyer.updateProfit(-best_ask["p_max"] * clearing_price)
-                    buyer.updateVolume(best_ask["p_max"])
+                    print("buy update price old:", player.cash, "best_ask:",
+                          best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
+                    buyer.updateProfit(-best_ask["q_max"] * clearing_price)
+                    buyer.updateVolume(best_ask["q_max"])
                     print("buy update price new:", player.cash)
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
@@ -721,7 +723,7 @@ class Player(BasePlayer):
                 # Setup Bets and File input
                 self.group.init_order_copies()
                 # ENABLE reenable set_bets
-                # call_with_delay(0, self.group.set_bets)
+                call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 
                 # Begin Continuously Updating function
