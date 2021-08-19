@@ -40,6 +40,17 @@
     false
   );
 
+  const jsx = htm.bind(React.createElement);
+  const App = (props) => {
+    [test, setTest] = React.useState("testing")
+    return jsx`<div>Hello World! Foo: ${props.foo}</div>`;
+  }
+
+  ReactDOM.render(
+    jsx`<${App} foo=${"bar"} />`,
+    document.getElementById("root")
+  );
+
   let orderHistory = [];
 
   // update order history if an order has expired
