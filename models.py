@@ -396,6 +396,7 @@ class Group(BaseGroup):
         if condition:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
+            print("new clearing_price", clearing_price)
 
             # Graph the clearing price
             for player in self.get_players():
@@ -450,7 +451,6 @@ class Group(BaseGroup):
                         sell['q_max_cda_copy'] -= best_bid_q
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
-
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
                         print("2")
                         print("should remove here sells copy old 0:", sells)
@@ -775,7 +775,7 @@ class Player(BasePlayer):
                     p.setUpdateRunning()
                 # Setup Bets and File input
                 self.group.init_order_copies()
-                # ENABLE reenable set_bets
+                # # ENABLE reenable set_bets
                 call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 

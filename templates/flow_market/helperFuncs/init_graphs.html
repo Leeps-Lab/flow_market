@@ -1,11 +1,16 @@
 {% load otree %}
 <script>
+  let update_freq = parseFloat('{{update_freq}}')
+
+  if (update_freq < 0.1)
+    update_freq = 0.1
+
   function init_graphs() {
     var cash_ctx = document.getElementById('cash-bar');
     var cash_bar = Highcharts.chart('cash-bar', {
       chart: {
         animation: {
-          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
+          duration: update_freq < 0.1 ? 0 : 500,
         },
       },
       credits: { enabled: false },
@@ -26,10 +31,11 @@
           text: 'Time',
         },
         min: 0,
-        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        max: (1 / update_freq * 180), // f = seconds per tick, 1/f = ticks per second
         labels: {
           formatter: function () { // fix time tick values
-            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            const seconds = (this.value) * (update_freq) // t:ticks, s:seconds----[t] * [s/t] = [s]
             return seconds
           }
         }
@@ -99,10 +105,11 @@
           text: 'Time',
         },
         min: 0,
-        max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
+        max: (1 / update_freq * 180), // f = seconds per tick, 1/f = ticks per second
         labels: {
           formatter: function () { // fix time tick values
-            const seconds = (this.value) * (parseFloat('{{update_freq}}')) // t:ticks, s:seconds----[t] * [s/t] = [s]
+            const seconds = (this.value) * (update_freq) // t:ticks, s:seconds----[t] * [s/t] = [s]
             return seconds
           }
         }

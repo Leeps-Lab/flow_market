@@ -20,6 +20,12 @@
 {% endblock %}
 
 <script>
+  console.error("new_sell should be available")
+
+  // DEBUG tick count
+  let tickCount = 0
+  const ticks = []
+
   document.addEventListener(
     'DOMContentLoaded',
     () => {
@@ -33,22 +39,18 @@
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
       setInterval(() => {
+
+        // DEBUG tick count
+        ticks.push(tickCount)
+        const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
+        // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
+        tickCount = 0
+
         updateCashAndInventoryDisplay(cachedData);
         BetsUI.decrementDeadlines();
       }, 1000);
     },
     false
-  );
-
-  const jsx = htm.bind(React.createElement);
-  const App = (props) => {
-    [test, setTest] = React.useState("testing")
-    return jsx`<div>Hello World! Foo: ${props.foo}</div>`;
-  }
-
-  ReactDOM.render(
-    jsx`<${App} foo=${"bar"} />`,
-    document.getElementById("root")
   );
 
   let orderHistory = [];
@@ -510,7 +512,6 @@
       // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
-
       const payoff = document.querySelectorAll(".payoff")
       for (let i = 0; i < payoff.length; i++) payoff[i].innerText = d["payoff"]
 
@@ -531,6 +532,8 @@
       document.querySelector(".c_bar").innerText = d["c_bar"]
       document.querySelector(".negative_inventory").innerText = d["negative_inventory"]
     }
+
+    tickCount++
   }
 
   // console.error(parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2)));
@@ -849,3 +852,4 @@
     document.querySelector('#activeOrdersDirection').style.width = '0';
   }
 </script>
+<script src="{% static 'flow_market/react.js' %}"></script>
