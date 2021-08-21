@@ -16,12 +16,17 @@ from jsonfield import JSONField
 import time
 import uuid
 import copy
+from timeit import default_timer as timer
+import statistics
 
 author = 'LeepsLab'
 
 doc = """
 This is a continuous flow market game
 """
+
+time_last = 0
+times = []
 
 
 class Constants(BaseConstants):
@@ -381,6 +386,17 @@ class Group(BaseGroup):
         return index
 
     def update(self):
+        # TEST does this update function follow frequency in config?
+        # global time_last
+        # current_time = time.perf_counter()
+        # global times
+        # if len(times) > 50:
+        #     # pass
+        #     del times[0:48]
+        # times.append(current_time-time_last)
+        # print("avg time elapsed:", statistics.median(times))
+        # time_last = current_time
+
         buys = self.buys()
         sells = self.sells()
         payloads = {}
