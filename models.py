@@ -208,11 +208,17 @@ class Group(BaseGroup):
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
         if data['direction'] == 'buy':
-            player.updateProfit(data['quantity']*data['limit_price'])
+            player.updateProfit(data['quantity']*data['limit_price'], True)
             player.updateVolume(-data['quantity'])
+
+            player.update_money_gained_from_buy_bets(
+                data['quantity']*data['limit_price'])
         else:
-            player.updateProfit(-data['quantity']*data['limit_price'])
+            player.updateProfit(-data['quantity']*data['limit_price'], True)
             player.updateVolume(data['quantity'])
+
+            player.update_money_lost_from_sell_bets(
+                -data['quantity']*data['limit_price'])
 
         # Use live send back to update seller's frontend
         payloads = {}
@@ -290,38 +296,26 @@ class Group(BaseGroup):
         return sells_list
 
     def calcDemand(self, buy, price):
-        # print("")
-        # print("calcDemand")
-        # print("buy:", buy)
-        # print("price:", price)
         if (price <= buy['p_min']):
-            # print(" 1")
-
             if (buy['q_max'] < buy['u_max']):
-                # print(" 1.1")
                 # Don't trade more than q_max
                 return buy['q_max']
             # Trade at max rate if p <= p_min
             return buy['u_max']
         elif (price > buy['p_max']):
-            # print(" 2")
             # Don't trade if price is higher than max willingness to buy
             # it seems returning 0 for demand disables execution for that specific buy order, I will use this fact in part of my implementation for preventing self trades
             return 0.0
         else:
-            print(" 3")
             # The price fell p_min < price < p_max
             if((buy['p_max'] - buy['p_min']) == 0):
-                print(" 3.1")
                 return buy['q_max']
 
             trade_vol = buy['u_max'] * \
                 ((buy['p_max'] - price) / (buy['p_max'] - buy['p_min']))
             if (trade_vol > buy['q_max']):
-                print(" 3.2")
                 # Saturate to q_max if trade_vol will exceed q_max
                 return buy['q_max']
-            print(" 3.3")
             return trade_vol
 
     def calcSupply(self, sell, price):
@@ -402,6 +396,7 @@ class Group(BaseGroup):
         if condition:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
+            print("new clearing_price", clearing_price)
 
             # Graph the clearing price
             for player in self.get_players():
@@ -456,7 +451,6 @@ class Group(BaseGroup):
                         sell['q_max_cda_copy'] -= best_bid_q
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
-
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
                         print("2")
                         print("should remove here sells copy old 0:", sells)
@@ -533,9 +527,10 @@ class Group(BaseGroup):
 
                 # TODO copy
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    print("sell update price old:", player.cash)
-                    seller.updateProfit(best_bid["p_max"] * clearing_price)
-                    seller.updateVolume(-best_bid["p_max"])
+                    print("sell update price old:", player.cash, "best_bid:",
+                          best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
+                    seller.updateProfit(best_bid["q_max"] * clearing_price)
+                    seller.updateVolume(-best_bid["q_max"])
                     print("sell update price new:", player.cash)
                 elif self.treatment_val == 'flo':
                     seller.updateProfit(trader_vol * clearing_price)
@@ -544,7 +539,7 @@ class Group(BaseGroup):
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
-                        "type": 'update', "cash": player.cash, "inventory": player.inventory}
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
@@ -664,9 +659,10 @@ class Group(BaseGroup):
                                          0].participant._index_in_pages, payloads)
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    print("buy update price old:", player.cash)
-                    buyer.updateProfit(-best_ask["p_max"] * clearing_price)
-                    buyer.updateVolume(best_ask["p_max"])
+                    print("buy update price old:", player.cash, "best_ask:",
+                          best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
+                    buyer.updateProfit(-best_ask["q_max"] * clearing_price)
+                    buyer.updateVolume(best_ask["q_max"])
                     print("buy update price new:", player.cash)
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
@@ -675,7 +671,7 @@ class Group(BaseGroup):
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
-                        "type": 'update', "cash": player.cash, "inventory": player.inventory}
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
@@ -683,7 +679,7 @@ class Group(BaseGroup):
             # Clear the clearing price graph
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    "type": 'clear', "cash": player.cash, "inventory": player.inventory}
+                    "type": 'clear', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
 
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                 0].participant._index_in_pages, payloads)
@@ -694,6 +690,19 @@ class Player(BasePlayer):
     inventory = models.FloatField(initial=500)
     num_buys = models.IntegerField(initial=0)
     num_sells = models.IntegerField(initial=0)
+
+    # Payoff
+    endowment = models.FloatField(initial=0)
+    money_gained_in_market = models.FloatField(initial=0)
+    money_lost_in_market = models.FloatField(initial=0)
+
+    money_gained_from_buy_bets = models.FloatField(initial=0)
+    money_lost_from_sell_bets = models.FloatField(initial=0)
+
+    c_bar = models.FloatField(initial=100)
+    negative_inventory = models.FloatField(initial=0)
+
+    # payoff = models.FloatField(initial=0)
 
     # Current order states
     direction = models.StringField()  # 'buy', 'sell'
@@ -708,6 +717,52 @@ class Player(BasePlayer):
     def init_cash_inv(self):
         self.cash = self.group.start_cash()
         self.inventory = self.group.start_inv()
+        self.update_endowment(self.cash)
+
+    def update_payoff(self):
+        a = self.endowment + self.money_gained_in_market - self.money_lost_in_market
+        b = self.money_gained_from_buy_bets - self.money_lost_from_sell_bets
+        c = self.c_bar * self.negative_inventory
+        self.payoff = a + b - c
+
+    def get_payoff_data(self):
+        self.update_payoff()
+
+        return {
+            "payoff": self.payoff,
+            "endowment": self.endowment,
+            "money_gained_in_market": self.money_gained_in_market,
+            "money_lost_in_market": self.money_lost_in_market,
+            "money_gained_from_buy_bets": self.money_gained_from_buy_bets,
+            "money_lost_from_sell_bets": self.money_lost_from_sell_bets,
+            "c_bar": self.c_bar,
+            "negative_inventory": self.negative_inventory,
+        }
+
+    # Done automatically in this class
+    def update_endowment(self, val):
+        self.endowment = val
+
+    # Done automatically in this class
+    def update_money_gained_in_market(self, val):
+        self.money_gained_in_market += abs(val)
+
+    # Done automatically in this class
+    def update_money_lost_in_market(self, val):
+        self.money_lost_in_market += abs(val)
+
+    def update_money_gained_from_buy_bets(self, val):
+        self.money_gained_from_buy_bets += abs(val)
+
+    def update_money_lost_from_sell_bets(self, val):
+        self.money_lost_from_sell_bets += abs(val)
+
+    # Done automatically in this class
+    def update_negative_inventory(self):
+        if self.inventory < 0:
+            self.negative_inventory = abs(self.inventory)
+        else:
+            self.negative_inventory = 0
 
     def setUpdateRunning(self):
         self.updateRunning = True
@@ -720,8 +775,8 @@ class Player(BasePlayer):
                     p.setUpdateRunning()
                 # Setup Bets and File input
                 self.group.init_order_copies()
-                # ENABLE reenable set_bets
-                # call_with_delay(0, self.group.set_bets)
+                # # ENABLE reenable set_bets
+                call_with_delay(0, self.group.set_bets)
                 call_with_delay(0, self.group.input_order_file)
 
                 # Begin Continuously Updating function
@@ -777,11 +832,18 @@ class Player(BasePlayer):
 
         self.group.new_order(order, self.id_in_group, self.currentID)
 
-    def updateProfit(self, profit):
+    def updateProfit(self, profit, calling_from_bets=False):
         self.cash += profit
+
+        if (not calling_from_bets):
+            if profit > 0:
+                self.update_money_gained_in_market(profit)
+            if profit < 0:
+                self.update_money_lost_in_market(profit)
 
     def updateVolume(self, volume):
         self.inventory += volume
+        self.update_negative_inventory()
 
 
 class Order(ExtraModel):
