@@ -83,8 +83,19 @@ def init_copies():
 
 class Group(BaseGroup):
     treatment_val = models.StringField()
+    should_pause_after_bet = models.BooleanField(initial=False)
     # order_copies[player_id_in_group][order_id]
     order_copies = JSONField(null=True, default=init_copies)
+
+    def set_should_pause_after_bet(self, should_pause=False):
+        if should_pause:
+            self.should_pause_after_bet = True
+            self.save()
+            return self.should_pause_after_bet
+        else:
+            self.should_pause_after_bet = False
+            self.save()
+            return self.should_pause_after_bet
 
     def init_order_copies(self):
         self.order_copies = {str(i): {}
@@ -212,15 +223,18 @@ class Group(BaseGroup):
     # HERE works execute_bet
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
+
         if data['direction'] == 'buy':
-            player.updateProfit(data['quantity']*data['limit_price'], True)
-            player.updateVolume(-data['quantity'])
+            player.updateProfit(
+                data['quantity']*data['limit_price'], True, data['trader_id'] == 1)
+            player.updateVolume(-data['quantity'], True)
 
             player.update_money_gained_from_buy_bets(
                 data['quantity']*data['limit_price'])
         else:
-            player.updateProfit(-data['quantity']*data['limit_price'], True)
-            player.updateVolume(data['quantity'])
+            player.updateProfit(-data['quantity'] *
+                                data['limit_price'], True, data['trader_id'] == 1)
+            player.updateVolume(data['quantity'], True)
 
             player.update_money_lost_from_sell_bets(
                 -data['quantity']*data['limit_price'])
@@ -545,7 +559,8 @@ class Group(BaseGroup):
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     print("sell update price old:", player.cash, "best_bid:",
                           best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
-                    seller.updateProfit(best_bid["q_max"] * clearing_price)
+                    seller.updateProfit(
+                        best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
                     seller.updateVolume(-best_bid["q_max"])
                     print("sell update price new:", player.cash)
                 elif self.treatment_val == 'flo':
@@ -677,7 +692,8 @@ class Group(BaseGroup):
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     print("buy update price old:", player.cash, "best_ask:",
                           best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
-                    buyer.updateProfit(-best_ask["q_max"] * clearing_price)
+                    buyer.updateProfit(-best_ask["q_max"] *
+                                       clearing_price, False, buy["player"] == 1)
                     buyer.updateVolume(best_ask["q_max"])
                     print("buy update price new:", player.cash)
                 elif self.treatment_val == "flo":
@@ -695,7 +711,7 @@ class Group(BaseGroup):
             # Clear the clearing price graph
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    "type": 'clear', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
+                    "type": 'clear', "cash": player.getCash(), "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
 
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                 0].participant._index_in_pages, payloads)
@@ -848,8 +864,11 @@ class Player(BasePlayer):
 
         self.group.new_order(order, self.id_in_group, self.currentID)
 
-    def updateProfit(self, profit, calling_from_bets=False):
+    def updateProfit(self, profit, calling_from_bets=False, debug=False):
         self.cash += profit
+
+        if (calling_from_bets):
+            self.save()
 
         if (not calling_from_bets):
             if profit > 0:
@@ -857,9 +876,15 @@ class Player(BasePlayer):
             if profit < 0:
                 self.update_money_lost_in_market(profit)
 
-    def updateVolume(self, volume):
+    def getCash(self):
+        return self.cash
+
+    def updateVolume(self, volume, calling_from_bets=False):
         self.inventory += volume
         self.update_negative_inventory()
+
+        if (calling_from_bets):
+            self.save()
 
 
 class Order(ExtraModel):
