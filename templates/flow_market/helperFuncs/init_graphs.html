@@ -1,6 +1,9 @@
 {% load otree %}
 <script>
+  // seems to bug out when using this variable in a ternary expression
   let update_freq = parseFloat('{{update_freq}}')
+  // console.log("* update_freq", update_freq)
+  // console.error("got speed:", typeof (update_freq < 0.1 ? 0 : 500), typeof (parseFloat('{{update_freq}}') < 0.1 ? 0 : 500))
 
   if (update_freq < 0.1)
     update_freq = 0.1
@@ -10,7 +13,7 @@
     var cash_bar = Highcharts.chart('cash-bar', {
       chart: {
         animation: {
-          duration: update_freq < 0.1 ? 0 : 500,
+          duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
         },
       },
       credits: { enabled: false },
@@ -82,6 +85,8 @@
     var inventory_bar = Highcharts.chart('inv-bar', {
       chart: {
         animation: {
+          // duration: 0,
+          // duration: update_freq < 0.1 ? 0 : 500,
           duration: parseFloat('{{update_freq}}') < 0.1 ? 0 : 500,
         },
       },
