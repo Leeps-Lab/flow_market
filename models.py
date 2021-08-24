@@ -866,9 +866,9 @@ class Player(BasePlayer):
 
     def updateProfit(self, profit, calling_from_bets=False, debug=False):
         self.cash += profit
-
-        if (calling_from_bets):
-            self.save()
+        self.save()
+        # if (calling_from_bets):
+        #     self.save()
 
         if (not calling_from_bets):
             if profit > 0:
@@ -881,10 +881,13 @@ class Player(BasePlayer):
 
     def updateVolume(self, volume, calling_from_bets=False):
         self.inventory += volume
+        self.save()
+
         self.update_negative_inventory()
 
-        if (calling_from_bets):
-            self.save()
+
+        # if (calling_from_bets):
+        #     self.save()
 
 
 class Order(ExtraModel):
