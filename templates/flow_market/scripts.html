@@ -41,10 +41,10 @@
       setInterval(() => {
 
         // DEBUG tick count
-        ticks.push(tickCount)
-        const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
+        // ticks.push(tickCount)
+        // const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
         // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
-        tickCount = 0
+        // tickCount = 0
 
         updateCashAndInventoryDisplay(cachedData);
         BetsUI.decrementDeadlines();
@@ -438,6 +438,7 @@
     }
 
     if (data['type'] == 'clear') {
+      // console.log(tickCount, " clear", "cash:", data['cash'], "inv:", data['inventory'])
       // update cash and inventory bar regardless
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
@@ -498,6 +499,7 @@
     }
 
     if (data['type'] == 'bets update') {
+      // console.log(tickCount, " bets update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
@@ -506,6 +508,7 @@
     }
 
     if (data['type'] == 'update') {
+      // console.log(tickCount, " update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedData = data;
