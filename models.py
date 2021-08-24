@@ -750,12 +750,14 @@ class Player(BasePlayer):
         self.cash = self.group.start_cash()
         self.inventory = self.group.start_inv()
         self.update_endowment(self.cash)
+        self.save()
 
     def update_payoff(self):
         a = self.endowment + self.money_gained_in_market - self.money_lost_in_market
         b = self.money_gained_from_buy_bets - self.money_lost_from_sell_bets
         c = self.c_bar * self.negative_inventory
         self.payoff = a + b - c
+        self.save()
 
     def get_payoff_data(self):
         self.update_payoff()
@@ -774,20 +776,25 @@ class Player(BasePlayer):
     # Done automatically in this class
     def update_endowment(self, val):
         self.endowment = val
+        self.save()
 
     # Done automatically in this class
     def update_money_gained_in_market(self, val):
         self.money_gained_in_market += abs(val)
+        self.save()
 
     # Done automatically in this class
     def update_money_lost_in_market(self, val):
         self.money_lost_in_market += abs(val)
+        self.save()
 
     def update_money_gained_from_buy_bets(self, val):
         self.money_gained_from_buy_bets += abs(val)
+        self.save()
 
     def update_money_lost_from_sell_bets(self, val):
         self.money_lost_from_sell_bets += abs(val)
+        self.save()
 
     # Done automatically in this class
     def update_negative_inventory(self):
@@ -795,9 +802,11 @@ class Player(BasePlayer):
             self.negative_inventory = abs(self.inventory)
         else:
             self.negative_inventory = 0
+        self.save()
 
     def setUpdateRunning(self):
         self.updateRunning = True
+        self.save()
 
     def live_method(self, data):
         # First Live message from user is to begin intialization
