@@ -158,6 +158,8 @@
     });
 
     Chart.defaults.font.family = "Lato"
+    // Chart.defaults.animation.duration = parseFloat('{{update_freq}}') < 0.1 ? 0 : 500
+    Chart.defaults.animation.duration = 0
     var klf_line_ctx = document.getElementById('klf-line');
     var klf_line = new Chart(klf_line_ctx, {
       type: 'scatter',
