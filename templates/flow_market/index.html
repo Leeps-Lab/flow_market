@@ -496,10 +496,13 @@
                     <tbody id="activeBets">
                       {% for bet in bets %}
                       <tr id="a{{bet.bet_id}}">
-                        <td style="width:91px; height:23px;">{{bet.direction}}
+                        <td class="betDirection"
+                          style="width:91px; height:23px;">{{bet.direction}}
                         </td>
-                        <td style="width:61px;">{{bet.limit_price}}</td>
-                        <td style="width:88px;">{{bet.quantity}}</td>
+                        <td class="betPrice" style="width:61px;">
+                          {{bet.limit_price}}</td>
+                        <td class="betQuantity" style="width:88px;">
+                          {{bet.quantity}}</td>
                         <td class="betDeadline">{{bet.deadline}} ms</td>
                       </tr>
                       {% endfor %}
@@ -872,8 +875,13 @@
 
   <hr class="mt-5 mb-5" />
   <p class="h1">React testing</p>
-  <div class="row justify-content-center" id="reactInputSelectorTest">
+  <div class="row justify-content-center" id="reactInputSelectorTest"></div>
 
+  <hr class="mt-5 mb-5" />
+  <p class="h1">Profit chart testing</p>
+  <div class="row justify-content-center" id=""
+    style="width:400px; height:400px">
+    <canvas id="myChart"></canvas>
   </div>
-</div> {% block scripts %}
-{% include Constants.scripts_template %} {% endblock %}
+
+  {% block scripts %} {% include Constants.scripts_template %} {% endblock %}

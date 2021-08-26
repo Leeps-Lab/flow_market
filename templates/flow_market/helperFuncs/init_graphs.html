@@ -166,28 +166,21 @@
       options: {
         maintainAspectRatio: false,
         scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: isCDA || isFBA ? 'Price' : 'Rate',
-              },
+          y: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Price' : 'Rate',
             },
-          ],
-          xAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: isCDA || isFBA ? 'Volume' : 'Price',
-              },
+            beginAtZero: true,
+          },
+
+          x: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Volume' : 'Price',
             },
-          ],
+            beginAtZero: true,
+          },
         },
         title: {
           display: false,
@@ -206,7 +199,7 @@
             label: 'Bids',
             borderColor: '#007bff',
             backgroundColor: 'rgba(0, 0, 0, 0)',
-            fill: false,
+            fill: false, // TODO test
             showLine: true,
             lineTension: 0,
             data: [],

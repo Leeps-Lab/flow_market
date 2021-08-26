@@ -38,6 +38,11 @@
 
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
+
+      // populate profit graph with new bet info
+      const { quantity, price, direction } = BetsUI.getUpcomingBetData()
+      setLabelsBasedOnBet(myChart, quantity, price, direction)
+
       setInterval(() => {
 
         // DEBUG tick count
@@ -150,7 +155,158 @@
     return numToBeValid;
   }
 
-  // Chart.defaults.global.defaultFontFamily = 'Nunito';
+  ///////////////////////////////////////////////////////////////////////////////////
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      datasets: [
+        {
+          label: 'Orders',
+          data: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 400, 500],
+          fill: { above: 'red', below: 'green', target: { value: 10 } },
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: 'blue',
+        },
+        {
+          label: 'Profit Line',
+          data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+          fill: false,
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: '#0',
+        },
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          suggestedMin: 50,
+          suggestedMax: 100,
+          title: {
+            display: true,
+            text: 'Price',
+          },
+          beginAtZero: true,
+        },
+
+        x: {
+          title: {
+            display: true,
+            text: 'Quantity',
+          },
+          beginAtZero: true,
+        },
+      }
+    }
+  });
+
+  function addData(chart, data) {
+    console.log("adding", data)
+    chart.data.datasets.forEach((dataset) => {
+      dataset.data.push(data);
+    });
+    chart.update();
+  }
+
+  function setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
+    // chart.data.labels.push(label);
+    // console.log("labels:", chart.data.labels)
+
+    // x-axis values (labels)
+    const newLabels = []
+    for (let i = 0; i <= betQuantity; i++) {
+      newLabels.push(i)
+    }
+    chart.data.labels = newLabels
+
+    const profitPriceLine = []
+    for (let i = 0; i <= betQuantity; i++) {
+      profitPriceLine.push(betPrice)
+    }
+    chart.data.datasets[1].data = profitPriceLine
+
+    //   datasets: [
+    //     {
+    //       label: 'Orders',
+    //       data: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 400, 500],
+    //       fill: { above: 'red', below: 'green', target: { value: 10 } }
+    //     },
+    //     {
+    //       label: 'Bet',
+    //       data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+    //       fill: false,
+    //       pointRadius: 0,
+    //       borderWidth: 2,
+    //       borderColor: '#0',
+    //     },
+    //   ]
+    // },
+    // console.log("dataset", chart.data.datasets[0].fill.target.value)
+
+    // set profit price line
+    chart.data.datasets[0].fill.target.value = betPrice
+    chart.options.scales.y.suggestedMax = betPrice
+
+    // options: {
+    //   scales: {
+    // y: {
+    //           suggestedMin: 50,
+    //           suggestedMax: 100
+    //       }
+    //     y: {
+    //       min: 0,
+    //       max: 100
+    //     }
+    //   }
+    // }
+
+    // fill: { above: 'red', below: 'green', target: { value: 10 } }
+    if (betDirection.includes("BUY")) {
+      console.log("below green for buy")
+      chart.data.datasets[0].fill.above = "red"
+      chart.data.datasets[0].fill.below = "green"
+    } else if (betDirection.includes("SELL")) {
+      console.log("below red for sell")
+      chart.data.datasets[0].fill.above = "green"
+      chart.data.datasets[0].fill.below = "red"
+    } else {
+      console.error("betDirection not recognized")
+    }
+
+    chart.update();
+
+    // data: {
+    //   labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    //   datasets: [{
+    //     label: 'D9',
+    //     data: [10, 10, 10, -10, 20, 20, 20],
+    //     fill: { above: 'red', below: 'green', target: { value: 10 } }
+    //   }]
+    // },
+  }
+
+  function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+      dataset.data.pop();
+    });
+    chart.update();
+  }
+
+  function debug() {
+    // console.log("test")
+    // addData(myChart, 3)
+    // setLabelsBasedOnBet(myChart, Math.ceil(Math.random() * 20))
+    const { quantity, price, direction } = BetsUI.getUpcomingBetData()
+    setLabelsBasedOnBet(myChart, quantity, price, direction)
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////
 
   const graphs = init_graphs();
   const klf_line = graphs[2];
@@ -372,7 +528,7 @@
     let dataset = chart.series[0];
     const profitFormatted = parseFloat(profit.toFixed(2));
     dataset.addPoint(profitFormatted);
-    //chart.update();
+    //chart.update(); // why not update? does it work differently in highcharts or something?
   }
 
   // Adds or subtracts volume to trader
@@ -393,9 +549,31 @@
       this.#appendToExpired();
     }
 
+    static getUpcomingBetData() {
+      const table = document.querySelector('#activeBets');
+
+      if (table.children.length === 0) return
+
+      const upcomingBet = table.firstElementChild
+      console.log("got bet", upcomingBet)
+
+      const data = {
+        quantity: parseFloat(upcomingBet.querySelector(".betQuantity").textContent),
+        price: parseFloat(upcomingBet.querySelector(".betPrice").textContent),
+        direction: upcomingBet.querySelector(".betDirection").textContent.trim(),
+      }
+
+      console.log("got data", data)
+      return data
+    }
+
     static #removeFromActive(id) {
       this.#currentBet = document.querySelector(`#a${id}`).cloneNode(true);
       document.querySelector(`#a${id}`).remove();
+
+      // populate profit graph with new bet info
+      const { quantity, price, direction } = BetsUI.getUpcomingBetData()
+      setLabelsBasedOnBet(myChart, quantity, price, direction)
     }
 
     static #appendToExpired() {
@@ -426,9 +604,6 @@
     }
   }
 
-  function debug() {
-    BetsUI.decrementDeadlines();
-  }
 
   function liveRecv(data) {
     // console.timeEnd(`timing`);
