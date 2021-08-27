@@ -1,8 +1,7 @@
 {% load otree %}
 
 <!-- Code heavily adopted from Jason Vranek (github.com/JasonVranek) (https://people.ucsc.edu/~jvranek/flow_viz.html) -->
-<!-- not sure market.js is even needed anymore -->
-<script type="module" src="{% static 'flow_market/market.js' %}"></script>
+
 <!-- prettier-ignore -->
 {% block constants %} {% include Constants.scripts_constants_template %}
 {% endblock %}
@@ -160,20 +159,6 @@
     return numToBeValid;
   }
 
-
-  // axes.addEventListener("click", () => {
-  //   // Redraw all of the graphs
-  //   graphCDA(cda_line, cda_bids, cda_asks);
-
-  //   if (klf_bids.length > 0 && klf_asks.length > 0) {
-  //     var clearing_price = clearingPrice(klf_bids, klf_asks);
-
-  //     graphClearingPrice(klf_line, clearing_price, klf_bids, klf_asks);
-  //   }
-
-  //   graphKLF(klf_line, klf_bids, klf_asks);
-  // });
-
   ///////////////////////////////////////////////////////////////////////////////////
 
   var ctx = document.getElementById('myChart').getContext('2d');
@@ -184,10 +169,6 @@
       datasets: [
         {
           label: 'Orders',
-          // barPercentage: 1,
-          // categoryPercentage: 1,
-          // data: [10, 20, 30, 40, 50, 60, 70],
-          // data: [0, 5, 10, 15, 20, 50, 50, 50, 50, 50, 50, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 325, 325, 325, 325, 325, 325, 325, 230, 230, 230, 230, 230, 230, 230, 230, 230, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83,],
           data: [],
           fill: { above: 'red', below: 'green', target: { value: 10 } },
           pointRadius: 0,
@@ -196,7 +177,6 @@
         },
         {
           label: 'Profit Line',
-          // data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
           data: [],
           fill: false,
           pointRadius: 0,
@@ -378,30 +358,6 @@
     klf_line.update()
   }
 
-  /*
-      var klf_line = new Chart(klf_line_ctx, {
-      type: 'scatter',
-      options: {
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            title: {
-              display: true,
-              text: isCDA || isFBA ? 'Volume' : 'Rate',
-            },
-            beginAtZero: true,
-          },
-
-          x: {
-            title: {
-              display: true,
-              text: isCDA || isFBA ? 'Price' : 'Price',
-            },
-            beginAtZero: true,
-          },
-        },
-  */
-
   ///////////////////////////////////////////////////////////////////////////////////
 
   const graphs = init_graphs();
@@ -559,14 +515,6 @@
           y: agg_supply,
         });
 
-        // if (flipAxes) {
-        //   for (let i = 0; i < points.length; i++) {
-        //     var new_x = points[i].y;
-        //     var new_y = points[i].x;
-        //     points[i].y = new_y;
-        //     points[i].x = new_x;
-        //   }
-        // }
       });
     } else {
       // if treatment is cda, sort the buy orders,
