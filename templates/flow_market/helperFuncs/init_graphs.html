@@ -157,34 +157,30 @@
       },
     });
 
+    Chart.defaults.font.family = "Lato"
+    // Chart.defaults.animation.duration = parseFloat('{{update_freq}}') < 0.1 ? 0 : 500
+    Chart.defaults.animation.duration = 0
     var klf_line_ctx = document.getElementById('klf-line');
     var klf_line = new Chart(klf_line_ctx, {
       type: 'scatter',
       options: {
         maintainAspectRatio: false,
         scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: isCDA || isFBA ? 'Price' : 'Rate',
-              },
+          y: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Volume' : 'Rate',
             },
-          ],
-          xAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: isCDA || isFBA ? 'Volume' : 'Price',
-              },
+            beginAtZero: true,
+          },
+
+          x: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Price' : 'Price',
             },
-          ],
+            beginAtZero: true,
+          },
         },
         title: {
           display: false,
@@ -203,7 +199,7 @@
             label: 'Bids',
             borderColor: '#007bff',
             backgroundColor: 'rgba(0, 0, 0, 0)',
-            fill: false,
+            fill: false, // TODO test
             showLine: true,
             lineTension: 0,
             data: [],

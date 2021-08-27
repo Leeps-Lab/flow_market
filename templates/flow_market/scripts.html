@@ -25,6 +25,7 @@
   // DEBUG tick count
   let tickCount = 0
   const ticks = []
+  let flipAxes = false
 
   document.addEventListener(
     'DOMContentLoaded',
@@ -38,6 +39,8 @@
 
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
+      ProfitGraph.updateProfitLineFromUpcomingBet()
+
       setInterval(() => {
 
         // DEBUG tick count
@@ -46,12 +49,15 @@
         // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
         // tickCount = 0
 
-        updateCashAndInventoryDisplay(cachedData);
+        updateCashAndInventoryDisplay(cachedDataForOdometer);
         BetsUI.decrementDeadlines();
       }, 1000);
     },
     false
   );
+
+  let cash = 0
+  let inventory = 0
 
   let orderHistory = [];
 
@@ -73,8 +79,12 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
-        // also remove from active orders table
+        // remove from active orders table
         removeActiveOrderTable(order.orderID);
+
+        // update profit graph
+        ProfitGraph.addOrderData(orderInData)
+
         return false;
       } else {
         return true;
@@ -150,7 +160,249 @@
     return numToBeValid;
   }
 
-  Chart.defaults.global.defaultFontFamily = 'Nunito';
+
+  // axes.addEventListener("click", () => {
+  //   // Redraw all of the graphs
+  //   graphCDA(cda_line, cda_bids, cda_asks);
+
+  //   if (klf_bids.length > 0 && klf_asks.length > 0) {
+  //     var clearing_price = clearingPrice(klf_bids, klf_asks);
+
+  //     graphClearingPrice(klf_line, clearing_price, klf_bids, klf_asks);
+  //   }
+
+  //   graphKLF(klf_line, klf_bids, klf_asks);
+  // });
+
+  ///////////////////////////////////////////////////////////////////////////////////
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      datasets: [
+        {
+          label: 'Orders',
+          // barPercentage: 1,
+          // categoryPercentage: 1,
+          // data: [10, 20, 30, 40, 50, 60, 70],
+          // data: [0, 5, 10, 15, 20, 50, 50, 50, 50, 50, 50, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 325, 325, 325, 325, 325, 325, 325, 230, 230, 230, 230, 230, 230, 230, 230, 230, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83,],
+          data: [],
+          fill: { above: 'red', below: 'green', target: { value: 10 } },
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: 'blue',
+        },
+        {
+          label: 'Profit Line',
+          // data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+          data: [],
+          fill: false,
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: '#0',
+        },
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          suggestedMin: 50,
+          suggestedMax: 100,
+          title: {
+            display: true,
+            text: 'Price',
+          },
+          beginAtZero: true,
+        },
+
+        x: {
+          title: {
+            display: true,
+            text: 'Quantity',
+          },
+          beginAtZero: true,
+        },
+      }
+    }
+  });
+
+  class ProfitGraph {
+    static chart = myChart
+    static profitLineValue = 0
+    static potentialProfit = 0
+    static betDirection = ""
+
+    static updateProfitLineFromUpcomingBet() {
+      const betData = BetsUI.getUpcomingBetData()
+      if (betData !== null) {
+        const { quantity, price, direction } = betData
+
+        this.profitLineValue = price
+        this.betDirection = direction
+        this.potentialProfit = 0
+
+        ProfitGraph.setLabelsBasedOnBet(myChart, quantity, price, direction)
+      }
+    }
+
+    static addOrderData(order) {
+      // TODO add conditional for if order and bet are compatible to graph
+      // if (order["direction"].includes("buy"))
+      console.log("addorderinfo", order)
+      const { executedProfit, executedVolume } = order
+      const pricePerVol = Math.abs(executedProfit) / Math.abs(executedVolume)
+
+      this.updatePotentialProfit(executedProfit, executedVolume, pricePerVol)
+
+      console.log("* pricePerVol", pricePerVol)
+
+      for (let i = 0; i < Math.abs(executedVolume); i++) {
+        this.chart.data.datasets[0].data.push(pricePerVol)
+        console.log("pushed", pricePerVol)
+      }
+
+      this.chart.update();
+    }
+
+    static updatePotentialProfit(executedProfit, executedVolume, pricePerVol) {
+      if (pricePerVol < this.profitLineValue) {
+
+        if (this.betDirection.includes("BUY")) {
+          this.potentialProfit += Math.abs(executedProfit)
+
+        } else if (this.betDirection.includes("SELL")) {
+          this.potentialProfit -= Math.abs(executedProfit)
+        }
+
+      } else if (pricePerVol > this.profitLineValue) {
+
+        if (this.betDirection.includes("BUY")) {
+          this.potentialProfit -= Math.abs(executedProfit)
+
+        } else if (this.betDirection.includes("SELL")) {
+          this.potentialProfit += Math.abs(executedProfit)
+        }
+      }
+
+      console.log("potentialProfit:", this.potentialProfit)
+      document.querySelector(".potentialProfit").textContent = `potential profit: ${Math.round(this.potentialProfit)}`
+    }
+
+    static setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
+      // x-axis values (labels)
+      const newLabels = []
+      for (let i = 0; i <= betQuantity; i++) {
+        newLabels.push(i)
+      }
+      chart.data.labels = newLabels
+
+      const profitPriceLine = []
+      for (let i = 0; i <= betQuantity; i++) {
+        profitPriceLine.push(betPrice)
+      }
+      chart.data.datasets[1].data = profitPriceLine
+
+      // set profit price line
+      chart.data.datasets[0].fill.target.value = betPrice
+      chart.options.scales.y.suggestedMax = betPrice
+
+      if (betDirection.includes("BUY")) {
+        console.log("below green for buy")
+        chart.data.datasets[0].fill.above = "red"
+        chart.data.datasets[0].fill.below = "green"
+      } else if (betDirection.includes("SELL")) {
+        console.log("below red for sell")
+        chart.data.datasets[0].fill.above = "green"
+        chart.data.datasets[0].fill.below = "red"
+      } else {
+        console.error("betDirection not recognized")
+      }
+
+      chart.update();
+    }
+
+    static removeData(chart) {
+      chart.data.labels.pop();
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+      });
+      chart.update();
+    }
+  }
+
+
+  function debug() {
+    // console.log("test")
+    flipGraphAxes()
+  }
+
+  function flipGraphAxes() {
+    flipAxes = !flipAxes
+    regraphMarketGraph()
+    flipMarketGraphAxes()
+  }
+
+  function regraphMarketGraph() {
+    graphClearingPrice(klf_line, null, null, null, true)
+    // functon graphClearingPrice(chart, price = null, buys = null, sells = null, regraph = false) {
+
+    graphBids(klf_line, null, true)
+    // functon graphBids(chart, buys = null, regraph = false) {
+
+    graphAsks(klf_line, null, true)
+    // functon graphAsks(chart, sells = null, regraph = false) {
+  }
+
+  function flipMarketGraphAxes() {
+    if (isCDA || isFBA) {
+      if (flipAxes) {
+        klf_line.options.scales.x.title.text = "Volume"
+        klf_line.options.scales.y.title.text = "Price"
+      } else {
+        klf_line.options.scales.x.title.text = "Price"
+        klf_line.options.scales.y.title.text = "Volume"
+      }
+    } else if (isFLO) {
+      if (flipAxes) {
+        klf_line.options.scales.x.title.text = "Rate"
+        klf_line.options.scales.y.title.text = "Price"
+      } else {
+        klf_line.options.scales.x.title.text = "Price"
+        klf_line.options.scales.y.title.text = "Rate"
+      }
+    }
+
+    klf_line.update()
+  }
+
+  /*
+      var klf_line = new Chart(klf_line_ctx, {
+      type: 'scatter',
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Volume' : 'Rate',
+            },
+            beginAtZero: true,
+          },
+
+          x: {
+            title: {
+              display: true,
+              text: isCDA || isFBA ? 'Price' : 'Price',
+            },
+            beginAtZero: true,
+          },
+        },
+  */
+
+  ///////////////////////////////////////////////////////////////////////////////////
 
   const graphs = init_graphs();
   const klf_line = graphs[2];
@@ -222,35 +474,66 @@
     }
   }
 
-  function graphClearingPrice(chart, price, buys, sells) {
+  let lastDataToGraphClearingPrice = {
+    price: undefined,
+    buys: undefined,
+    sells: undefined
+  }
+
+  function graphClearingPrice(chart, price = null, buys = null, sells = null, regraph = false) {
+
+    if (regraph === true && price === null && sells === null && buys === null) {
+      if (chart.data.datasets[2].data.length === 0) return
+      let { price, buys, sells } = lastDataToGraphClearingPrice
+    } else {
+      lastDataToGraphClearingPrice = { price, buys, sells }
+    }
+
+    console.log("cached graph clearing price:", lastDataToGraphClearingPrice)
+
+
     buys = buys.filter((buy) => buy['status'] == 'active');
     sells = sells.filter((sell) => sell['status'] == 'active');
+
     var agg_supply = 0.0; // agg_supply will be equal to agg_demand
     sells.forEach(function (sell, _index, _array) {
       agg_supply += calcSupply(sell, price);
     });
+
     var points = [];
-    points.push({
-      x: 0.0,
-      y: agg_supply,
-    });
-    points.push({
-      x: price,
-      y: agg_supply,
-    });
-    points.push({
-      x: price,
-      y: 0.0,
-    });
+
+    if (flipAxes) {
+      points.push({ x: 0.0, y: price });
+      points.push({ x: agg_supply, y: price });
+      points.push({ x: agg_supply, y: 0.0 });
+    } else {
+      points.push({ x: 0.0, y: agg_supply });
+      points.push({ x: price, y: agg_supply });
+      points.push({ x: price, y: 0.0 });
+    }
 
     chart.data.datasets[2].data = points;
     chart.update();
   }
 
-  function graphBids(chart, buys) {
-    // console.log('graphBids() buys:', buys);
+  let lastDataToGraphBids
+  function graphBids(chart, buys = null, regraph = false) {
+
+    console.log("graphBids 0")
+
+    if (regraph === true && buys === null) {
+      if (chart.data.datasets[0].data.length === 0) return
+      buys = lastDataToGraphBids
+    } else {
+      lastDataToGraphBids = buys
+    }
+
+    console.log("graphBids 1")
+
     buys = buys.filter((buy) => buy['status'] == 'active');
+
     if ('{{treatment}}' != 'cda') {
+
       // if treatment is fba/flo, calculate aggregate supply and graph x, y as price, aggregate supply
       if (buys.length == 0) {
         chart.data.datasets[0].data = [];
@@ -269,15 +552,26 @@
         buys.forEach(function (buy, _index, _array) {
           agg_supply += calcDemand(buy, price);
         });
+
         // console.log('graphBids() plotting x:', price, 'y:', agg_supply);
         points.push({
           x: price,
           y: agg_supply,
         });
+
+        // if (flipAxes) {
+        //   for (let i = 0; i < points.length; i++) {
+        //     var new_x = points[i].y;
+        //     var new_y = points[i].x;
+        //     points[i].y = new_y;
+        //     points[i].x = new_x;
+        //   }
+        // }
       });
     } else {
       // if treatment is cda, sort the buy orders,
       buys.sort((a, b) => (a['p_max'] < b['p_max'] ? 1 : -1));
+
       var volume = 0.0;
       var points = [];
 
@@ -287,16 +581,20 @@
           x: buy['p_max'],
           y: volume,
         });
+
         console.error('buy q copy', buy['q_max_cda_copy'], buy['q_max'])
+
         if (buy['q_max_cda_copy'] !== undefined) {
           volume += buy['q_max_cda_copy'];
         } else {
           volume += buy['q_max'];
         }
+
         points.push({
           x: buy['p_max'],
           y: volume,
         });
+
       });
 
       // insert a horizontal line to 0 to show limit order
@@ -306,13 +604,39 @@
       });
     }
 
+    if (flipAxes) {
+      for (let i = 0; i < points.length; i++) {
+        var new_x = points[i].y;
+        var new_y = points[i].x;
+        points[i].y = new_y;
+        points[i].x = new_x;
+      }
+    }
+
     chart.data.datasets[0].data = points;
     chart.update();
   }
 
-  function graphAsks(chart, sells) {
+  let lastDataToGraphAsks
+  function graphAsks(chart, sells = null, regraph = false) {
+    console.log("graphAsks 0", sells)
+
+    if (regraph === true && sells === null) {
+      console.log("graphAsks 1", sells)
+      if (chart.data.datasets[1].data.length === 0) {
+        console.log("graphAsks 1.1", sells)
+        return
+      }
+      sells = lastDataToGraphAsks
+    } else {
+      console.log("graphAsks 2", sells)
+      lastDataToGraphAsks = sells
+    }
+
     sells = sells.filter((sell) => sell['status'] == 'active');
+
     if ('{{treatment}}' != 'cda') {
+
       if (sells.length == 0) {
         chart.data.datasets[1].data = [];
         chart.update();
@@ -321,34 +645,49 @@
 
       var points = [];
       var prices = [...Array(20).keys()];
+
       prices.forEach(function (price, _index, _array) {
         var agg_supply = 0.0;
+
         sells.forEach(function (sell, _index, _array) {
           agg_supply += calcSupply(sell, price);
         });
-        // console.log('graphSells() plotting x:', price, 'y:', agg_supply);
+
         points.push({
           x: price,
           y: agg_supply,
         });
       });
-      // console.log('graphSells() points', points);
+
+      if (flipAxes) {
+        for (let i = 0; i < points.length; i++) {
+          var new_x = points[i].y;
+          var new_y = points[i].x;
+          points[i].y = new_y;
+          points[i].x = new_x;
+        }
+      }
+
     } else {
+      // Sort the asks in increasing order (lowest price first)
       sells.sort((a, b) => (a['p_max'] > b['p_max'] ? 1 : -1));
+
       var volume = 0.0;
       var points = [];
+
       sells.forEach(function (sell, _index, _array) {
         // Graph (price, old_vol) -> (price, new_vol)
         points.push({
           x: sell['p_max'],
           y: volume,
         });
-        console.error('sell q copy', sell['q_max_cda_copy'], sell['q_max'])
+
         if (sell['q_max_cda_copy'] !== undefined) {
           volume += sell['q_max_cda_copy'];
         } else {
           volume += sell['q_max'];
         }
+
         points.push({
           x: sell['p_max'],
           y: volume,
@@ -360,6 +699,15 @@
         x: 20.0,
         y: volume,
       });
+
+      if (flipAxes) {
+        for (let i = 0; i < points.length; i++) {
+          var new_x = points[i].y;
+          var new_y = points[i].x;
+          points[i].y = new_y;
+          points[i].x = new_x;
+        }
+      }
     }
 
     chart.data.datasets[1].data = points;
@@ -372,7 +720,7 @@
     let dataset = chart.series[0];
     const profitFormatted = parseFloat(profit.toFixed(2));
     dataset.addPoint(profitFormatted);
-    //chart.update();
+    //chart.update(); // why not update? does it work differently in highcharts or something?
   }
 
   // Adds or subtracts volume to trader
@@ -393,9 +741,29 @@
       this.#appendToExpired();
     }
 
+    static getUpcomingBetData() {
+      const table = document.querySelector('#activeBets');
+
+      if (table.children.length === 0) return null
+
+      const upcomingBet = table.firstElementChild
+      console.log("got bet", upcomingBet)
+
+      const data = {
+        quantity: parseFloat(upcomingBet.querySelector(".betQuantity").textContent),
+        price: parseFloat(upcomingBet.querySelector(".betPrice").textContent),
+        direction: upcomingBet.querySelector(".betDirection").textContent.trim(),
+      }
+
+      console.log("got data", data)
+      return data
+    }
+
     static #removeFromActive(id) {
       this.#currentBet = document.querySelector(`#a${id}`).cloneNode(true);
       document.querySelector(`#a${id}`).remove();
+
+      ProfitGraph.updateProfitLineFromUpcomingBet()
     }
 
     static #appendToExpired() {
@@ -426,9 +794,6 @@
     }
   }
 
-  function debug() {
-    BetsUI.decrementDeadlines();
-  }
 
   function liveRecv(data) {
     // console.timeEnd(`timing`);
@@ -438,13 +803,17 @@
     }
 
     if (data['type'] == 'clear') {
-      // console.log(tickCount, " clear", "cash:", data['cash'], "inv:", data['inventory'])
-      // update cash and inventory bar regardless
+      // to continually move time in the cash and inv graphs, 
+      // update cash and inventory bar regardless of changes to cash and inv
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
+
       // clear book graph
       klf_line.data.datasets[2].data = [];
       klf_line.update();
+
+      // lastDataToGraphClearingPrice
+
 
       const d = data["payoff_data"]
 
@@ -476,6 +845,7 @@
       graphAsks(klf_line, data['sells']);
       //   console.warn('should check if order has expired here', data);
       updateOrderHistory(data);
+      console.log("order expired here's the data", data)
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
@@ -502,7 +872,7 @@
       // console.log(tickCount, " bets update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
-      cachedData = data;
+      cachedDataForOdometer = data;
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
@@ -511,7 +881,7 @@
       // console.log(tickCount, " update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
-      cachedData = data;
+      cachedDataForOdometer = data;
       // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
@@ -539,13 +909,9 @@
     tickCount++
   }
 
-  // console.error(parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2)));
-  // console.error(
-  //   typeof parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2))
-  // );
-  let cachedData;
+  let cachedDataForOdometer;
   function updateCashAndInventoryDisplay(data) {
-    if (cachedData === undefined) return;
+    if (cachedDataForOdometer === undefined) return;
     cashOdometer.update(parseFloat(data['cash']).toFixed(2));
     invOdometer.update(parseFloat(data['inventory']).toFixed(2));
     // console.error(parseFloat(data['cash']).toFixed(2));
@@ -831,7 +1197,7 @@
       newRow.append(direction, price, quantity);
     }
 
-    // since id's cannot start with number
+    // since ids cannot start with number
     newRow.id = 'a' + order.orderID;
     const tableWrapper = document.querySelector('#activeOrdersTableWrapper');
 
