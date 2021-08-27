@@ -538,6 +538,25 @@ class Group(BaseGroup):
                 self.save()
                 print("sells 2b:", sells)
 
+                if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
+                    print("sell update price old:", player.cash, "best_bid:",
+                          best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
+                    seller.updateProfit(
+                        best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
+                    seller.updateVolume(-best_bid["q_max"])
+                    print("sell update price new:", player.cash)
+                elif self.treatment_val == 'flo':
+                    seller.updateProfit(trader_vol * clearing_price)
+                    seller.updateVolume(-trader_vol)
+
+                    if "executedProfit" not in sell:
+                        sell['executedProfit'] = 0
+                    if "executedVolume" not in sell:
+                        sell['executedVolume'] = 0
+
+                    sell['executedProfit'] += trader_vol * clearing_price
+                    sell['executedVolume'] += -trader_vol
+
                 # remove the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= 0.0) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= 0.0):
                     cache = self.order_copies
@@ -555,17 +574,6 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                # TODO copy
-                if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    print("sell update price old:", player.cash, "best_bid:",
-                          best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
-                    seller.updateProfit(
-                        best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
-                    seller.updateVolume(-best_bid["q_max"])
-                    print("sell update price new:", player.cash)
-                elif self.treatment_val == 'flo':
-                    seller.updateProfit(trader_vol * clearing_price)
-                    seller.updateVolume(-trader_vol)
 
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
@@ -665,6 +673,27 @@ class Group(BaseGroup):
                 self.order_copies = cache
                 self.save()
 
+                if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
+                    print("buy update price old:", player.cash, "best_ask:",
+                          best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
+                    buyer.updateProfit(-best_ask["q_max"] *
+                                       clearing_price, False, buy["player"] == 1)
+                    buyer.updateVolume(best_ask["q_max"])
+                    print("buy update price new:", player.cash)
+                elif self.treatment_val == "flo":
+                    buyer.updateProfit(-trader_vol * clearing_price)
+                    buyer.updateVolume(trader_vol)
+
+                    if "executedProfit" not in buy:
+                        buy['executedProfit'] = 0
+                    if "executedVolume" not in buy:
+                        buy['executedVolume'] = 0
+                    
+                    print("*executed old profit", buy['executedProfit'], "change", -trader_vol * clearing_price)
+                    buy['executedProfit'] += -trader_vol * clearing_price
+                    buy['executedVolume'] += trader_vol
+                    print("*executed new profit", buy['executedProfit'], "change", -trader_vol * clearing_price)
+
                 # remove the order if q_max <= 0
                 # if (buy['q_max'] <= 0.0):
                 if (self.treatment_val == "flo" and buy['q_max'] <= 0.0) or (self.treatment_val == "cda" and buy["q_max_cda_copy"] <= 0.0):
@@ -689,16 +718,6 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    print("buy update price old:", player.cash, "best_ask:",
-                          best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
-                    buyer.updateProfit(-best_ask["q_max"] *
-                                       clearing_price, False, buy["player"] == 1)
-                    buyer.updateVolume(best_ask["q_max"])
-                    print("buy update price new:", player.cash)
-                elif self.treatment_val == "flo":
-                    buyer.updateProfit(-trader_vol * clearing_price)
-                    buyer.updateVolume(trader_vol)
 
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():

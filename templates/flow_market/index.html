@@ -467,6 +467,31 @@
     </h2>
   </div>
 </div>
+<div class="container">
+
+  <div class="row mt-0 mb-0">
+
+    <div class="col">
+      <hr class="mt-5 mb-5" />
+      <p class="h1">Profit chart testing</p>
+      <div class="row justify-content-center" id=""
+        style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <div class="col">
+      <hr class="mt-5 mb-5" />
+      <p class="h1 potentialProfit">potential profit: </p>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
 <div class="container-fluid containerMargin hideDebug conditionalMarginTop">
   <div class="row justify-content-center">
     <div
@@ -479,7 +504,8 @@
             <div class="" id="BETS">
               <div class="" id="bets2">
                 <div class="cardHeader w-100 text-align-right">
-                  <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets</h5>
+                  <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets
+                  </h5>
                 </div>
                 <table class="table mb-0">
                   <thead class="thead-light">
@@ -737,7 +763,8 @@
             <div class="" id="EXECUTEDBETS">
               <div class="" id="bets2">
                 <div class="cardHeader w-100 text-align-right">
-                  <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed Bets
+                  <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
+                    Bets
                   </h5>
                 </div>
                 <table class="table mb-0">
@@ -769,7 +796,8 @@
               <table class="table mb-0">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col" id="executedOrdersDirection">Direction</th>
+                    <th scope="col" id="executedOrdersDirection">Direction
+                    </th>
                     <th scope="col">Price</th>
                     <th scope="col">Quantity</th>
                     <th scope="col" id="executedOrdersRate">Rate</th>
@@ -821,7 +849,8 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">() = endowment + money gained in market - money lost in
+        <th scope="col">() = endowment + money gained in market - money lost
+          in
           market</th>
         <th scope="col">endowment</th>
         <th scope="col">money gained in market</th>
@@ -877,11 +906,5 @@
   <p class="h1">React testing</p>
   <div class="row justify-content-center" id="reactInputSelectorTest"></div>
 
-  <hr class="mt-5 mb-5" />
-  <p class="h1">Profit chart testing</p>
-  <div class="row justify-content-center" id=""
-    style="width:400px; height:400px">
-    <canvas id="myChart"></canvas>
-  </div>
 
   {% block scripts %} {% include Constants.scripts_template %} {% endblock %}

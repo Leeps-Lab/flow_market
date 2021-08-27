@@ -38,10 +38,7 @@
 
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
-
-      // populate profit graph with new bet info
-      const { quantity, price, direction } = BetsUI.getUpcomingBetData()
-      setLabelsBasedOnBet(myChart, quantity, price, direction)
+      ProfitGraph.updateProfitLineFromUpcomingBet()
 
       setInterval(() => {
 
@@ -51,12 +48,15 @@
         // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
         // tickCount = 0
 
-        updateCashAndInventoryDisplay(cachedData);
+        updateCashAndInventoryDisplay(cachedDataForOdometer);
         BetsUI.decrementDeadlines();
       }, 1000);
     },
     false
   );
+
+  let cash = 0
+  let inventory = 0
 
   let orderHistory = [];
 
@@ -78,8 +78,12 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
-        // also remove from active orders table
+        // remove from active orders table
         removeActiveOrderTable(order.orderID);
+
+        // update profit graph
+        ProfitGraph.addOrderData(orderInData)
+
         return false;
       } else {
         return true;
@@ -155,6 +159,20 @@
     return numToBeValid;
   }
 
+
+  // axes.addEventListener("click", () => {
+  //   // Redraw all of the graphs
+  //   graphCDA(cda_line, cda_bids, cda_asks);
+    
+  //   if (klf_bids.length > 0 && klf_asks.length > 0) {
+  //     var clearing_price = clearingPrice(klf_bids, klf_asks);
+
+  //     graphClearingPrice(klf_line, clearing_price, klf_bids, klf_asks);
+  //   }
+
+  //   graphKLF(klf_line, klf_bids, klf_asks);
+  // });
+
   ///////////////////////////////////////////////////////////////////////////////////
 
   var ctx = document.getElementById('myChart').getContext('2d');
@@ -165,7 +183,11 @@
       datasets: [
         {
           label: 'Orders',
-          data: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 400, 500],
+          // barPercentage: 1,
+          // categoryPercentage: 1,
+          // data: [10, 20, 30, 40, 50, 60, 70],
+          // data: [0, 5, 10, 15, 20, 50, 50, 50, 50, 50, 50, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 325, 325, 325, 325, 325, 325, 325, 230, 230, 230, 230, 230, 230, 230, 230, 230, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83, 83,],
+          data: [],
           fill: { above: 'red', below: 'green', target: { value: 10 } },
           pointRadius: 0,
           borderWidth: 2,
@@ -173,7 +195,8 @@
         },
         {
           label: 'Profit Line',
-          data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+          // data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+          data: [],
           fill: false,
           pointRadius: 0,
           borderWidth: 2,
@@ -205,105 +228,115 @@
     }
   });
 
-  function addData(chart, data) {
-    console.log("adding", data)
-    chart.data.datasets.forEach((dataset) => {
-      dataset.data.push(data);
-    });
-    chart.update();
-  }
+  class ProfitGraph {
+    static chart = myChart
+    static profitLineValue = 0
+    static potentialProfit = 0
+    static betDirection = ""
 
-  function setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
-    // chart.data.labels.push(label);
-    // console.log("labels:", chart.data.labels)
+    static updateProfitLineFromUpcomingBet() {
+      const betData = BetsUI.getUpcomingBetData()
+      if (betData !== null) {
+        const { quantity, price, direction } = betData
 
-    // x-axis values (labels)
-    const newLabels = []
-    for (let i = 0; i <= betQuantity; i++) {
-      newLabels.push(i)
-    }
-    chart.data.labels = newLabels
+        this.profitLineValue = price
+        this.betDirection = direction
+        this.potentialProfit = 0
 
-    const profitPriceLine = []
-    for (let i = 0; i <= betQuantity; i++) {
-      profitPriceLine.push(betPrice)
-    }
-    chart.data.datasets[1].data = profitPriceLine
-
-    //   datasets: [
-    //     {
-    //       label: 'Orders',
-    //       data: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 90, 120, 150, 200, 250, 300, 400, 500],
-    //       fill: { above: 'red', below: 'green', target: { value: 10 } }
-    //     },
-    //     {
-    //       label: 'Bet',
-    //       data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
-    //       fill: false,
-    //       pointRadius: 0,
-    //       borderWidth: 2,
-    //       borderColor: '#0',
-    //     },
-    //   ]
-    // },
-    // console.log("dataset", chart.data.datasets[0].fill.target.value)
-
-    // set profit price line
-    chart.data.datasets[0].fill.target.value = betPrice
-    chart.options.scales.y.suggestedMax = betPrice
-
-    // options: {
-    //   scales: {
-    // y: {
-    //           suggestedMin: 50,
-    //           suggestedMax: 100
-    //       }
-    //     y: {
-    //       min: 0,
-    //       max: 100
-    //     }
-    //   }
-    // }
-
-    // fill: { above: 'red', below: 'green', target: { value: 10 } }
-    if (betDirection.includes("BUY")) {
-      console.log("below green for buy")
-      chart.data.datasets[0].fill.above = "red"
-      chart.data.datasets[0].fill.below = "green"
-    } else if (betDirection.includes("SELL")) {
-      console.log("below red for sell")
-      chart.data.datasets[0].fill.above = "green"
-      chart.data.datasets[0].fill.below = "red"
-    } else {
-      console.error("betDirection not recognized")
+        ProfitGraph.setLabelsBasedOnBet(myChart, quantity, price, direction)
+      }
     }
 
-    chart.update();
+    static addOrderData(order) {
+      // TODO add conditional for if order and bet are compatible to graph
+      // if (order["direction"].includes("buy"))
+      console.log("addorderinfo", order)
+      const { executedProfit, executedVolume } = order
+      const pricePerVol = Math.abs(executedProfit) / Math.abs(executedVolume)
 
-    // data: {
-    //   labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    //   datasets: [{
-    //     label: 'D9',
-    //     data: [10, 10, 10, -10, 20, 20, 20],
-    //     fill: { above: 'red', below: 'green', target: { value: 10 } }
-    //   }]
-    // },
-  }
+      this.updatePotentialProfit(executedProfit, executedVolume, pricePerVol)
 
-  function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-      dataset.data.pop();
-    });
-    chart.update();
+      console.log("* pricePerVol", pricePerVol)
+
+      for (let i = 0; i < Math.abs(executedVolume); i++) {
+        this.chart.data.datasets[0].data.push(pricePerVol)
+        console.log("pushed", pricePerVol)
+      }
+
+      this.chart.update();
+    }
+
+    static updatePotentialProfit(executedProfit, executedVolume, pricePerVol) {
+      if (pricePerVol < this.profitLineValue) {
+
+        if (this.betDirection.includes("BUY")) {
+          this.potentialProfit += Math.abs(executedProfit)
+
+        } else if (this.betDirection.includes("SELL")) {
+          this.potentialProfit -= Math.abs(executedProfit)
+        }
+
+      } else if (pricePerVol > this.profitLineValue) {
+
+        if (this.betDirection.includes("BUY")) {
+          this.potentialProfit -= Math.abs(executedProfit)
+
+        } else if (this.betDirection.includes("SELL")) {
+          this.potentialProfit += Math.abs(executedProfit)
+        }
+      }
+
+      console.log("potentialProfit:", this.potentialProfit)
+      document.querySelector(".potentialProfit").textContent = `potential profit: ${Math.round(this.potentialProfit)}`
+    }
+
+    static setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
+      // x-axis values (labels)
+      const newLabels = []
+      for (let i = 0; i <= betQuantity; i++) {
+        newLabels.push(i)
+      }
+      chart.data.labels = newLabels
+
+      const profitPriceLine = []
+      for (let i = 0; i <= betQuantity; i++) {
+        profitPriceLine.push(betPrice)
+      }
+      chart.data.datasets[1].data = profitPriceLine
+
+      // set profit price line
+      chart.data.datasets[0].fill.target.value = betPrice
+      chart.options.scales.y.suggestedMax = betPrice
+
+      if (betDirection.includes("BUY")) {
+        console.log("below green for buy")
+        chart.data.datasets[0].fill.above = "red"
+        chart.data.datasets[0].fill.below = "green"
+      } else if (betDirection.includes("SELL")) {
+        console.log("below red for sell")
+        chart.data.datasets[0].fill.above = "green"
+        chart.data.datasets[0].fill.below = "red"
+      } else {
+        console.error("betDirection not recognized")
+      }
+
+      chart.update();
+    }
+
+    static removeData(chart) {
+      chart.data.labels.pop();
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+      });
+      chart.update();
+    }
   }
 
   function debug() {
     // console.log("test")
     // addData(myChart, 3)
     // setLabelsBasedOnBet(myChart, Math.ceil(Math.random() * 20))
-    const { quantity, price, direction } = BetsUI.getUpcomingBetData()
-    setLabelsBasedOnBet(myChart, quantity, price, direction)
+    ProfitGraph.updateProfitLineFromUpcomingBet()
   }
 
   ///////////////////////////////////////////////////////////////////////////////////
@@ -552,7 +585,7 @@
     static getUpcomingBetData() {
       const table = document.querySelector('#activeBets');
 
-      if (table.children.length === 0) return
+      if (table.children.length === 0) return null
 
       const upcomingBet = table.firstElementChild
       console.log("got bet", upcomingBet)
@@ -571,9 +604,7 @@
       this.#currentBet = document.querySelector(`#a${id}`).cloneNode(true);
       document.querySelector(`#a${id}`).remove();
 
-      // populate profit graph with new bet info
-      const { quantity, price, direction } = BetsUI.getUpcomingBetData()
-      setLabelsBasedOnBet(myChart, quantity, price, direction)
+      ProfitGraph.updateProfitLineFromUpcomingBet()
     }
 
     static #appendToExpired() {
@@ -613,10 +644,11 @@
     }
 
     if (data['type'] == 'clear') {
-      // console.log(tickCount, " clear", "cash:", data['cash'], "inv:", data['inventory'])
-      // update cash and inventory bar regardless
+      // to continually move time in the cash and inv graphs, 
+      // update cash and inventory bar regardless of changes to cash and inv
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
+
       // clear book graph
       klf_line.data.datasets[2].data = [];
       klf_line.update();
@@ -651,6 +683,7 @@
       graphAsks(klf_line, data['sells']);
       //   console.warn('should check if order has expired here', data);
       updateOrderHistory(data);
+      console.log("order expired here's the data", data)
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
@@ -677,7 +710,7 @@
       // console.log(tickCount, " bets update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
-      cachedData = data;
+      cachedDataForOdometer = data;
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
@@ -686,7 +719,7 @@
       // console.log(tickCount, " update", "cash:", data['cash'], "inv:", data['inventory'])
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
-      cachedData = data;
+      cachedDataForOdometer = data;
       // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
@@ -714,13 +747,9 @@
     tickCount++
   }
 
-  // console.error(parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2)));
-  // console.error(
-  //   typeof parseFloat('{{ player.inventory|floatformat:1 }}'.toFixed(2))
-  // );
-  let cachedData;
+  let cachedDataForOdometer;
   function updateCashAndInventoryDisplay(data) {
-    if (cachedData === undefined) return;
+    if (cachedDataForOdometer === undefined) return;
     cashOdometer.update(parseFloat(data['cash']).toFixed(2));
     invOdometer.update(parseFloat(data['inventory']).toFixed(2));
     // console.error(parseFloat(data['cash']).toFixed(2));
@@ -1006,7 +1035,7 @@
       newRow.append(direction, price, quantity);
     }
 
-    // since id's cannot start with number
+    // since ids cannot start with number
     newRow.id = 'a' + order.orderID;
     const tableWrapper = document.querySelector('#activeOrdersTableWrapper');
 
