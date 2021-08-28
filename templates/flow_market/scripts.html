@@ -24,7 +24,6 @@
   // DEBUG tick count
   let tickCount = 0
   const ticks = []
-  let flipAxes = false
 
   document.addEventListener(
     'DOMContentLoaded',
@@ -41,14 +40,15 @@
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
       ProfitGraph.updateProfitLineFromUpcomingBet()
+      MarketGraph.updateAxesText()
 
       setInterval(() => {
 
         // DEBUG tick count
-        // ticks.push(tickCount)
-        // const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
-        // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
-        // tickCount = 0
+        ticks.push(tickCount)
+        const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
+        console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
+        tickCount = 0
 
         updateCashAndInventoryDisplay(cachedDataForOdometer);
         BetsUI.decrementDeadlines();
@@ -95,47 +95,80 @@
     }
 
     static async #player1ActionsFLO() {
-      await this.delay(5 * 1000);
-      new_buy(true, 4, 14, 80, 1)
+      // await this.delay(5 * 1000);
+      setTimeout(() =>
+        new_buy(true, 4, 14, 80, 1),
+        5 * 1000
+      )
     }
 
     static async #player2ActionsFLO() {
-      await this.delay(15 * 1000);
-      new_sell(true, 6, 10, 100, 1)
+      // await this.delay(15 * 1000);
+      setTimeout(() =>
+        new_sell(true, 6, 10, 100, 1),
+        15 * 1000
+      )
     }
 
     static async #player3ActionsFLO() {
-      await this.delay(20 * 1000);
-      new_buy(true, 3, 7, 80, 1)
+      // await this.delay(20 * 1000);
+      setTimeout(() =>
+        new_buy(true, 3, 7, 80, 1),
+        20 * 1000
+      )
     }
 
 
     //////////////////////////
     static async #player1ActionsCDA() {
-      await this.delay(5 * 1000);
-      new_buy(true, null, 7, 10, 1)
+      // await this.delay(5 * 1000);
 
-      await this.delay(20 * 1000);
-      new_buy(true, null, 7, 5, 1)
+      setTimeout(() =>
+        new_buy(true, null, 7, 10, 1),
+        5 * 1000
+      )
+
+      // await this.delay(20 * 1000);
+
+      setTimeout(() =>
+        new_buy(true, null, 7, 5, 1),
+        20 * 1000
+      )
     }
 
     static async #player2ActionsCDA() {
-      await this.delay(15 * 1000);
-      new_sell(true, null, 7, 20, 1)
+      // await this.delay(15 * 1000);
 
-      await this.delay(35 * 1000);
-      new_sell(true, null, 7, 15, 1)
+      setTimeout(() =>
+        new_sell(true, null, 7, 20, 1),
+        15 * 1000
+      )
+
+      // await this.delay(35 * 1000);
+      setTimeout(() =>
+        new_sell(true, null, 7, 15, 1),
+        35 * 1000
+      )
     }
 
     static async #player3ActionsCDA() {
-      await this.delay(30 * 1000);
-      new_buy(true, null, 8, 7, 1)
+      // await this.delay(30 * 1000);
+      setTimeout(() =>
+        new_buy(true, null, 8, 7, 1),
+        30 * 1000
+      )
 
-      await this.delay(45 * 1000);
-      new_buy(true, null, 8, 7, 1)
+      // await this.delay(45 * 1000);
 
-      await this.delay(50 * 1000);
-      new_buy(true, null, 8, 6, 1)
+      setTimeout(() =>
+        new_buy(true, null, 8, 7, 1),
+        45 * 1000
+      )
+      // await this.delay(50 * 1000);
+      setTimeout(() =>
+        new_buy(true, null, 8, 6, 1),
+        50 * 1000
+      )
     }
 
 
@@ -418,47 +451,59 @@
 
   function debug() {
     // console.log("test")
-    flipGraphAxes()
+    MarketGraph.flipGraphAxes()
   }
 
-  function flipGraphAxes() {
-    flipAxes = !flipAxes
-    regraphMarketGraph()
-    flipMarketGraphAxes()
-  }
+  class MarketGraph {
+    static flipAxes = true
 
-  function regraphMarketGraph() {
-    graphClearingPrice(klf_line, null, null, null, true)
-    // functon graphClearingPrice(chart, price = null, buys = null, sells = null, regraph = false) {
-
-    graphBids(klf_line, null, true)
-    // functon graphBids(chart, buys = null, regraph = false) {
-
-    graphAsks(klf_line, null, true)
-    // functon graphAsks(chart, sells = null, regraph = false) {
-  }
-
-  function flipMarketGraphAxes() {
-    if (isCDA || isFBA) {
-      if (flipAxes) {
-        klf_line.options.scales.x.title.text = "Volume"
-        klf_line.options.scales.y.title.text = "Price"
-      } else {
-        klf_line.options.scales.x.title.text = "Price"
-        klf_line.options.scales.y.title.text = "Volume"
-      }
-    } else if (isFLO) {
-      if (flipAxes) {
-        klf_line.options.scales.x.title.text = "Rate"
-        klf_line.options.scales.y.title.text = "Price"
-      } else {
-        klf_line.options.scales.x.title.text = "Price"
-        klf_line.options.scales.y.title.text = "Rate"
-      }
+    static flipGraphAxes() {
+      MarketGraph.flipAxes = !MarketGraph.flipAxes
+      MarketGraph.regraphAllGraphs()
+      MarketGraph.updateAxesText()
     }
 
-    klf_line.update()
+    static regraphAllGraphs() {
+      graphClearingPrice(klf_line, null, null, null, true)
+      // functon graphClearingPrice(chart, price = null, buys = null, sells = null, regraph = false) {
+
+      graphBids(klf_line, null, true)
+      // functon graphBids(chart, buys = null, regraph = false) {
+
+      graphAsks(klf_line, null, true)
+      // functon graphAsks(chart, sells = null, regraph = false) {
+    }
+
+    static updateAxesText() {
+      if (isCDA || isFBA) {
+        if (MarketGraph.flipAxes) {
+          klf_line.options.scales.x.title.text = "Volume"
+          klf_line.options.scales.y.title.text = "Price"
+        } else {
+          klf_line.options.scales.x.title.text = "Price"
+          klf_line.options.scales.y.title.text = "Volume"
+        }
+      } else if (isFLO) {
+        console.log("**flipping")
+        if (MarketGraph.flipAxes) {
+          console.log("** 1flipping")
+          klf_line.options.scales.x.title.text = "Rate"
+          klf_line.options.scales.y.title.text = "Price"
+        } else {
+          console.log("** 2flipping")
+          klf_line.options.scales.x.title.text = "Price"
+          klf_line.options.scales.y.title.text = "Rate"
+        }
+      }
+
+      klf_line.update()
+    }
   }
+
+  // let MarketGraph.flipAxes = true
+
+
+
 
   ///////////////////////////////////////////////////////////////////////////////////
 
@@ -560,7 +605,7 @@
 
     var points = [];
 
-    if (flipAxes) {
+    if (MarketGraph.flipAxes) {
       points.push({ x: 0.0, y: price });
       points.push({ x: agg_supply, y: price });
       points.push({ x: agg_supply, y: 0.0 });
@@ -648,7 +693,7 @@
       });
     }
 
-    if (flipAxes) {
+    if (MarketGraph.flipAxes) {
       for (let i = 0; i < points.length; i++) {
         var new_x = points[i].y;
         var new_y = points[i].x;
@@ -699,7 +744,7 @@
         });
       });
 
-      if (flipAxes) {
+      if (MarketGraph.flipAxes) {
         for (let i = 0; i < points.length; i++) {
           var new_x = points[i].y;
           var new_y = points[i].x;
@@ -740,7 +785,7 @@
         y: volume,
       });
 
-      if (flipAxes) {
+      if (MarketGraph.flipAxes) {
         for (let i = 0; i < points.length; i++) {
           var new_x = points[i].y;
           var new_y = points[i].x;

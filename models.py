@@ -426,7 +426,7 @@ class Group(BaseGroup):
         if condition:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
-            print("new clearing_price", clearing_price)
+            # print("new clearing_price", clearing_price)
 
             # Graph the clearing price
             for player in self.get_players():
@@ -440,13 +440,13 @@ class Group(BaseGroup):
             )
 
             # TODO start here sell
-            print("")
-            print("-----------------------------------")
-            print("buys", buys)
-            print("self.buys", self.buys())
-            print("treatment:", self.treatment_val)
-            print("original sells:", sells)
-            print("original buys:", buys)
+            # print("")
+            # print("-----------------------------------")
+            # print("buys", buys)
+            # print("self.buys", self.buys())
+            # print("treatment:", self.treatment_val)
+            # print("original sells:", sells)
+            # print("original buys:", buys)
 
             # Update the traders' profits and orders
             for sell in sells:
@@ -464,9 +464,9 @@ class Group(BaseGroup):
                 if (not ("q_max_cda_copy" in sell)):
                     sell["q_max_cda_copy"] = sell["q_max"]
 
-                print("**in sells")
-                print("got best_bid", best_bid)
-                print("")
+                # print("**in sells")
+                # print("got best_bid", best_bid)
+                # print("")
 
                 seller = self.get_player_by_id(sell['player'])
 
@@ -474,7 +474,7 @@ class Group(BaseGroup):
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
 
-                        print("1")
+                        # print("1")
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
@@ -482,9 +482,9 @@ class Group(BaseGroup):
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
-                        print("2")
-                        print("should remove here sells copy old 0:", sells)
-                        print("should remove here buys copy old 0:", buys)
+                        # print("2")
+                        # print("should remove here sells copy old 0:", sells)
+                        # print("should remove here buys copy old 0:", buys)
 
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
@@ -493,13 +493,13 @@ class Group(BaseGroup):
                         best_bid['q_max_cda_copy'] -= sell_q
                         best_bid['expired_by_cda_sell'] = True
 
-                        print("should remove here sells copy new 0:", sells)
-                        print("should remove here buys copy new 0:", buys)
+                        # print("should remove here sells copy new 0:", sells)
+                        # print("should remove here buys copy new 0:", buys)
                         pass
                         # can't do this here, since shouldn't update player that owns best_bid here
                         # best_bid['q_max'] -= sell['q_max']
                     else:  # TODO look into
-                        print("3")
+                        # print("3")
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
@@ -508,43 +508,44 @@ class Group(BaseGroup):
                         pass
                         # can't do this here, since shouldn't update player that owns best_bid here
                         # best_bid['q_max'] -= sell['q_max']
-                    print("new sell[q_max]:", sell["q_max"])
-                    print("sells 1:", sells)
+                    # print("new sell[q_max]:", sell["q_max"])
+                    # print("sells 1:", sells)
                 elif self.treatment_val == "flo":  # TODO copy
-                    print("in flo")
+                    # print("in flo")
                     # decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
                     sell['q_max'] -= trader_vol
 
                 # TODO add flo vs cda
                 # TODO insert fix above cache code
-                print("out")
-                print("sells 2a:", sells)
+                # print("out")
+                # print("sells 2a:", sells)
                 cache = self.order_copies
-                print("sells 2a1:", sells)
+                # print("sells 2a1:", sells)
 
                 if (self.treatment_val == "cda"):
-                    print("sells 2a2:", sells)
+                    pass
+                    # print("sells 2a2:", sells)
                     # TODO not sure why doing this updates sells
                     # cache[str(seller.id_in_group)][str(
                     #     sell['orderID'])]['q_max'] -= best_bid["q_max"]
-                    print("sells 2aa:", sells)
+                    # print("sells 2aa:", sells)
                 elif self.treatment_val == 'flo':
                     cache[str(seller.id_in_group)][str(
                         sell['orderID'])]['q_max'] -= trader_vol
-                    print("sells 2ab:", sells)
+                    # print("sells 2ab:", sells)
                 self.order_copies = cache
-                print("sells 2ba:", sells)
+                # print("sells 2ba:", sells)
                 self.save()
-                print("sells 2b:", sells)
+                # print("sells 2b:", sells)
 
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    print("sell update price old:", player.cash, "best_bid:",
-                          best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
+                    # print("sell update price old:", player.cash, "best_bid:",
+                    #       best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
                     seller.updateProfit(
                         best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
                     seller.updateVolume(-best_bid["q_max"])
-                    print("sell update price new:", player.cash)
+                    # print("sell update price new:", player.cash)
 
                     if "executedprofit" not in sell:
                         sell['executedprofit'] = 0
@@ -564,6 +565,8 @@ class Group(BaseGroup):
 
                     sell['executedprofit'] += trader_vol * clearing_price
                     sell['executedvolume'] += -trader_vol
+
+                self.save()
 
                 # remove the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= 0.0) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= 0.0):
@@ -606,16 +609,16 @@ class Group(BaseGroup):
                 if (not ("q_max_cda_copy" in buy)):
                     buy["q_max_cda_copy"] = buy["q_max"]
 
-                print("**in buys")
-                print("got best_ask", best_ask)
-                print("")
+                # print("**in buys")
+                # print("got best_ask", best_ask)
+                # print("")
 
                 buyer = self.get_player_by_id(buy['player'])
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:  # TODO look into
 
-                        print("1")
+                        # print("1")
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -625,9 +628,9 @@ class Group(BaseGroup):
 
                     elif buy['q_max_cda_copy'] == best_ask["q_max_cda_copy"]:
 
-                        print("2")
-                        print("should remove here sells copy old 0:", sells)
-                        print("should remove here buys copy old 0:", buys)
+                        # print("2")
+                        # print("should remove here sells copy old 0:", sells)
+                        # print("should remove here buys copy old 0:", buys)
 
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
@@ -636,14 +639,14 @@ class Group(BaseGroup):
                         best_ask['q_max_cda_copy'] -= buy_q
                         best_ask['expired_by_cda_buy'] = True
 
-                        print("should remove here sells copy new 0:", sells)
-                        print("should remove here buys copy new 0:", buys)
+                        # print("should remove here sells copy new 0:", sells)
+                        # print("should remove here buys copy new 0:", buys)
                         pass
                         # can't do this here, since shouldn't update player that owns best_ask here
                         # best_ask['q_max'] -= buy['q_max']
                     else:  # TODO look into
 
-                        print("3")
+                        # print("3")
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -652,10 +655,10 @@ class Group(BaseGroup):
                         pass
                         # can't do this here, since shouldn't update player that owns best_ask here
                         # best_ask['q_max'] -= buy['q_max']
-                    print("new buy[q_max]:", buy["q_max"])
-                    print("sells 1:", sells)
+                    # print("new buy[q_max]:", buy["q_max"])
+                    # print("sells 1:", sells)
                 elif (self.treatment_val == "flo"):
-                    print("in flo")
+                    # print("in flo")
                     # decrement remaining quantity of order
                     trader_vol = self.calcDemand(buy, clearing_price)
                     buy['q_max'] -= trader_vol
@@ -663,17 +666,19 @@ class Group(BaseGroup):
                     # TODO insert fix above cache code
                 else:
                     if (best_ask != None):
-                        print("debug buy_p_max",
-                              buy['p_max'], "best_ask_p_max", best_ask['q_max'])
+                        pass
+                        # print("debug buy_p_max",
+                        #       buy['p_max'], "best_ask_p_max", best_ask['q_max'])
                 # TODO flo/cda
                 # trader_vol = self.calcDemand(buy, clearing_price)
-                print("buys 0:", buys)
+                # print("buys 0:", buys)
                 cache = self.order_copies
                 if (self.treatment_val == "cda"):
+                    pass
                     # TODO not sure why doing this updates buys
                     # cache[str(buy['player'])][str(buy['orderID'])
                     #                           ]['q_max'] -= best_ask["q_max"]
-                    print("buys 1:", buys)
+                    # print("buys 1:", buys)
                 elif (self.treatment_val == "flo"):
                     cache[str(buy['player'])][str(buy['orderID'])
                                               ]['q_max'] -= trader_vol
@@ -682,12 +687,12 @@ class Group(BaseGroup):
                 self.save()
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    print("buy update price old:", player.cash, "best_ask:",
-                          best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
+                    # print("buy update price old:", player.cash, "best_ask:",
+                    #       best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
                     buyer.updateProfit(-best_ask["q_max"] *
                                        clearing_price, False, buy["player"] == 1)
                     buyer.updateVolume(best_ask["q_max"])
-                    print("buy update price new:", player.cash)
+                    # print("buy update price new:", player.cash)
 
 
                     if "executedProfit" not in buy:
@@ -709,6 +714,8 @@ class Group(BaseGroup):
                     
                     buy['executedProfit'] += -trader_vol * clearing_price
                     buy['executedVolume'] += trader_vol
+
+                self.save()
 
                 # remove the order if q_max <= 0
                 # if (buy['q_max'] <= 0.0):
