@@ -545,17 +545,25 @@ class Group(BaseGroup):
                         best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
                     seller.updateVolume(-best_bid["q_max"])
                     print("sell update price new:", player.cash)
+
+                    if "executedprofit" not in sell:
+                        sell['executedprofit'] = 0
+                    if "executedvolume" not in sell:
+                        sell['executedvolume'] = 0
+
+                    sell['executedprofit'] += best_bid["q_max"] * clearing_price
+                    sell['executedvolume'] += -best_bid["q_max"]
                 elif self.treatment_val == 'flo':
                     seller.updateProfit(trader_vol * clearing_price)
                     seller.updateVolume(-trader_vol)
 
-                    if "executedProfit" not in sell:
-                        sell['executedProfit'] = 0
-                    if "executedVolume" not in sell:
-                        sell['executedVolume'] = 0
+                    if "executedprofit" not in sell:
+                        sell['executedprofit'] = 0
+                    if "executedvolume" not in sell:
+                        sell['executedvolume'] = 0
 
-                    sell['executedProfit'] += trader_vol * clearing_price
-                    sell['executedVolume'] += -trader_vol
+                    sell['executedprofit'] += trader_vol * clearing_price
+                    sell['executedvolume'] += -trader_vol
 
                 # remove the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= 0.0) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= 0.0):
@@ -680,6 +688,16 @@ class Group(BaseGroup):
                                        clearing_price, False, buy["player"] == 1)
                     buyer.updateVolume(best_ask["q_max"])
                     print("buy update price new:", player.cash)
+
+
+                    if "executedProfit" not in buy:
+                        buy['executedProfit'] = 0
+                    if "executedVolume" not in buy:
+                        buy['executedVolume'] = 0
+                    
+                    buy['executedProfit'] += -best_ask["q_max"] * clearing_price
+                    buy['executedVolume'] += best_ask["q_max"]
+
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
                     buyer.updateVolume(trader_vol)
@@ -689,10 +707,8 @@ class Group(BaseGroup):
                     if "executedVolume" not in buy:
                         buy['executedVolume'] = 0
                     
-                    print("*executed old profit", buy['executedProfit'], "change", -trader_vol * clearing_price)
                     buy['executedProfit'] += -trader_vol * clearing_price
                     buy['executedVolume'] += trader_vol
-                    print("*executed new profit", buy['executedProfit'], "change", -trader_vol * clearing_price)
 
                 # remove the order if q_max <= 0
                 # if (buy['q_max'] <= 0.0):

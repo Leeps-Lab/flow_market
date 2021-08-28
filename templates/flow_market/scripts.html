@@ -36,9 +36,7 @@
         console.log('begin round');
       }
 
-      console.log("0")
       Automate.start()
-      console.log("1")
 
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
@@ -579,16 +577,12 @@
   let lastDataToGraphBids
   function graphBids(chart, buys = null, regraph = false) {
 
-    console.log("graphBids 0")
-
     if (regraph === true && buys === null) {
       if (chart.data.datasets[0].data.length === 0) return
       buys = lastDataToGraphBids
     } else {
       lastDataToGraphBids = buys
     }
-
-    console.log("graphBids 1")
 
     buys = buys.filter((buy) => buy['status'] == 'active');
 
@@ -634,8 +628,6 @@
           y: volume,
         });
 
-        console.error('buy q copy', buy['q_max_cda_copy'], buy['q_max'])
-
         if (buy['q_max_cda_copy'] !== undefined) {
           volume += buy['q_max_cda_copy'];
         } else {
@@ -671,17 +663,13 @@
 
   let lastDataToGraphAsks
   function graphAsks(chart, sells = null, regraph = false) {
-    console.log("graphAsks 0", sells)
 
     if (regraph === true && sells === null) {
-      console.log("graphAsks 1", sells)
       if (chart.data.datasets[1].data.length === 0) {
-        console.log("graphAsks 1.1", sells)
         return
       }
       sells = lastDataToGraphAsks
     } else {
-      console.log("graphAsks 2", sells)
       lastDataToGraphAsks = sells
     }
 
