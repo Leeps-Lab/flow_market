@@ -36,6 +36,10 @@
         console.log('begin round');
       }
 
+      console.log("0")
+      Automate.start()
+      console.log("1")
+
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
       ProfitGraph.updateProfitLineFromUpcomingBet()
@@ -54,6 +58,106 @@
     },
     false
   );
+
+  class Automate {
+    static playerID = parseInt("{{player.id_in_group}}")
+
+    static delay(ms) { return new Promise(res => setTimeout(res, ms)) }
+
+    static start() {
+      if (isFLO) {
+        switch (this.playerID) {
+          case 1:
+            this.#player1ActionsFLO()
+            break;
+          case 2:
+            this.#player2ActionsFLO()
+            break;
+          case 3:
+            this.#player3ActionsFLO()
+            break;
+          default:
+            console.error("switch case error")
+        }
+      } else if (isCDA) {
+        switch (this.playerID) {
+          case 1:
+            this.#player1ActionsCDA()
+            break;
+          case 2:
+            this.#player2ActionsCDA()
+            break;
+          case 3:
+            this.#player3ActionsCDA()
+            break;
+          default:
+            console.error("switch case error")
+        }
+      }
+    }
+
+    static async #player1ActionsFLO() {
+      await this.delay(5 * 1000);
+      new_buy(true, 4, 14, 80, 1)
+    }
+
+    static async #player2ActionsFLO() {
+      await this.delay(15 * 1000);
+      new_sell(true, 6, 10, 100, 1)
+    }
+
+    static async #player3ActionsFLO() {
+      await this.delay(20 * 1000);
+      new_buy(true, 3, 7, 80, 1)
+    }
+
+
+    //////////////////////////
+    static async #player1ActionsCDA() {
+      await this.delay(5 * 1000);
+      new_buy(true, null, 7, 10, 1)
+
+      await this.delay(20 * 1000);
+      new_buy(true, null, 7, 5, 1)
+    }
+
+    static async #player2ActionsCDA() {
+      await this.delay(15 * 1000);
+      new_sell(true, null, 7, 20, 1)
+
+      await this.delay(35 * 1000);
+      new_sell(true, null, 7, 15, 1)
+    }
+
+    static async #player3ActionsCDA() {
+      await this.delay(30 * 1000);
+      new_buy(true, null, 8, 7, 1)
+
+      await this.delay(45 * 1000);
+      new_buy(true, null, 8, 7, 1)
+
+      await this.delay(50 * 1000);
+      new_buy(true, null, 8, 6, 1)
+    }
+
+
+    //////////////////////////////////
+
+
+    static setSliders(minPrice, maxPrice, volume, uMax) {
+      if (isCDA || isFBA) {
+        document.getElementById('noUiPriceSlider').noUiSlider.set(maxPrice)
+      } else if (isFLO) {
+        document.getElementById('noUiPriceSlider').noUiSlider.set([minPrice, maxPrice])
+      }
+
+      document.getElementById('noUiVolSlider').noUiSlider.set(volume)
+
+      if (isFLO) {
+        document.getElementById('noUiRateSlider').noUiSlider.set(uMax)
+      }
+    }
+  }
 
   let cash = 0
   let inventory = 0
@@ -762,7 +866,6 @@
 
       // lastDataToGraphClearingPrice
 
-
       const d = data["payoff_data"]
 
       const payoff = document.querySelectorAll(".payoff")
@@ -865,47 +968,71 @@
     // console.error(parseFloat(data['cash']).toFixed(2));
   }
 
-  function new_buy() {
-    let maxprice;
-    let minprice;
-    if (isCDA || isFBA) {
-      maxprice = parseInt(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()
-      );
-      minprice = maxprice;
-    } else if (isFLO) {
-      maxprice = parseFloat(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
-      );
-      minprice = parseFloat(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
-      );
-    }
+  function new_buy(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
 
-    const volume = parseInt(
-      document.getElementById('noUiVolSlider').noUiSlider.get()
-    );
+    let maxPrice;
+    let minPrice;
+    let uMax
+    let volume
 
-    var u_max;
-    if ('{{treatment}}' != 'flo') {
-      // use rate slider if flo
-      u_max = parseInt('{{max_u_max}}');
+    if (isAutomated) {
+      if (isCDA && tempMinPrice !== null && tempMinPrice !== tempMaxPrice) {
+        console.error("CDA prices are supposed to be the same")
+      }
+
+      maxPrice = tempMaxPrice
+      minPrice = isFLO ? tempMinPrice : tempMaxPrice
+
+
+      volume = tempVolume
+
+      if (isCDA || isFBA) {
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = tempUMax
+      }
+
+      Automate.setSliders(minPrice, maxPrice, volume, uMax)
+
     } else {
-      u_max = parseInt(
-        document.getElementById('noUiRateSlider').noUiSlider.get()
+
+      if (isCDA || isFBA) {
+        maxPrice = parseInt(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()
+        );
+        minPrice = maxPrice;
+
+      } else if (isFLO) {
+        maxPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
+        );
+        minPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
+        );
+      }
+
+      volume = parseInt(
+        document.getElementById('noUiVolSlider').noUiSlider.get()
       );
+
+      if ('{{treatment}}' != 'flo') {
+        // use rate slider if flo
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = parseInt(document.getElementById('noUiRateSlider').noUiSlider.get());
+      }
     }
 
-    if (minprice > maxprice) {
-      alert('Minimum Price should be less than or equal to Maximum Price');
-      return;
+    if (minPrice > maxPrice) {
+      console.error("minPrice > maxPrice")
+      return
     }
 
     const order = {
-      p_min: minprice,
-      p_max: maxprice,
+      p_min: minPrice,
+      p_max: maxPrice,
       q_max: volume,
-      u_max: u_max,
+      u_max: uMax,
       direction: 'buy',
       status: 'active',
       timestamp: performance.now(),
@@ -913,11 +1040,15 @@
     };
 
     const valueToBeat = isNewOrderValid(order); // undefined means order is valid
+
     if (valueToBeat === undefined) {
+
       orderHistory.push(order);
       appendActiveOrdersTable(order);
       liveSend(order);
+
     } else {
+
       let errorText;
       if (isCDA || isFBA) {
         // cda/fba: can only buy when buy's p_max < sell's p_max
@@ -928,6 +1059,7 @@
         // flo: can only buy when p_max < sell's p_min
         errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
       }
+
       Swal.fire({
         title: 'Cannot Trade With Yourself',
         icon: 'warning',
@@ -936,45 +1068,76 @@
           popup: 'animate__animated animate__fadeIn',
         },
       });
+
     }
   }
 
-  function new_sell() {
-    let maxprice;
-    let minprice;
-    if (isCDA || isFBA) {
-      maxprice = parseInt(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()
+  function new_sell(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
+
+    let maxPrice;
+    let minPrice;
+    let uMax;
+    let volume;
+
+    if (isAutomated) {
+
+      if (isCDA && tempMinPrice !== null && tempMinPrice !== tempMaxPrice) {
+        console.error("CDA prices are supposed to be the same")
+      }
+
+      maxPrice = tempMaxPrice
+      minPrice = isFLO ? tempMinPrice : tempMaxPrice
+
+      volume = tempVolume
+
+      if (isCDA || isFBA) {
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = tempUMax
+      }
+
+      Automate.setSliders(minPrice, maxPrice, volume, uMax)
+
+    } else {
+
+      if (isCDA || isFBA) {
+        maxPrice = parseInt(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()
+        );
+        minPrice = maxPrice;
+      } else if (isFLO) {
+        maxPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
+        );
+        minPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
+        );
+      }
+
+      volume = parseInt(
+        document.getElementById('noUiVolSlider').noUiSlider.get()
       );
-      minprice = maxprice;
-    } else if (isFLO) {
-      maxprice = parseFloat(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
-      );
-      minprice = parseFloat(
-        document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
-      );
+
+      if ('{{treatment}}' != 'flo') {
+        // use rate slider if flo
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = parseInt(
+          document.getElementById('noUiRateSlider').noUiSlider.get()
+        );
+      }
     }
 
-    const volume = parseInt(
-      document.getElementById('noUiVolSlider').noUiSlider.get()
-    );
-
-    let u_max;
-    if ('{{treatment}}' != 'flo') {
-      // use rate slider if flo
-      u_max = parseInt('{{max_u_max}}');
-    } else {
-      u_max = parseInt(
-        document.getElementById('noUiRateSlider').noUiSlider.get()
-      );
+    if (minPrice > maxPrice) {
+      console.error("minPrice > maxPrice")
+      return
     }
 
     const order = {
-      p_min: minprice,
-      p_max: maxprice,
+      p_min: minPrice,
+      p_max: maxPrice,
       q_max: volume,
-      u_max: u_max,
+      u_max: uMax,
       direction: 'sell',
       status: 'active',
       timestamp: performance.now(),
@@ -997,6 +1160,7 @@
         // flo: can only buy when p_max < sell's p_min
         errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
       }
+
       Swal.fire({
         title: 'Cannot Trade With Yourself',
         icon: 'warning',
@@ -1169,4 +1333,4 @@
     document.querySelector('#activeOrdersDirection').style.width = '0';
   }
 </script>
-<script src="{% static 'flow_market/react.js' %}"></script>
+<!-- <script src="{% static 'flow_market/react.js' %}"></script> -->
