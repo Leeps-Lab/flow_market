@@ -97,7 +97,7 @@
     static async #player1ActionsFLO() {
       // await this.delay(5 * 1000);
       setTimeout(() =>
-        new_buy(true, 4, 9, 80, 1),
+        new_buy(true, 4, 9, 60, 1),
         5 * 1000
       )
     }
@@ -113,7 +113,7 @@
     static async #player3ActionsFLO() {
       // await this.delay(20 * 1000);
       setTimeout(() =>
-        new_buy(true, 3, 7, 80, 1),
+        new_buy(true, 5, 7, 80, 1),
         20 * 1000
       )
     }
@@ -1025,6 +1025,8 @@
         uMax = tempUMax
       }
 
+      console.log("*** using uMax", uMax)
+
       Automate.setSliders(minPrice, maxPrice, volume, uMax)
 
     } else {
@@ -1128,7 +1130,7 @@
       } else {
         uMax = tempUMax
       }
-
+      console.log("*** using uMax sell", uMax)
       Automate.setSliders(minPrice, maxPrice, volume, uMax)
 
     } else {

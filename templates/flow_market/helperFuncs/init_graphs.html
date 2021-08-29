@@ -30,6 +30,12 @@
 
         maxPadding: 0.5, // https://api.highcharts.com/highcharts/yAxis.maxPadding
         minPadding: 0.5,
+
+        // max: 5300, // hardcoded values for flo
+        // min: 4600
+
+        // max: 5100, // hardcoded values for cda
+        // min: 4100
       },
 
       xAxis: {
@@ -109,6 +115,12 @@
 
         maxPadding: 0.5, // https://api.highcharts.com/highcharts/yAxis.maxPadding
         minPadding: 0.5,
+
+        // max: 550, // hardcoded values for flo
+        // min: 450
+
+        // max: 620, // hardcoded values for cda
+        // min: 400
       },
 
       xAxis: {
@@ -178,6 +190,9 @@
               text: isCDA || isFBA ? 'Volume' : 'Rate',
             },
             beginAtZero: true,
+
+            suggestedMin: 0, // TODO maybe remove after dan's video
+            suggestedMax: 20,
           },
 
           x: {
@@ -186,6 +201,9 @@
               text: isCDA || isFBA ? 'Price' : 'Price',
             },
             beginAtZero: true,
+
+            suggestedMin: 0, // TODO maybe remove after dan's video
+            suggestedMax: 2,
           },
         },
         title: {
