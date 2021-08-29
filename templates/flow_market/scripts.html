@@ -72,7 +72,7 @@
             this.#player2ActionsFLO()
             break;
           case 3:
-            this.#player3ActionsFLO()
+            // this.#player3ActionsFLO()
             break;
           default:
             console.error("switch case error")
@@ -96,17 +96,27 @@
 
     static async #player1ActionsFLO() {
       // await this.delay(5 * 1000);
+      // setTimeout(() =>
+      //   new_buy(true, 4, 9, 60, 1),
+      //   5 * 1000
+      // )
+
       setTimeout(() =>
-        new_buy(true, 4, 9, 60, 1),
-        5 * 1000
+        new_buy(true, 8, 12, 50, 3),
+        2 * 1000
       )
     }
 
     static async #player2ActionsFLO() {
       // await this.delay(15 * 1000);
+      // setTimeout(() =>
+      //   new_sell(true, 6, 14, 100, 1),
+      //   15 * 1000
+      // )
+
       setTimeout(() =>
-        new_sell(true, 6, 14, 100, 1),
-        15 * 1000
+        new_sell(true, 8, 12, 50, 3),
+        4 * 1000
       )
     }
 
