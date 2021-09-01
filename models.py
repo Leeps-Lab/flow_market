@@ -517,8 +517,8 @@ class Group(BaseGroup):
                     # print("in flo")
                     # decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
-                    print("**vol0 id", sell['player'], "trader_vol", trader_vol,
-                          "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                    # print("**vol0 id", sell['player'], "trader_vol", trader_vol,
+                    #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                     sell['q_max'] -= trader_vol
 
                 # TODO add flo vs cda
@@ -526,8 +526,8 @@ class Group(BaseGroup):
                 # print("out")
                 # print("sells 2a:", sells)
                 cache = self.order_copies
-                print("**vol0.1 id", sell['player'], "trader_vol", trader_vol,
-                      "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                # print("**vol0.1 id", sell['player'], "trader_vol", trader_vol,
+                #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                 # print("sells 2a1:", sells)
 
                 if (self.treatment_val == "cda"):
@@ -546,8 +546,8 @@ class Group(BaseGroup):
                 self.order_copies = cache
                 # print("sells 2ba:", sells)
                 self.save()
-                print("**vol0.3 id", sell['player'], "trader_vol", trader_vol,
-                      "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                # print("**vol0.3 id", sell['player'], "trader_vol", trader_vol,
+                #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                 # print("sells 2b:", sells)
 
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
@@ -566,8 +566,8 @@ class Group(BaseGroup):
                     sell['executedProfit'] += best_bid["q_max"] * clearing_price
                     sell['executedVolume'] += -best_bid["q_max"]
                 elif self.treatment_val == 'flo':
-                    print("**vol1 id", sell['player'], "trader_vol", trader_vol,
-                          "old vol: ", seller.inventory, "new: ", seller.inventory - trader_vol)
+                    # print("**vol1 id", sell['player'], "trader_vol", trader_vol,
+                    #       "old vol: ", seller.inventory, "new: ", seller.inventory - trader_vol)
 
                     seller.updateProfit(trader_vol * clearing_price)
                     seller.updateVolume(-trader_vol)
@@ -581,8 +581,8 @@ class Group(BaseGroup):
                     sell['executedVolume'] += -trader_vol
 
                 self.save()
-                print("**vol0.4 id", sell['player'], "trader_vol", trader_vol,
-                      "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                # print("**vol0.4 id", sell['player'], "trader_vol", trader_vol,
+                #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
 
                 # remove the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= self.rounding_factor) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= self.rounding_factor):
@@ -601,8 +601,8 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                print("**vol0.5 id", sell['player'], "trader_vol", trader_vol,
-                      "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                # print("**vol0.5 id", sell['player'], "trader_vol", trader_vol,
+                #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
@@ -610,8 +610,8 @@ class Group(BaseGroup):
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
-                print("**vol0.6 id", sell['player'], "trader_vol", trader_vol,
-                      "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
+                # print("**vol0.6 id", sell['player'], "trader_vol", trader_vol,
+                #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
 
             for buy in buys:
                 min_price = float('inf')

@@ -11,6 +11,9 @@
     --borderRadius: 4px;
     /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
     --shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
+
+    --border: 1px solid rgba(101, 109, 119, .16);
+    /* --border: 1px solid rgba(255, 0, 0, 0.507);
   }
 
   #GITHUB_CARD {
@@ -129,7 +132,8 @@
     border-radius: var(--borderRadius);
 
     /* border: solid; */
-    border: 1px solid rgba(101, 109, 119, .16);
+    border: var(--border);
+    box-shadow: var(--shadow);
   }
 
   .header {
@@ -145,6 +149,8 @@
     z-index: 200;
     top: 0;
     border-radius: 0 !important;
+
+    border: var(--border);
   }
 
   .borderRadiusFix {
@@ -193,6 +199,10 @@
 
     .conditionalMarginLeft {
       margin-left: var(--cardSpacing);
+    }
+
+    .fixHeaderAlignment {
+      padding-right: 0px !important;
     }
   }
 
@@ -497,7 +507,8 @@
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
-  <div class="col-xl-4  col-6 text-center ">
+  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
+    style="padding-right: 155px;">
     <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
     <h2 id="" class=""
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
@@ -508,7 +519,8 @@
       {{ player.cash|floatformat:1 }}
     </h2>
   </div>
-  <div class="col-xl-4  col-6 text-center ">
+  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
+    style="padding-right: 60px; min-width: 300px;">
     <h2 id="" class="mt-0"
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Inventory&nbsp;
