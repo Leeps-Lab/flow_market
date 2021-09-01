@@ -505,10 +505,10 @@
     static updateAxesText() {
       if (isCDA || isFBA) {
         if (MarketGraph.flipAxes) {
-          klf_line.options.scales.x.title.text = "Volume"
+          klf_line.options.scales.x.title.text = "Volume            "
           klf_line.options.scales.y.title.text = "Price"
         } else {
-          klf_line.options.scales.x.title.text = "Price"
+          klf_line.options.scales.x.title.text = "Price            "
           klf_line.options.scales.y.title.text = "Volume"
         }
       } else if (isFLO) {
