@@ -59,10 +59,13 @@
 
   class Automate {
     static playerID = parseInt("{{player.id_in_group}}")
+    static #AUTOMATE_ENABLED = false
 
     static delay(ms) { return new Promise(res => setTimeout(res, ms)) }
 
     static start() {
+      if (!this.#AUTOMATE_ENABLED) return
+
       if (isFLO) {
         switch (this.playerID) {
           case 1:
@@ -72,7 +75,7 @@
             this.#player2ActionsFLO()
             break;
           case 3:
-            // this.#player3ActionsFLO()
+            this.#player3ActionsFLO()
             break;
           default:
             console.error("switch case error")
@@ -94,51 +97,35 @@
       }
     }
 
-    static async #player1ActionsFLO() {
-      // await this.delay(5 * 1000);
-      // setTimeout(() =>
-      //   new_buy(true, 4, 9, 60, 1),
-      //   5 * 1000
-      // )
-
+    static #player1ActionsFLO() {
       setTimeout(() =>
-        new_buy(true, 8, 12, 50, 3),
-        2 * 1000
+        new_buy(true, 4, 9, 50, 1),
+        5 * 1000
       )
     }
 
-    static async #player2ActionsFLO() {
-      // await this.delay(15 * 1000);
-      // setTimeout(() =>
-      //   new_sell(true, 6, 14, 100, 1),
-      //   15 * 1000
-      // )
-
+    static #player2ActionsFLO() {
       setTimeout(() =>
-        new_sell(true, 8, 12, 50, 3),
-        4 * 1000
+        new_sell(true, 6, 12, 100, 1),
+        15 * 1000
       )
+
     }
 
-    static async #player3ActionsFLO() {
-      // await this.delay(20 * 1000);
+    static #player3ActionsFLO() {
       setTimeout(() =>
-        new_buy(true, 5, 7, 80, 1),
+        new_buy(true, 8, 9, 30, 1),
         20 * 1000
       )
     }
 
 
     //////////////////////////
-    static async #player1ActionsCDA() {
-      // await this.delay(5 * 1000);
-
+    static #player1ActionsCDA() {
       setTimeout(() =>
         new_buy(true, null, 7, 60, 1),
         5 * 1000
       )
-
-      // await this.delay(20 * 1000);
 
       setTimeout(() =>
         new_buy(true, null, 6, 50, 1),
@@ -146,35 +133,29 @@
       )
     }
 
-    static async #player2ActionsCDA() {
-      // await this.delay(15 * 1000);
-
+    static #player2ActionsCDA() {
       setTimeout(() =>
         new_sell(true, null, 7, 20, 1),
         15 * 1000
       )
 
-      // await this.delay(35 * 1000);
       setTimeout(() =>
         new_sell(true, null, 7, 50, 1),
         35 * 1000
       )
     }
 
-    static async #player3ActionsCDA() {
-      // await this.delay(30 * 1000);
+    static #player3ActionsCDA() {
       setTimeout(() =>
         new_buy(true, null, 8, 7, 1),
         30 * 1000
       )
 
-      // await this.delay(45 * 1000);
-
       setTimeout(() =>
         new_buy(true, null, 8, 20, 1),
         45 * 1000
       )
-      // await this.delay(50 * 1000);
+
       setTimeout(() =>
         new_buy(true, null, 8, 20, 1),
         50 * 1000
