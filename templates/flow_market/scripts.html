@@ -186,9 +186,6 @@
     }
   }
 
-  let cash = 0
-  let inventory = 0
-
   let orderHistory = [];
 
   // update order history if an order has expired
@@ -343,9 +340,12 @@
   class ProfitGraph {
     static chart = myChart
     static profitLineValue = 0
-    static potentialProfit = 0
     static totalExecutedVol = 0 // TODO
     static betDirection = ""
+
+    static potentialProfit = 0
+    static cashAfterBet = 0
+    static invAfterBet = 0
 
     static updateProfitLineFromUpcomingBet() {
       const betData = BetsUI.getUpcomingBetData()
@@ -378,6 +378,7 @@
 
 
       this.updatePotentialProfit(executedProfit, executedVolume, pricePerVol, order)
+      this.updateInvAfterBet()
 
       console.log("* pricePerVol", pricePerVol)
 
@@ -387,6 +388,37 @@
       }
 
       this.chart.update();
+    }
+
+    static updateCashAfterBet() {
+      const betData = BetsUI.getUpcomingBetData()
+      if (betData == null) return
+
+      const { quantity: betVolume, price: betPrice, direction: betDirection } = betData
+
+      if (betDirection.includes("BUY")) {
+        console.log()
+
+        this.cashAfterBet = cash + (betVolume * betPrice)
+        console.log("* this.cashAfterBet1", this.cashAfterBet, "cash: ", cash, "adding", (betVolume * betPrice))
+
+        this.invAfterBet = inventory - betVolume
+
+      } else if (betDirection.includes("SELL")) {
+
+        this.cashAfterBet = cash - (betVolume * betPrice)
+        console.log("* this.cashAfterBet", this.cashAfterBet)
+        this.invAfterBet = inventory + betVolume
+
+      }
+
+      document.querySelector(".cashAfterBet").textContent = `cash after bet: ${Math.round(this.cashAfterBet)}`
+      console.log("* this.cashAfterBet", this.cashAfterBet)
+      document.querySelector(".invAfterBet").textContent = `inventory after bet: ${Math.round(this.invAfterBet)}`
+    }
+
+    static updateInvAfterBet() {
+
     }
 
     static updatePotentialProfit(executedProfit, executedVolume, executedPricePerVol, order) {
@@ -410,28 +442,8 @@
 
       this.potentialProfit += potentialProfitChange
 
-      // if (pricePerVol < this.profitLineValue) {
-
-      //   if (this.betDirection.includes("BUY")) {
-      //     this.potentialProfit += Math.abs(executedProfit)
-
-      //   } else if (this.betDirection.includes("SELL")) {
-      //     this.potentialProfit -= Math.abs(executedProfit)
-      //   }
-
-      // } else if (pricePerVol > this.profitLineValue) {
-
-      //   if (this.betDirection.includes("BUY")) {
-      //     this.potentialProfit -= Math.abs(executedProfit)
-
-      //   } else if (this.betDirection.includes("SELL")) {
-      //     this.potentialProfit += Math.abs(executedProfit)
-      //   }
-      // }
-
       console.log("potentialProfit:", this.potentialProfit)
-      document.querySelector(".potentialProfit").textContent = `potential profit (the exact amount you will
-        gain if you want your inventory to remain the same after the bet): ${Math.round(this.potentialProfit)}`
+      document.querySelector(".potentialProfit").textContent = `area (additional cash you will make from the bet, not including what you will recieve from the bet): ${Math.round(this.potentialProfit)}`
     }
 
     static setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
@@ -987,6 +999,8 @@
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedDataForOdometer = data;
+      cash = data['cash']
+      inventory = data['inventory']
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
@@ -996,6 +1010,8 @@
       updateProfit(cash_bar, data['cash']);
       updateVolume(inventory_bar, data['inventory']);
       cachedDataForOdometer = data;
+      cash = data['cash']
+      inventory = data['inventory']
       // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
@@ -1024,10 +1040,16 @@
   }
 
   let cachedDataForOdometer;
+  let cash = 0
+  let inventory = 0
   function updateCashAndInventoryDisplay(data) {
     if (cachedDataForOdometer === undefined) return;
-    cashOdometer.update(parseFloat(data['cash']).toFixed(2));
-    invOdometer.update(parseFloat(data['inventory']).toFixed(2));
+
+    cashOdometer.update(parseFloat(cash).toFixed(2));
+    invOdometer.update(parseFloat(inventory).toFixed(2));
+
+    ProfitGraph.updateCashAfterBet()
+
     // console.error(parseFloat(data['cash']).toFixed(2));
   }
 
@@ -1393,6 +1415,7 @@
     table.appendChild(rowCopy);
 
     return rowCopy
+    updateCashAfterBet
   }
 
   function hideRateColumnActiveOrdersTable() {
