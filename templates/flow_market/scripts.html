@@ -59,7 +59,7 @@
 
   class Automate {
     static playerID = parseInt("{{player.id_in_group}}")
-    static #AUTOMATE_ENABLED = false
+    static #AUTOMATE_ENABLED = true
 
     static delay(ms) { return new Promise(res => setTimeout(res, ms)) }
 
@@ -99,24 +99,29 @@
 
     static #player1ActionsFLO() {
       setTimeout(() =>
-        new_buy(true, 4, 9, 50, 1),
-        5 * 1000
+        new_buy(true, 1, 8, 30, 5),
+        1 * 1000
+      )
+
+      setTimeout(() =>
+        new_buy(true, 10, 15, 20, 5),
+        10 * 1000
       )
     }
 
     static #player2ActionsFLO() {
       setTimeout(() =>
-        new_sell(true, 6, 12, 100, 1),
-        15 * 1000
+        new_sell(true, 1, 9, 30, 5),
+        5 * 1000
       )
 
+      setTimeout(() =>
+        new_sell(true, 10, 15, 20, 5),
+        15 * 1000
+      )
     }
 
     static #player3ActionsFLO() {
-      setTimeout(() =>
-        new_buy(true, 8, 9, 30, 1),
-        20 * 1000
-      )
     }
 
 
@@ -339,6 +344,7 @@
     static chart = myChart
     static profitLineValue = 0
     static potentialProfit = 0
+    static totalExecutedVol = 0 // TODO
     static betDirection = ""
 
     static updateProfitLineFromUpcomingBet() {
@@ -361,40 +367,71 @@
       const { executedProfit, executedVolume } = order
       const pricePerVol = Math.abs(executedProfit) / Math.abs(executedVolume)
 
-      this.updatePotentialProfit(executedProfit, executedVolume, pricePerVol)
+      console.log("*testProfit executedProfit: ", executedProfit, "vol", executedVolume, "price per vol", pricePerVol)
+      // if (BetsUI.#currentBet == null) {
+      //   console.error("current bet is null when trying to calculate profit, what?")
+      //   return
+      // }
+
+      // console.log("*curr bet", BetsUI.#currentBet)
+
+
+
+      this.updatePotentialProfit(executedProfit, executedVolume, pricePerVol, order)
 
       console.log("* pricePerVol", pricePerVol)
 
-      for (let i = 0; i < Math.abs(executedVolume); i++) {
+      for (let i = 0; i <= Math.abs(executedVolume).toFixed(0.001); i++) {
         this.chart.data.datasets[0].data.push(pricePerVol)
-        console.log("pushed", pricePerVol)
+        console.log("*testProfit pushed", pricePerVol, "i:", i)
       }
 
       this.chart.update();
     }
 
-    static updatePotentialProfit(executedProfit, executedVolume, pricePerVol) {
-      if (pricePerVol < this.profitLineValue) {
+    static updatePotentialProfit(executedProfit, executedVolume, executedPricePerVol, order) {
+      console.log("*profit updatePotentialProfit")
+      const { quantity: betVolume, price: betPrice, direction: betDirection } = BetsUI.getUpcomingBetData()
 
-        if (this.betDirection.includes("BUY")) {
-          this.potentialProfit += Math.abs(executedProfit)
+      // quantity: 50, price: 9, direction: "BUY"}
+      let potentialProfitChange
 
-        } else if (this.betDirection.includes("SELL")) {
-          this.potentialProfit -= Math.abs(executedProfit)
-        }
-
-      } else if (pricePerVol > this.profitLineValue) {
-
-        if (this.betDirection.includes("BUY")) {
-          this.potentialProfit -= Math.abs(executedProfit)
-
-        } else if (this.betDirection.includes("SELL")) {
-          this.potentialProfit += Math.abs(executedProfit)
-        }
+      if (betDirection.includes("BUY")) {
+        console.log("*profit 1 updatePotentialProfit")
+        potentialProfitChange = Math.abs(Math.min(betVolume, executedVolume)) * (betPrice - executedPricePerVol)
+      } else if (betDirection.includes("SELL")) {
+        console.log("*profit 2 updatePotentialProfit")
+        potentialProfitChange = Math.abs(Math.min(betVolume, executedVolume)) * (executedPricePerVol - betPrice)
       }
 
+      console.log("*profit 3 updatePotentialProfit, got", potentialProfitChange)
+      console.log("*profit all variables", betVolume, betPrice, betDirection, executedProfit, executedVolume, executedPricePerVol)
+      console.log("*profit order", order)
+
+      this.potentialProfit += potentialProfitChange
+
+      // if (pricePerVol < this.profitLineValue) {
+
+      //   if (this.betDirection.includes("BUY")) {
+      //     this.potentialProfit += Math.abs(executedProfit)
+
+      //   } else if (this.betDirection.includes("SELL")) {
+      //     this.potentialProfit -= Math.abs(executedProfit)
+      //   }
+
+      // } else if (pricePerVol > this.profitLineValue) {
+
+      //   if (this.betDirection.includes("BUY")) {
+      //     this.potentialProfit -= Math.abs(executedProfit)
+
+      //   } else if (this.betDirection.includes("SELL")) {
+      //     this.potentialProfit += Math.abs(executedProfit)
+      //   }
+      // }
+
       console.log("potentialProfit:", this.potentialProfit)
-      document.querySelector(".potentialProfit").textContent = `potential profit: ${Math.round(this.potentialProfit)}`
+      document.querySelector(".potentialProfit").textContent = `potential profit (the exact amount you will
+        gain if you want your inventory to remain the same after the bet): ${Math.round(this.potentialProfit)}`
     }
 
     static setLabelsBasedOnBet(chart, betQuantity, betPrice, betDirection) {
@@ -809,12 +846,16 @@
   }
 
   class BetsUI {
-    static #currentBet = null;
+    static #recentBet = null;
+    // static recentBetPrice = null
+    // static recentBetVol = null
 
     static moveExpiredBet(bet) {
       const id = bet.bet_id;
       this.#removeFromActive(id);
       this.#appendToExpired();
+
+      ProfitGraph.updateProfitLineFromUpcomingBet()
     }
 
     static getUpcomingBetData() {
@@ -836,15 +877,13 @@
     }
 
     static #removeFromActive(id) {
-      this.#currentBet = document.querySelector(`#a${id}`).cloneNode(true);
+      this.#recentBet = document.querySelector(`#a${id}`).cloneNode(true);
       document.querySelector(`#a${id}`).remove();
-
-      ProfitGraph.updateProfitLineFromUpcomingBet()
     }
 
     static #appendToExpired() {
       const table = document.querySelector('#executedBetsTable');
-      table.appendChild(this.#currentBet);
+      table.appendChild(this.#recentBet);
     }
 
     static convertDeadlinesToSeconds() {
@@ -1352,6 +1391,8 @@
 
     const table = document.querySelector('#executedOrdersTable');
     table.appendChild(rowCopy);
+
+    return rowCopy
   }
 
   function hideRateColumnActiveOrdersTable() {

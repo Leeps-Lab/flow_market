@@ -5,11 +5,19 @@
 
 <style>
   :root {
-    --cardSpacing: 24px;
-    --borderRadius: .7rem;
-    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+    /* --cardSpacing: 24px; */
+    --cardSpacing: 18px;
+    /* --borderRadius: .7rem; */
+    --borderRadius: 4px;
+    /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
+    --shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
   }
 
+  #GITHUB_CARD {
+    background-clip: border-box;
+    border-radius: 4px;
+    box-shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
+  }
 
   * {
     /* font-family: Tangerine; */
@@ -18,12 +26,16 @@
   }
 
   body {
-    background-color: #f8fbff;
+    /* background-color: #f8fbff; */
+    background-color: #f4f6fa;
   }
 
   #MANUAL {
     display: none;
   }
+
+
+
 
 
 
@@ -85,7 +97,21 @@
   }
 
   #inv-bar,
-  #cash-bar,
+  #cash-bar {
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+  }
+
   .cardWrapper {
     /* copied from https://zuramai.github.io/mazer/demo/ */
     font-family: Nunito;
@@ -103,6 +129,7 @@
     border-radius: var(--borderRadius);
 
     /* border: solid; */
+    border: 1px solid rgba(101, 109, 119, .16);
   }
 
   .header {
@@ -439,6 +466,30 @@
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
+
+<!-- profit chart testing -->
+<div class="container testingContainer">
+  <div class="row mt-0 mb-0">
+    <div class="col">
+      <hr class="mt-5 mb-5" />
+      <p class="h1">Profit chart testing</p>
+      <!-- <div class="row justify-content-center" id=""
+        style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div> -->
+    </div>
+
+    <div class="col">
+      <hr class="mt-5 mb-5" />
+      <p class="h1 potentialProfit">potential profit (the exact amount you will
+        gain if you want your inventory to remain the same after the bet): </p>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- HEADER -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
   <div class=" col-xl-4  col-12 text-center  roundFixMargin"
@@ -476,8 +527,7 @@
 
 <div class="container-fluid containerMargin hideDebug conditionalMarginTop">
   <div class="row justify-content-center">
-    <div
-      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -549,14 +599,57 @@
         </div>
       </div>
     </div>
-    <div class="col-8 shadow market minWidth cardWrapper conditionalMargin"
-      id="MARKET">
-      <div class="pb-5 pl-4 pr-4 w-100 h-100"
-        style="padding-top: 14px !important;">
-        <h5 class="mb-2 text-center">Market</h5>
-        <canvas id="klf-line" class="h-100 pb-2"></canvas>
+
+
+    <!-- class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight" -->
+
+
+    <!-- <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div> -->
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
+      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
+        <div class="pb-5 pl-4 pr-4 w-100 h-100"
+          style="padding-top: 14px !important;">
+          <h5 class="mb-2 text-center">Market</h5>
+          <canvas id="klf-line" class="h-100 pb-2"></canvas>
+        </div>
       </div>
     </div>
+
+
+    <div class="col-4 minWidth marginBottomFix">
+      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
+        <div class="pb-5 pl-4 pr-4 w-100 h-100"
+          style="padding-top: 14px !important;">
+          <h5 class="mb-2 text-center">Profit</h5>
+          <canvas id="myChart" class="h-100 pb-2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div
+      class="col-4 mr-4 cardSpacingBottom cardWrapper marginLeft shadow minWidth justify-content-center"
+      id="">
+      <h5 class="mb-2 text-center">Market</h5>
+      <div style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div> -->
+
+
+
+
   </div>
   <div class="row justify-content-center" id="reactInputSelector">
     <div id="MANUAL_INPUT">
@@ -733,10 +826,10 @@
         </div>
       </div>
     </div>
+
   </div>
-  <div class="row justify-content-center">
-    <div
-      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+  <div class=" row justify-content-center">
+    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -804,9 +897,31 @@
           </div>
         </div>
       </div>
+
+
     </div>
-    <div class="col-8 minWidth conditionalMargin">
+
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
+      <div class=" minWidth graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class=""></div>
+        </div>
+      </div>
     </div>
+
+    <div
+      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2">
+      <div class="  graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="col-8 minWidth conditionalMargin">
+    </div> -->
+
   </div>
   <p class="h1">Payoff = <span class="payoff">payoff</span></p>
   <table class="table">
@@ -888,25 +1003,5 @@
   <p class="h1">React testing</p>
   <div class="row justify-content-center" id="reactInputSelectorTest"></div>
 
-  <div class="container testingContainer">
-
-    <div class="row mt-0 mb-0">
-
-      <div class="col">
-        <hr class="mt-5 mb-5" />
-        <p class="h1">Profit chart testing</p>
-        <div class="row justify-content-center" id=""
-          style="width:400px; height:400px">
-          <canvas id="myChart"></canvas>
-        </div>
-      </div>
-
-      <div class="col">
-        <hr class="mt-5 mb-5" />
-        <p class="h1 potentialProfit">potential profit: </p>
-      </div>
-
-    </div>
-  </div>
 
   {% block scripts %} {% include Constants.scripts_template %} {% endblock %}
