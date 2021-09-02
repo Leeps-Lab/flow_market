@@ -39,7 +39,9 @@
 
       InputDropdown.hideAlgorithmicInputDropdown();
       BetsUI.convertDeadlinesToSeconds();
-      ProfitGraph.updateProfitLineFromUpcomingBet()
+
+      setTimeout(ProfitGraph.updateProfitLineFromUpcomingBet, 1000)
+
       MarketGraph.updateAxesText()
 
       setInterval(() => {
@@ -296,29 +298,41 @@
       labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
       datasets: [
         {
-          label: 'Orders',
+          borderWidth: 0,
+          pointStyle: 'line',
+
+          label: "",
           data: [],
-          fill: { above: 'red', below: 'green', target: { value: 10 } },
+          fill: { above: RED, below: GREEN, target: { value: 10 } },
           pointRadius: 0,
-          borderWidth: 2,
-          borderColor: 'blue',
+          borderColor: "",
         },
         {
+          borderWidth: 4,
+          pointStyle: 'line',
+
           label: 'Profit Line',
           data: [],
           fill: false,
           pointRadius: 0,
-          borderWidth: 2,
-          borderColor: '#0',
+          borderColor: 'black',
         },
       ]
     },
     options: {
       maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            usePointStyle: true,
+          }
+        }
+      },
       scales: {
         y: {
           suggestedMin: 50,
           suggestedMax: 100,
+
           title: {
             display: true,
             text: 'Price',
@@ -327,6 +341,26 @@
         },
 
         x: {
+          ticks: {
+            stepSize: 2,
+            autoSkip: false,
+            callback: function (value, index, values) {
+              if (this.chart.data.labels.length - 1 % 2 === 0) {
+                if (value % 5 === 1) {
+                  // console.log("**bet is odd ", this)
+                  return value;
+                }
+              } else {
+                if (value % 5 === 0) {
+                  // console.log("**bet is even ", this)
+                  return value;
+                }
+              }
+
+              return null
+            },
+          },
+
           title: {
             display: true,
             text: 'Quantity                   ',
@@ -423,7 +457,10 @@
 
     static updatePotentialProfit(executedProfit, executedVolume, executedPricePerVol, order) {
       console.log("*profit updatePotentialProfit")
-      const { quantity: betVolume, price: betPrice, direction: betDirection } = BetsUI.getUpcomingBetData()
+      const betData = BetsUI.getUpcomingBetData()
+      if (betData == null) return
+
+      const { quantity: betVolume, price: betPrice, direction: betDirection } = betData
 
       // quantity: 50, price: 9, direction: "BUY"}
       let potentialProfitChange
@@ -466,12 +503,12 @@
 
       if (betDirection.includes("BUY")) {
         console.log("below green for buy")
-        chart.data.datasets[0].fill.above = "red"
-        chart.data.datasets[0].fill.below = "green"
+        chart.data.datasets[0].fill.above = RED
+        chart.data.datasets[0].fill.below = GREEN
       } else if (betDirection.includes("SELL")) {
         console.log("below red for sell")
-        chart.data.datasets[0].fill.above = "green"
-        chart.data.datasets[0].fill.below = "red"
+        chart.data.datasets[0].fill.above = GREEN
+        chart.data.datasets[0].fill.below = RED
       } else {
         console.error("betDirection not recognized")
       }

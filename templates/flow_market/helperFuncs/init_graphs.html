@@ -73,6 +73,7 @@
 
       series: [
         {
+          lineWidth: 2,
           name: 'Cash',
           data: [parseInt('{{player.cash}}')],
           showInLegend: false,
@@ -125,6 +126,7 @@
       },
 
       xAxis: {
+
         title: {
           text: 'Time  ㅤ',
         },
@@ -158,6 +160,7 @@
 
       series: [
         {
+          lineWidth: 2,
           name: 'Inventory',
           showInLegend: false,
           color: '#17a2b8',
@@ -184,6 +187,13 @@
       type: 'scatter',
       options: {
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+            }
+          }
+        },
         scales: {
           y: {
             title: {
@@ -221,27 +231,38 @@
       data: {
         datasets: [
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Bids',
             borderColor: '#007bff',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            backgroundColor: '#007bff',
             fill: false, // TODO test
             showLine: true,
             lineTension: 0,
             data: [],
           },
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Asks',
             borderColor: '#dc3545',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            backgroundColor: '#dc3545',
+            // backgroundColor: 'rgba(0, 0, 0, 0)',
             fill: false,
             showLine: true,
             lineTension: 0,
             data: [],
           },
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Clearing Price',
-            borderColor: '#28a745',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: '#53a551',
+            backgroundColor: '#53a551',
+            // backgroundColor: 'rgba(0, 0, 0, 0)',
             fill: false,
             showLine: true,
             lineTension: 0,

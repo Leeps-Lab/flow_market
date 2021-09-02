@@ -1,2 +1,2 @@
 trader_id,direction,limit_price,quantity,deadline
-1,buy,5,50,30000
+1,buy,5,100,300000
