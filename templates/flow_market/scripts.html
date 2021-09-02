@@ -101,25 +101,20 @@
 
     static #player1ActionsFLO() {
       setTimeout(() =>
-        new_buy(true, 1, 8, 30, 5),
+        new_buy(true, 1, 10, 100, 5),
         1 * 1000
       )
-
       setTimeout(() =>
-        new_buy(true, 10, 15, 20, 5),
+        new_buy(true, 1, 10, 100, 5),
         10 * 1000
       )
+
     }
 
     static #player2ActionsFLO() {
       setTimeout(() =>
-        new_sell(true, 1, 9, 30, 5),
-        5 * 1000
-      )
-
-      setTimeout(() =>
-        new_sell(true, 10, 15, 20, 5),
-        15 * 1000
+        new_sell(true, 1, 10, 100, 5),
+        3 * 1000
       )
     }
 
