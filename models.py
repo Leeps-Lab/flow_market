@@ -82,6 +82,9 @@ def init_copies():
 
 
 class Group(BaseGroup):
+    # probably don't need this since it can be inferred from index
+    order_num = models.IntegerField(initial=0)
+
     rounding_factor = models.FloatField(initial=0.00001)
     treatment_val = models.StringField()
     should_pause_after_bet = models.BooleanField(initial=False)
@@ -286,8 +289,11 @@ class Group(BaseGroup):
             'u_max': order['u_max'],
             'direction': order['direction'],
             'status': order['status'],
-            'orderID': currentID
+            'orderID': currentID,
+            'orderNum': self.order_num,
         }
+
+        self.order_num += 1
         self.order_copies = cache
         self.save()
 
@@ -431,6 +437,7 @@ class Group(BaseGroup):
             clearing_price = self.clearingPrice(buys, sells)
             # print("new clearing_price", clearing_price)
 
+            # TODO should make this different for cda
             # Graph the clearing price
             for player in self.get_players():
                 payloads[player.participant.code] = {
@@ -452,15 +459,35 @@ class Group(BaseGroup):
             # print("original buys:", buys)
 
             # Update the traders' profits and orders
-            for sell in sells:
-                max_price = float('-inf')
-                best_bid = None
-                for obj in buys:
-                    # if (obj["p_max"] > max_price and obj['status'] != 'expired'):
-                    if (obj["p_max"] > max_price and not ("expired_by_cda_sell" in obj['status'])):
-                        max_price = obj["p_max"]
-                        best_bid = obj
 
+            best_bid = None
+            max_price = float('-inf')
+            for obj in buys:
+                # if (obj["p_max"] > max_price and obj['status'] != 'expired'):
+                if (obj["p_max"] > max_price and not ("expired_by_cda_sell" in obj)):
+                    max_price = obj["p_max"]
+                    best_bid = obj
+
+            best_ask = None
+            min_price = float('inf')
+            for obj in sells:
+                # if (obj["p_max"] < min_price and obj['status'] != 'expired'):
+                if (obj["p_max"] < min_price and not ("expired_by_cda_buy" in obj['status'])):
+                    min_price = obj["p_max"]
+                    best_ask = obj
+
+            cda_clearing_price = None
+            if (best_ask != None and best_bid != None):
+                print("both not equal to none best_ask:",
+                      best_ask, "best_bid:", best_bid)
+                if (best_ask["orderNum"] < best_bid["orderNum"]):
+                    cda_clearing_price = best_ask["p_max"]
+                    print("clearing price is best_ask")
+                else:
+                    cda_clearing_price = best_bid["p_max"]
+                    print("clearing price is best_bid")
+
+            for sell in sells:
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
                     best_bid["q_max_cda_copy"] = best_bid["q_max"]
 
@@ -472,9 +499,11 @@ class Group(BaseGroup):
                 # print("")
 
                 seller = self.get_player_by_id(sell['player'])
+                best_bid_q = None
 
                 # TODO copy
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
+
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
 
                         # print("1")
@@ -551,10 +580,10 @@ class Group(BaseGroup):
                 # print("sells 2b:", sells)
 
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    # print("sell update price old:", player.cash, "best_bid:",
-                    #       best_bid['p_max'], "clearing price:", clearing_price, "a*b:", best_bid["p_max"] * clearing_price)
+                    print("sell update price old:", player.cash, "best_bid:",
+                          best_bid['p_max'], "best_bid_price:", cda_clearing_price, "a*b:", best_bid["q_max"] * cda_clearing_price)
                     seller.updateProfit(
-                        best_bid["q_max"] * clearing_price, False, sell['player'] == 1)
+                        best_bid["q_max"] * cda_clearing_price, False, sell['player'] == 1)
                     seller.updateVolume(-best_bid["q_max"])
                     # print("sell update price new:", player.cash)
 
@@ -563,7 +592,8 @@ class Group(BaseGroup):
                     if "executedVolume" not in sell:
                         sell['executedVolume'] = 0
 
-                    sell['executedProfit'] += best_bid["q_max"] * clearing_price
+                    sell['executedProfit'] += best_bid["q_max"] * \
+                        cda_clearing_price
                     sell['executedVolume'] += -best_bid["q_max"]
                 elif self.treatment_val == 'flo':
                     # print("**vol1 id", sell['player'], "trader_vol", trader_vol,
@@ -614,25 +644,28 @@ class Group(BaseGroup):
                 #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
 
             for buy in buys:
-                min_price = float('inf')
-                best_ask = None
-                for obj in sells:
-                    # if (obj["p_max"] < min_price and obj['status'] != 'expired'):
-                    if (obj["p_max"] < min_price and not ("expired_by_cda_buy" in obj['status'])):
-                        min_price = obj["p_max"]
-                        best_ask = obj
-
-                if (best_ask != None and not ("q_max_cda_copy" in best_ask)):
-                    best_ask["q_max_cda_copy"] = best_ask["q_max"]
-
-                if (not ("q_max_cda_copy" in buy)):
-                    buy["q_max_cda_copy"] = buy["q_max"]
 
                 # print("**in buys")
                 # print("got best_ask", best_ask)
                 # print("")
 
                 buyer = self.get_player_by_id(buy['player'])
+
+                best_ask = None
+                min_price = float('inf')
+                for obj in sells:
+                    if (obj["p_max"] < min_price and not ("expired_by_cda_buy" in obj)):
+                        min_price = obj["p_max"]
+                        best_ask = obj
+
+                print("best_ask", best_ask)
+                # if (best_ask['status'])
+
+                if (best_ask != None and not ("q_max_cda_copy" in best_ask)):
+                    best_ask["q_max_cda_copy"] = best_ask["q_max"]
+
+                if (not ("q_max_cda_copy" in buy)):
+                    buy["q_max_cda_copy"] = buy["q_max"]
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:  # TODO look into
@@ -708,10 +741,10 @@ class Group(BaseGroup):
                 self.save()
 
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    # print("buy update price old:", player.cash, "best_ask:",
-                    #       best_ask['p_max'], "-clearing price:", -clearing_price, "a*b:", -best_ask["p_max"] * clearing_price)
+                    print("buy update price old:", player.cash, "best_ask:",
+                          best_ask['p_max'], "clearing price:", cda_clearing_price, "a*b:", -best_ask["q_max"] * cda_clearing_price)
                     buyer.updateProfit(-best_ask["q_max"] *
-                                       clearing_price, False, buy["player"] == 1)
+                                       cda_clearing_price, False, buy["player"] == 1)
                     buyer.updateVolume(best_ask["q_max"])
                     # print("buy update price new:", player.cash)
 
@@ -721,7 +754,7 @@ class Group(BaseGroup):
                         buy['executedVolume'] = 0
 
                     buy['executedProfit'] += - \
-                        best_ask["q_max"] * clearing_price
+                        best_ask["q_max"] * cda_clearing_price
                     buy['executedVolume'] += best_ask["q_max"]
 
                 elif self.treatment_val == "flo":
@@ -783,6 +816,7 @@ class Player(BasePlayer):
     cash = models.FloatField(initial=5000)
     inventory = models.FloatField(initial=500)
     num_buys = models.IntegerField(initial=0)
+    num_sells = models.IntegerField(initial=0)
     num_sells = models.IntegerField(initial=0)
 
     # Payoff
