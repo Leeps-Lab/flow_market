@@ -308,7 +308,7 @@
           borderColor: "",
         },
         {
-          borderWidth: 4,
+          borderWidth: 2,
           pointStyle: 'line',
 
           label: 'Profit Line',
@@ -316,6 +316,34 @@
           fill: false,
           pointRadius: 0,
           borderColor: 'black',
+        },
+
+        {
+          borderWidth: 2,
+          pointStyle: 'rect',
+
+          label: 'Profit',
+          borderColor: GREEN,
+          backgroundColor: GREEN,
+          // backgroundColor: 'rgba(0, 0, 0, 0)',
+          fill: false,
+          showLine: true,
+          lineTension: 0,
+          data: [],
+        },
+
+        {
+          borderWidth: 2,
+          pointStyle: 'rect',
+
+          label: 'Loss',
+          borderColor: RED,
+          backgroundColor: RED,
+          // backgroundColor: 'rgba(0, 0, 0, 0)',
+          fill: false,
+          showLine: true,
+          lineTension: 0,
+          data: [],
         },
       ]
     },
