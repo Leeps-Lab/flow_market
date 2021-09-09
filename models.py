@@ -32,7 +32,7 @@ times = []
 class Constants(BaseConstants):
     name_in_url = 'flow_market'
     players_per_group = None
-    num_rounds = 1
+    num_rounds = 2
 
     index_template = 'flow_market/index.html'
 
@@ -152,10 +152,13 @@ class Group(BaseGroup):
     def new_buy_algo(self, data):
         time_start = time.time()
         payloads = {}
+        print("data:", data)
         while time.time() < time_start + data['expiration_time']:
+            print("new while")
 
             # create group of orders
             for i in range(data['quantity_per']):
+                print("what? i:", i)
                 self.get_player_by_id(data['trader_id']).new_order({
                     'p_min': data['p_min'],
                     'p_max': data['p_max'],
@@ -169,7 +172,7 @@ class Group(BaseGroup):
             # Send out updated orderbooks to update graph on frontend
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    'type': 'buy', 'buys test': self.buys(), 'sells': self.sells()}
+                    'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
 
@@ -478,14 +481,14 @@ class Group(BaseGroup):
 
             cda_clearing_price = None
             if (best_ask != None and best_bid != None):
-                print("both not equal to none best_ask:",
-                      best_ask, "best_bid:", best_bid)
+                # print("both not equal to none best_ask:",
+                #       best_ask, "best_bid:", best_bid)
                 if (best_ask["orderNum"] < best_bid["orderNum"]):
                     cda_clearing_price = best_ask["p_max"]
-                    print("clearing price is best_ask")
+                    # print("clearing price is best_ask")
                 else:
                     cda_clearing_price = best_bid["p_max"]
-                    print("clearing price is best_bid")
+                    # print("clearing price is best_bid")
 
             for sell in sells:
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
@@ -658,7 +661,7 @@ class Group(BaseGroup):
                         min_price = obj["p_max"]
                         best_ask = obj
 
-                print("best_ask", best_ask)
+                # print("best_ask", best_ask)
                 # if (best_ask['status'])
 
                 if (best_ask != None and not ("q_max_cda_copy" in best_ask)):

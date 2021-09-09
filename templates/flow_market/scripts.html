@@ -45,12 +45,11 @@
       MarketGraph.updateAxesText()
 
       setInterval(() => {
-
         // DEBUG tick count
-        ticks.push(tickCount)
-        const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
-        console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
-        tickCount = 0
+        // ticks.push(tickCount)
+        // const avg = ticks.reduce((acc, curr) => acc + curr) / ticks.length
+        // console.log("ticks since last second:", tickCount, " avg:", avg.toFixed(2))
+        // tickCount = 0
 
         updateCashAndInventoryDisplay(cachedDataForOdometer);
         BetsUI.decrementDeadlines();
@@ -61,7 +60,7 @@
 
   class Automate {
     static playerID = parseInt("{{player.id_in_group}}")
-    static #AUTOMATE_ENABLED = true
+    static #AUTOMATE_ENABLED = false
 
     static delay(ms) { return new Promise(res => setTimeout(res, ms)) }
 
@@ -101,12 +100,12 @@
 
     static #player1ActionsFLO() {
       setTimeout(() =>
-        new_buy(true, 1, 10, 100, 5),
+        new_buy(true, 1, 10, 20, 5),
         1 * 1000
       )
       setTimeout(() =>
-        new_buy(true, 1, 10, 100, 5),
-        10 * 1000
+        new_buy(true, 1, 10, 20, 5),
+        5 * 1000
       )
 
     }
@@ -114,7 +113,7 @@
     static #player2ActionsFLO() {
       setTimeout(() =>
         new_sell(true, 1, 10, 100, 5),
-        3 * 1000
+        10 * 1000
       )
     }
 
@@ -706,6 +705,9 @@
 
   let lastDataToGraphBids
   function graphBids(chart, buys = null, regraph = false) {
+    console.log("graphBids() buys:")
+    console.log(buys)
+    console.log("")
 
     if (regraph === true && buys === null) {
       if (chart.data.datasets[0].data.length === 0) return
@@ -970,6 +972,8 @@
   function liveRecv(data) {
     // console.timeEnd(`timing`);
     // console.time(`timing`);
+
+
     if (data['type'] == 'begin') {
       console.log('Round begin');
     }
@@ -1020,6 +1024,9 @@
     }
 
     if (data['type'] == 'buy' || data['type'] == 'sell') {
+      console.log("incoming data:")
+      console.log(data)
+
       graphBids(klf_line, data['buys']);
       graphAsks(klf_line, data['sells']);
     }
