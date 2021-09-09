@@ -476,6 +476,10 @@
     padding-top: .25rem !important;
     text-align: center !important;
   }
+
+  .roundNum {
+    display: none;
+  }
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
@@ -511,6 +515,7 @@
   <div class=" col-xl-4  col-12 text-center  roundFixMargin"
     style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
+    <h2 class="roundNum">{{subsession.round_number}}</h2>
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
   <div class="col-xl-4  col-6 text-center fixHeaderAlignment"

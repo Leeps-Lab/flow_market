@@ -18,6 +18,7 @@ import uuid
 import copy
 from timeit import default_timer as timer
 import statistics
+import threading
 
 author = 'LeepsLab'
 
@@ -84,6 +85,7 @@ def init_copies():
 class Group(BaseGroup):
     # probably don't need this since it can be inferred from index
     order_num = models.IntegerField(initial=0)
+    round_number_old = models.IntegerField(initial=1)
 
     rounding_factor = models.FloatField(initial=0.00001)
     treatment_val = models.StringField()
@@ -121,6 +123,7 @@ class Group(BaseGroup):
     def treatment(self):
         treatment = parse_config(self.session.config['config_file'])[
             self.round_number-1]['treatment']
+        self.round_number_old = self.round_number
         self.treatment_val = treatment
         self.save()
         return treatment
@@ -172,7 +175,7 @@ class Group(BaseGroup):
             # Send out updated orderbooks to update graph on frontend
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    'type': 'buy', 'buys': self.buys(), 'sells': self.sells()}
+                    'type': 'buy', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
 
@@ -199,7 +202,7 @@ class Group(BaseGroup):
             # Send out updated orderbooks to update graph on frontend
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    'type': 'sell', 'buys': self.buys(), 'sells': self.sells()}
+                    'type': 'sell', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
 
@@ -252,7 +255,7 @@ class Group(BaseGroup):
             payloads[player_ref.participant.code] = {"type": 'none'}
 
         payloads[player.participant.code] = {
-            "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data}
+            "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data, 'round': self.round_number}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
 
@@ -277,7 +280,9 @@ class Group(BaseGroup):
 
             for player in self.get_players():
                 payloads[player.participant.code] = {'type': str(
-                    row['direction']), 'buys': self.buys(), 'sells': self.sells()}
+                    row['direction']), 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number, "this is it": "test"}
+                print("**sending ", row['direction'],
+                      "round:", self.round_number)
 
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
@@ -436,6 +441,10 @@ class Group(BaseGroup):
             # print("*ORDERBUG sells", sells)
 
         if condition:
+            print("updating for treatment:", self.treatment_val)
+            print("buys", buys)
+            print("sells", sells)
+
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
             # print("new clearing_price", clearing_price)
@@ -444,7 +453,7 @@ class Group(BaseGroup):
             # Graph the clearing price
             for player in self.get_players():
                 payloads[player.participant.code] = {
-                    "type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells}
+                    "type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells, 'round': self.round_number}
 
             live._live_send_back(
                 self.get_players()[0].participant._session_code,
@@ -629,7 +638,7 @@ class Group(BaseGroup):
                     # should_update_market_graph = True  # BUG think this is causing a bug
                     for player in self.get_players():
                         payloads[player.participant.code] = {
-                            "type": 'regraph', "buys": buys, "sells": sells}
+                            "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
@@ -639,7 +648,7 @@ class Group(BaseGroup):
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
-                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data(), 'round': self.round_number}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
@@ -786,14 +795,14 @@ class Group(BaseGroup):
                     # ReGraph KLF market since order expired
                     for player in self.get_players():
                         payloads[player.participant.code] = {
-                            "type": 'regraph', "buys": buys, "sells": sells}
+                            "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
                 elif should_update_market_graph:  # BUG think this is causing a bug with ui not updating
                     for player in self.get_players():
                         payloads[player.participant.code] = {
-                            "type": 'regraph', "buys": buys, "sells": sells}
+                            "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
@@ -801,15 +810,19 @@ class Group(BaseGroup):
                 # Use live send back to update buyer's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
-                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
+                        "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data(), 'round': self.round_number}
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
         else:
             # Clear the clearing price graph
+            playerIndex = 0
+
             for player in self.get_players():
+                # TODO continue here and check why some values are different
+                playerIndex += 1
                 payloads[player.participant.code] = {
-                    "type": 'clear', "cash": player.getCash(), "inventory": player.inventory, "payoff_data": player.get_payoff_data()}
+                    "type": 'clear', "cash": player.getCash(), "inventory": player.inventory, "payoff_data": player.get_payoff_data(), 'round': self.round_number}
 
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                 0].participant._index_in_pages, payloads)
@@ -940,7 +953,7 @@ class Player(BasePlayer):
         self.new_order(data)
 
         return_data = {'type': data['direction'], 'buys': self.group.buys(
-        ), 'sells': self.group.sells()}
+        ), 'sells': self.group.sells(), 'round': self.round_number}
 
         return {0: return_data}
 

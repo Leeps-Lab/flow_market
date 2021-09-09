@@ -44,6 +44,10 @@
 
       MarketGraph.updateAxesText()
 
+      ROUND_NUMBER = parseInt(document.querySelector(".roundNum").textContent)
+      console.log("HERE")
+      console.log("**got roundNum:", ROUND_NUMBER, "query", document.querySelector(".roundNum"), "text", document.querySelector(".roundNum").textContent)
+
       setInterval(() => {
         // DEBUG tick count
         // ticks.push(tickCount)
@@ -970,6 +974,14 @@
 
 
   function liveRecv(data) {
+    if (ROUND_NUMBER !== data['round']) {
+      // console.log("wrong round")
+      console.log("data", data)
+      return;
+    }
+
+    console.log("**data:", data)
+
     // console.timeEnd(`timing`);
     // console.time(`timing`);
 

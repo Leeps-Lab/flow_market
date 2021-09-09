@@ -14,7 +14,7 @@ class DecisionWaitPage(WaitPage):
 
 
 class Decision(Page):
-    # timeout_seconds = 10
+    timeout_seconds = 180
     live_method = "live_method"
 
     def is_displayed(self):
