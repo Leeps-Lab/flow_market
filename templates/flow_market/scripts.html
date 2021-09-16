@@ -103,38 +103,38 @@
   const floInitialDataAsks = [
     {
       x: 0, // point going to y = 20
-      y: 20
-    },
-    {
-      x: 0,
-      y: 19
+      y: 0
     },
     {
       x: 0, // should be same as next point
       y: 17
     },
     {
+      x: 0,
+      y: 19
+    },
+    {
       x: 0, // point going to y = 0, same x as middle point
-      y: 0
+      y: 20
     }
   ];
 
   const floInitialDataBids = [
     {
       x: 0, // point going to y = 0
-      y: 0
+      y: 20
     },
     {
       x: 0,
-      y: 1
-    },
-    {
-      x: 0, // should be same as next point
       y: 3
     },
     {
+      x: 0, // should be same as next point
+      y: 1
+    },
+    {
       x: 0, // point going to y = 20, same x as middle point
-      y: 20
+      y: 0
     }
   ];
 
@@ -200,36 +200,55 @@
 
   function getDraggableGraphBidData() {
     // console.log(myLineChart.data.datasets[blueVal]["data"]);
+    let minPrice
+    let maxPrice
+    let volume
+    let uMax
+
     if (isFLO) {
-      const maxPrice = myLineChart.data.datasets[blueVal].data[yPointVal]["y"];
-      const minPrice =
+      maxPrice = myLineChart.data.datasets[blueVal].data[yPointVal]["y"];
+      minPrice =
         myLineChart.data.datasets[blueVal].data[middlePointVal]["y"];
-      const rate = myLineChart.data.datasets[blueVal].data[middlePointVal]["x"];
-      const volume = 50;
-      console.log(minPrice, maxPrice, rate);
+      uMax = myLineChart.data.datasets[blueVal].data[middlePointVal]["x"];
+      volume = 50;
+      console.log(minPrice, maxPrice, uMax);
     } else if (isCDA) {
-      const maxPrice =
+      maxPrice =
         myLineChart.data.datasets[blueVal].data[cdaMiddlePoint]["y"];
-      const volume = 50;
+      volume = myLineChart.data.datasets[blueVal].data[middlePointVal]["x"];
+      minPrice = maxPrice
+      uMax = parseInt('{{max_u_max}}');
       console.log(maxPrice, volume);
     }
+
+    return { minPrice, maxPrice, volume, uMax }
   }
 
   function getDraggableGraphAskData() {
+    console.log("got ask data")
+    let minPrice
+    let maxPrice
+    let volume
+    let uMax
+
     // console.log(myLineChart.data.datasets[redVal]["data"]);
     if (isFLO) {
-      const minPrice = myLineChart.data.datasets[redVal].data[yPointVal]["y"];
-      const maxPrice =
+      minPrice = myLineChart.data.datasets[redVal].data[yPointVal]["y"];
+      maxPrice =
         myLineChart.data.datasets[redVal].data[middlePointVal]["y"];
-      const rate = myLineChart.data.datasets[redVal].data[middlePointVal]["x"];
-      const volume = 50;
-      console.log(minPrice, maxPrice, rate);
+      uMax = myLineChart.data.datasets[redVal].data[middlePointVal]["x"];
+      volume = 50;
+      console.log(minPrice, maxPrice, uMax);
     } else if (isCDA) {
-      const maxPrice =
+      maxPrice =
         myLineChart.data.datasets[redVal].data[cdaMiddlePoint]["y"];
-      const volume = 50;
+      volume = myLineChart.data.datasets[redVal].data[middlePointVal]["x"];
+      minPrice = maxPrice
+      uMax = parseInt('{{max_u_max}}');
       console.log(maxPrice, volume);
     }
+
+    return { minPrice, maxPrice, volume, uMax }
   }
 
   function test() {
@@ -352,14 +371,19 @@
                     "y"
                   ] = bottomYLimit;
                 }
+                if (value["y"] >= topYLimit) {
+                  myLineChart.data.datasets[blueVal].data[yPointVal][
+                    "y"
+                  ] = topYLimit;
+                }
 
                 const middlePointYVal =
                   myLineChart.data.datasets[blueVal].data[middlePointVal]["y"];
 
-                // prevent yPoint going above middle
-                if (value["y"] >= middlePointYVal) {
+                // prevent yPoint going below middle
+                if (value["y"] <= middlePointYVal) {
                   myLineChart.data.datasets[blueVal].data[yPointVal]["y"] =
-                    middlePointYVal - pointMinDifference;
+                    middlePointYVal + pointMinDifference;
                 }
 
                 // prevent yPoint moving on x-axis
@@ -368,12 +392,12 @@
                 }
               }
 
-              // blue, prevent middlePoint going above middle
+              // blue, prevent middlePoint going above yPoint
               if (isMiddlePoint) {
                 const yPointYVal =
                   myLineChart.data.datasets[blueVal].data[yPointVal]["y"];
-                if (value["y"] <= yPointYVal) {
-                  value["y"] = yPointYVal + pointMinDifference;
+                if (value["y"] >= yPointYVal) {
+                  value["y"] = yPointYVal - pointMinDifference;
                 }
               }
             } else if (isRed) {
@@ -392,6 +416,12 @@
                     "y"
                   ] = topYLimit;
                 }
+
+                if (value["y"] <= bottomYLimit) {
+                  myLineChart.data.datasets[redVal].data[red_middlePointVal][
+                    "y"
+                  ] = bottomYLimit;
+                }
               }
 
               if (isYPoint) {
@@ -405,10 +435,16 @@
                   ] = topYLimit;
                 }
 
+                if (value["y"] <= bottomYLimit) {
+                  myLineChart.data.datasets[redVal].data[red_yPointVal][
+                    "y"
+                  ] = bottomYLimit;
+                }
+
                 // prevent yPoint going above middle
-                if (value["y"] <= middlePointYVal) {
+                if (value["y"] >= middlePointYVal) {
                   myLineChart.data.datasets[redVal].data[red_yPointVal]["y"] =
-                    middlePointYVal + pointMinDifference;
+                    middlePointYVal - pointMinDifference;
                 }
 
                 // prevent yPoint moving on x-axis
@@ -421,8 +457,9 @@
               if (isMiddlePoint) {
                 const yPointYVal =
                   myLineChart.data.datasets[redVal].data[red_yPointVal]["y"];
-                if (value["y"] >= yPointYVal) {
-                  value["y"] = yPointYVal - pointMinDifference;
+
+                if (value["y"] <= yPointYVal) {
+                  value["y"] = yPointYVal + pointMinDifference;
                 }
 
                 if (value["y"] <= bottomYLimit) {
@@ -533,7 +570,7 @@
       y: {
         title: {
           display: true,
-          text: isCDA || isFBA ? "Volume" : "Price"
+          text: isCDA || isFBA ? "Price" : "Price"
         },
         beginAtZero: true,
 
@@ -544,12 +581,12 @@
       x: {
         title: {
           display: true,
-          text: isCDA || isFBA ? "Price" : "Rate"
+          text: isCDA || isFBA ? "Volume" : "Rate"
         },
         beginAtZero: true,
 
-        suggestedMin: 0, // TODO maybe remove after dan's video
-        suggestedMax: 5
+        suggestedMin: 1, // TODO maybe remove after dan's video
+        suggestedMax: isCDA || isFBA ? 100 : 5
       }
     }
   };
@@ -1658,7 +1695,9 @@
     // console.error(parseFloat(data['cash']).toFixed(2));
   }
 
-  function newBuyFromDraggableGraph(minPrice, maxPrice, volume, uMax) {
+  function newBuyFromDraggableGraph() {
+    let { minPrice, maxPrice, volume, uMax } = getDraggableGraphBidData()
+
     const order = {
       p_min: minPrice,
       p_max: maxPrice,
@@ -1700,6 +1739,53 @@
         },
       });
 
+    }
+  }
+
+  function newSellFromDraggableGraph() {
+    let { minPrice, maxPrice, volume, uMax } = getDraggableGraphAskData()
+
+    if (minPrice > maxPrice) {
+      console.error("minPrice > maxPrice")
+      return
+    }
+
+    const order = {
+      p_min: minPrice,
+      p_max: maxPrice,
+      q_max: volume,
+      u_max: uMax,
+      direction: 'sell',
+      status: 'active',
+      timestamp: performance.now(),
+      orderID: uuidv4(),
+    };
+
+    const valueToBeat = isNewOrderValid(order); // undefined means order is good
+    if (valueToBeat === undefined) {
+      orderHistory.push(order);
+      appendActiveOrdersTable(order);
+      liveSend(order);
+    } else {
+      let errorText;
+      if (isCDA || isFBA) {
+        // cda/fba: can only buy when buy's p_max < sell's p_max
+        // cda/fba: can only sell when sell's p_max > buy's p_max
+        errorText = `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
+      } else if (isFLO) {
+        // flo: can only sell when p_min is > buy's p_max
+        // flo: can only buy when p_max < sell's p_min
+        errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
+      }
+
+      Swal.fire({
+        title: 'Cannot Trade With Yourself',
+        icon: 'warning',
+        text: errorText,
+        showClass: {
+          popup: 'animate__animated animate__fadeIn',
+        },
+      });
     }
   }
 
@@ -1808,7 +1894,6 @@
   }
 
   function new_sell(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
-
     let maxPrice;
     let minPrice;
     let uMax;
