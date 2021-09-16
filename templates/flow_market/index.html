@@ -417,7 +417,8 @@
   }
 
   .containerMargin {
-    margin-top: 84px;
+    /* margin-top: 84px; */
+    margin-top: 0px;
   }
 
 
@@ -482,33 +483,20 @@
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 
-<!-- profit chart testing -->
-
-<canvas id="draggableInputGraph" width="200" height="100"></canvas>
-
-<div class="container testingContainer">
-  <div class="row mt-0 mb-0">
-    <div class="col">
-      <hr class="mt-5 mb-5" />
-      <p class="h1">Profit chart testing</p>
-      <!-- <div class="row justify-content-center" id=""
-        style="width:400px; height:400px">
-        <canvas id="myChart"></canvas>
-      </div> -->
-    </div>
-
-    <div class="col-8">
-      <hr class="mt-5 mb-5" />
-      <p class="h3 potentialProfit">area (additional cash you will make from the
-        bet, not including what you will recieve from the bet): </p>
-      <p class="h3 cashAfterBet">cash after bet: </p>
-      <p class="h3 invAfterBet">inventory after bet: </p>
-
+<div
+  class=" marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+  style="margin-top:80px;">
+  <div class=" shadow market minWidth  cardWrapper" id="DRAGGABLE_GRAPH_INPUT">
+    <div class="pb-5 pl-2 pr-3 w-100 h-100"
+      style="padding-top: 14px !important; padding-bottom: 40px !important">
+      <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+        Your Input</h5>
+      <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
     </div>
   </div>
 </div>
 
-
+<canvas id="blankPointStyle" width="1" height="1"></canvas>
 
 <!-- HEADER -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
@@ -1031,5 +1019,27 @@
   <p class="h1">React testing</p>
   <div class="row justify-content-center" id="reactInputSelectorTest"></div>
 
+  <div class="container testingContainer">
+    <div class="row mt-0 mb-0">
+      <div class="col">
+        <hr class="mt-5 mb-5" />
+        <p class="h1">Profit chart testing</p>
+        <!-- <div class="row justify-content-center" id=""
+        style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div> -->
+      </div>
+
+      <div class="col-8">
+        <hr class="mt-5 mb-5" />
+        <p class="h3 potentialProfit">area (additional cash you will make from
+          the
+          bet, not including what you will recieve from the bet): </p>
+        <p class="h3 cashAfterBet">cash after bet: </p>
+        <p class="h3 invAfterBet">inventory after bet: </p>
+
+      </div>
+    </div>
+  </div>
 
   {% block scripts %} {% include Constants.scripts_template %} {% endblock %}
