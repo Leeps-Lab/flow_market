@@ -63,6 +63,7 @@
   );
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   class DraggableGraphInput {
     static blueVal = 0;
     static redVal = 1;
@@ -145,7 +146,7 @@
     static cdaInitialDataAsks = [
       {
         x: 0, // x always 0, y always same as middle point (initial has .1 to fix drag bug)
-        y: 17 - DraggableGraphInput.CDA_DRAG_BUG_FIX
+        y: 17 - this.CDA_DRAG_BUG_FIX
       },
       {
         x: 0,
@@ -160,7 +161,7 @@
     static cdaInitialDataBids = [
       {
         x: 0, // x always 0, y always same as middle point
-        y: 3 + DraggableGraphInput.CDA_DRAG_BUG_FIX
+        y: 3 + this.CDA_DRAG_BUG_FIX
       },
       {
         x: 0, // middle point
@@ -171,477 +172,466 @@
         y: 0
       }
     ];
-  }
 
-
-
-
-
-  // borderColor: RED_TRANSPARENT,
-  // backgroundColor: RED_TRANSPARENT,
-
-  function makeRedOpaque() {
-    myLineChart.data.datasets[DraggableGraphInput.redVal]["borderColor"] = RED;
-    myLineChart.data.datasets[DraggableGraphInput.redVal]["backgroundColor"] = RED;
-    myLineChart.update();
-  }
-
-  function makeRedTransparent() {
-    myLineChart.data.datasets[DraggableGraphInput.redVal]["borderColor"] = RED_TRANSPARENT;
-    myLineChart.data.datasets[DraggableGraphInput.redVal]["backgroundColor"] = RED_TRANSPARENT;
-    myLineChart.update();
-  }
-
-  function makeBlueOpaque() {
-    myLineChart.data.datasets[DraggableGraphInput.blueVal]["borderColor"] = BLUE;
-    myLineChart.data.datasets[DraggableGraphInput.blueVal]["backgroundColor"] = BLUE;
-    myLineChart.update();
-  }
-
-  function makeBlueTransparent() {
-    myLineChart.data.datasets[DraggableGraphInput.blueVal]["borderColor"] = BLUE_TRANSPARENT;
-    myLineChart.data.datasets[DraggableGraphInput.blueVal]["backgroundColor"] = BLUE_TRANSPARENT;
-    myLineChart.update();
-  }
-
-  function getDraggableGraphBidData() {
-    // console.log(myLineChart.data.datasets[blueVal]["data"]);
-    let minPrice
-    let maxPrice
-    let volume
-    let uMax
-
-    if (isFLO) {
-      maxPrice = myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"];
-      minPrice =
-        myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal]["y"];
-      uMax = myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal]["x"];
-      volume = 50;
-      console.log(minPrice, maxPrice, uMax);
-    } else if (isCDA) {
-      maxPrice =
-        myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaMiddlePoint]["y"];
-      volume = myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal]["x"];
-      minPrice = maxPrice
-      uMax = parseInt('{{max_u_max}}');
-      console.log(maxPrice, volume);
+    static makeRedTransparent() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["borderColor"] = RED_TRANSPARENT;
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["backgroundColor"] = RED_TRANSPARENT;
+      DraggableGraphInput.myLineChart.update();
     }
 
-    return { minPrice, maxPrice, volume, uMax }
-  }
-
-  function getDraggableGraphAskData() {
-    console.log("got ask data")
-    let minPrice
-    let maxPrice
-    let volume
-    let uMax
-
-    // console.log(myLineChart.data.datasets[redVal]["data"]);
-    if (isFLO) {
-      minPrice = myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.yPointVal]["y"];
-      maxPrice =
-        myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.middlePointVal]["y"];
-      uMax = myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.middlePointVal]["x"];
-      volume = 50;
-      console.log(minPrice, maxPrice, uMax);
-    } else if (isCDA) {
-      maxPrice =
-        myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaMiddlePoint]["y"];
-      volume = myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.middlePointVal]["x"];
-      minPrice = maxPrice
-      uMax = parseInt('{{max_u_max}}');
-      console.log(maxPrice, volume);
+    static makeRedOpaque() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["borderColor"] = RED;
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["backgroundColor"] = RED;
+      DraggableGraphInput.myLineChart.update();
     }
 
-    return { minPrice, maxPrice, volume, uMax }
+    static makeBlueOpaque() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["borderColor"] = BLUE;
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["backgroundColor"] = BLUE;
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static makeBlueTransparent() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["borderColor"] = BLUE_TRANSPARENT;
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["backgroundColor"] = BLUE_TRANSPARENT;
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static getDraggableGraphBidData() {
+      // console.log(myLineChart.data.datasets[blueVal]["data"]);
+      let minPrice
+      let maxPrice
+      let volume
+      let uMax
+
+      if (isFLO) {
+        maxPrice = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.yPointVal]["y"];
+        minPrice =
+          DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["y"];
+        uMax = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["x"];
+        volume = 50;
+        console.log(minPrice, maxPrice, uMax);
+      } else if (isCDA) {
+        maxPrice =
+          DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePoint]["y"];
+        volume = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["x"];
+        minPrice = maxPrice
+        uMax = parseInt('{{max_u_max}}');
+        console.log(maxPrice, volume);
+      }
+
+      return { minPrice, maxPrice, volume, uMax }
+    }
+
+    static getDraggableGraphAskData() {
+      console.log("got** ask data")
+      let minPrice
+      let maxPrice
+      let volume
+      let uMax
+
+      // console.log(myLineChart.data.datasets[redVal]["data"]);
+      if (isFLO) {
+        minPrice = DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.yPointVal]["y"];
+        maxPrice =
+          DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["y"];
+        uMax = DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["x"];
+        volume = 50;
+        console.log(minPrice, maxPrice, uMax);
+      } else if (isCDA) {
+        maxPrice =
+          DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.cdaMiddlePoint]["y"];
+        volume = DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["x"];
+        minPrice = maxPrice
+        uMax = parseInt('{{max_u_max}}');
+        console.log(maxPrice, volume);
+      }
+
+      return { minPrice, maxPrice, volume, uMax }
+    }
+
+    static config = {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        tooltip: { enabled: false },
+        dragData: {
+          round: 0,
+          dragX: true,
+          showTooltip: true,
+
+          // controls the ability to start dragging
+          onDragStart: function (e, datasetIndex, index, value) {
+            const isBlue = datasetIndex === DraggableGraphInput.blueVal;
+            const isRed = datasetIndex === DraggableGraphInput.redVal;
+
+            if (isFLO) {
+              // disable ability to start dragging for x point and top point
+              if (isBlue) {
+                DraggableGraphInput.makeBlueOpaque();
+                DraggableGraphInput.makeRedTransparent();
+
+                const isYPoint = index === DraggableGraphInput.yPointVal;
+                const isMiddlePoint = index === DraggableGraphInput.middlePointVal;
+                const isXPoint = index === DraggableGraphInput.xPointVal;
+                const isTopPoint = index === DraggableGraphInput.topPointVal;
+
+                if (isXPoint || isTopPoint) {
+                  return false;
+                }
+              } else if (isRed) {
+                DraggableGraphInput.makeRedOpaque();
+                DraggableGraphInput.makeBlueTransparent();
+
+                const isYPoint = index === DraggableGraphInput.red_yPointVal;
+                const isBottomPoint = index === DraggableGraphInput.red_bottomPointVal;
+                const isTopPoint = index === DraggableGraphInput.red_topPointVal;
+
+                if (isBottomPoint || isTopPoint) {
+                  return false;
+                }
+              }
+            } else if (isCDA) {
+              // disable ability to start dragging for x point and top point
+              if (isBlue) {
+                DraggableGraphInput.makeBlueOpaque();
+                DraggableGraphInput.makeRedTransparent();
+
+                const isYPoint = index === DraggableGraphInput.cdaYPointVal;
+                if (isYPoint) {
+                  return false;
+                }
+
+                const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
+                if (isTopPoint) {
+                  return false;
+                }
+              } else if (isRed) {
+                DraggableGraphInput.makeRedOpaque();
+                DraggableGraphInput.makeBlueTransparent();
+
+                const isYPoint = index === DraggableGraphInput.cdaYPointVal;
+                if (isYPoint) {
+                  return false;
+                }
+
+                const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
+                if (isTopPoint) {
+                  return false;
+                }
+              }
+            }
+          },
+
+          onDrag: function (e, datasetIndex, index, value) {
+            const isBlue = datasetIndex === DraggableGraphInput.blueVal;
+            const isRed = datasetIndex === DraggableGraphInput.redVal;
+
+            const bottomYLimit = 1;
+            const topYLimit = 19;
+
+            e.target.style.cursor = "grabbing";
+
+            if (isFLO) {
+              if (isBlue) {
+                const isYPoint = index === DraggableGraphInput.yPointVal;
+                const isMiddlePoint = index === DraggableGraphInput.middlePointVal;
+                const isXPoint = index === DraggableGraphInput.xPointVal;
+
+                // update xPoint when middlePoint is dragged
+                if (isMiddlePoint) {
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.xPointVal]["x"] =
+                    value["x"];
+
+                  // prevent yPoint going below limit
+                  if (value["y"] <= bottomYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal][
+                      "y"
+                    ] = bottomYLimit;
+                  }
+                }
+
+                // cont here
+                if (isYPoint) {
+                  // prevent yPoint going above top y limit
+                  if (value["y"] <= bottomYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal][
+                      "y"
+                    ] = bottomYLimit;
+                  }
+                  if (value["y"] >= topYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal][
+                      "y"
+                    ] = topYLimit;
+                  }
+
+                  const middlePointYVal =
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal]["y"];
+
+                  // prevent yPoint going below middle
+                  if (value["y"] <= middlePointYVal) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"] =
+                      middlePointYVal + DraggableGraphInput.pointMinDifference;
+                  }
+
+                  // prevent yPoint moving on x-axis
+                  if (value["x"] > 0) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["x"] = 0;
+                  }
+                }
+
+                // blue, prevent middlePoint going above yPoint
+                if (isMiddlePoint) {
+                  const yPointYVal =
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"];
+                  if (value["y"] >= yPointYVal) {
+                    value["y"] = yPointYVal - DraggableGraphInput.pointMinDifference;
+                  }
+                }
+              } else if (isRed) {
+                const isYPoint = index === DraggableGraphInput.red_yPointVal;
+                const isMiddlePoint = index === DraggableGraphInput.red_middlePointVal;
+                const isTopPoint = index === DraggableGraphInput.red_topPointVal;
+
+                if (isMiddlePoint) {
+                  // update topPoint when middlePoint is dragged
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_topPointVal]["x"] =
+                    value["x"];
+
+                  // prevent middlePoint going above top y limit
+                  if (value["y"] >= topYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal][
+                      "y"
+                    ] = topYLimit;
+                  }
+
+                  if (value["y"] <= bottomYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal][
+                      "y"
+                    ] = bottomYLimit;
+                  }
+                }
+
+                if (isYPoint) {
+                  const middlePointYVal =
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal]["y"];
+
+                  // prevent yPoint going above limit
+                  if (value["y"] >= topYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal][
+                      "y"
+                    ] = topYLimit;
+                  }
+
+                  if (value["y"] <= bottomYLimit) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal][
+                      "y"
+                    ] = bottomYLimit;
+                  }
+
+                  // prevent yPoint going above middle
+                  if (value["y"] >= middlePointYVal) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"] =
+                      middlePointYVal - DraggableGraphInput.pointMinDifference;
+                  }
+
+                  // prevent yPoint moving on x-axis
+                  if (value["x"] > 0) {
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["x"] = 0;
+                  }
+                }
+
+                // prevent middlePoint going below middle
+                if (isMiddlePoint) {
+                  const yPointYVal =
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"];
+
+                  if (value["y"] <= yPointYVal) {
+                    value["y"] = yPointYVal + DraggableGraphInput.pointMinDifference;
+                  }
+
+                  if (value["y"] <= bottomYLimit) {
+                    value["y"] = bottomYLimit;
+                  }
+                }
+              }
+            } else if (isCDA) {
+              if (isBlue) {
+                const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
+                // make bottomPoint
+                if (isMiddlePoint) {
+                  if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
+                    value["y"] = DraggableGraphInput.cdaTopLimit;
+                  }
+
+                  if (value["y"] <= DraggableGraphInput.cdaBottomLimit) {
+                    value["y"] = DraggableGraphInput.cdaBottomLimit;
+                  }
+
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
+                    value["y"];
+
+                  if (value["x"] <= DraggableGraphInput.cdaXLimit) {
+                    value["x"] = DraggableGraphInput.cdaXLimit;
+
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
+                      value["y"] + DraggableGraphInput.CDA_DRAG_BUG_FIX;
+                  }
+
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaBottomPointVal]["x"] =
+                    value["x"];
+                }
+              } else if (isRed) {
+                const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
+                // make bottomPoint
+                if (isMiddlePoint) {
+                  if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
+                    value["y"] = DraggableGraphInput.cdaTopLimit;
+                  }
+
+                  if (value["y"] <= DraggableGraphInput.cdaBottomLimit) {
+                    value["y"] = DraggableGraphInput.cdaBottomLimit;
+                  }
+
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
+                    value["y"];
+
+                  if (value["x"] <= DraggableGraphInput.cdaXLimit) {
+                    value["x"] = DraggableGraphInput.cdaXLimit;
+
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
+                      value["y"] - DraggableGraphInput.CDA_DRAG_BUG_FIX;
+                  }
+
+                  DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaTopPointVal]["x"] =
+                    value["x"];
+                }
+              }
+            }
+          },
+
+          onDragEnd: function (e, datasetIndex, index, value) {
+            e.target.style.cursor = "default";
+          }
+        }
+      },
+
+      onHover: (e, chartElement) => {
+        // change cursor if hovering over a point
+        if (chartElement[0] != null) {
+          if (isFLO) {
+            // don't change hover for blue x-axis point and top point
+            const isBluePoint = chartElement[0].datasetIndex === DraggableGraphInput.blueVal;
+            const isXPoint = chartElement[0].index === DraggableGraphInput.xPointVal;
+            const isTopPoint = chartElement[0].index === DraggableGraphInput.topPointVal;
+
+            const isRedPoint = chartElement[0].datasetIndex === DraggableGraphInput.redVal;
+            const isRedBottomPoint = chartElement[0].index === DraggableGraphInput.red_bottomPointVal;
+            const isRedTopPoint = chartElement[0].index === DraggableGraphInput.red_topPointVal;
+
+            if (isBluePoint && !isXPoint && !isTopPoint) {
+              document.querySelector("#draggableGraphInput").style.cursor = "grab";
+            }
+
+            if (isRedPoint && !isRedBottomPoint && !isRedTopPoint) {
+              document.querySelector("#draggableGraphInput").style.cursor = "grab";
+            }
+          } else if (isCDA) {
+            const isBluePoint = chartElement[0].datasetIndex === DraggableGraphInput.blueVal;
+            const isRedPoint = chartElement[0].datasetIndex === DraggableGraphInput.redVal;
+            const isMiddlePoint = chartElement[0].index === DraggableGraphInput.cdaMiddlePoint;
+
+            if (isMiddlePoint) {
+              document.querySelector("#draggableGraphInput").style.cursor = "grab";
+            }
+          }
+        } else {
+          document.querySelector("#draggableGraphInput").style.cursor = "default";
+        }
+      },
+
+      hover: {
+        intersect: true
+      },
+
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: isCDA || isFBA ? "Price" : "Price"
+          },
+          beginAtZero: true,
+
+          suggestedMin: 0, // TODO maybe remove after dan's video
+          suggestedMax: 20
+        },
+
+        x: {
+          title: {
+            display: true,
+            text: isCDA || isFBA ? "Volume" : "Rate"
+          },
+          beginAtZero: true,
+
+          suggestedMin: 1, // TODO maybe remove after dan's video
+          suggestedMax: isCDA || isFBA ? 100 : 5
+        }
+      }
+    };
+
+    static myLineChart = new Chart(document.querySelector("#draggableGraphInput"), {
+      type: "scatter",
+      data: {
+        datasets: [
+          {
+            borderWidth: 2,
+            pointStyle: "line",
+
+            label: "Bids",
+            borderColor: BLUE_TRANSPARENT,
+            backgroundColor: BLUE_TRANSPARENT,
+            fill: false,
+            showLine: true,
+
+            pointStyle: isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle,
+
+            pointRadius: 6,
+            lineTension: 0,
+            pointHitRadius: 25,
+            data: isFLO ? DraggableGraphInput.floInitialDataBids : DraggableGraphInput.cdaInitialDataBids
+          },
+          {
+            borderWidth: 2,
+            pointStyle: "line",
+
+            label: "Asks",
+            borderColor: RED_TRANSPARENT,
+            backgroundColor: RED_TRANSPARENT,
+            fill: false,
+            showLine: true,
+            lineTension: 0,
+
+            pointStyle: isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle,
+
+            pointRadius: 6,
+            lineTension: 0,
+            pointHitRadius: 25,
+            data: isFLO ? DraggableGraphInput.floInitialDataAsks : DraggableGraphInput.cdaInitialDataAsks
+          }
+        ]
+      },
+
+      options: DraggableGraphInput.config
+    });
   }
 
   function test() {
     console.log("bid data:");
-    getDraggableGraphBidData()
+    DraggableGraphInput.getDraggableGraphBidData()
     console.log("ask data:");
-    getDraggableGraphAskData()
-    // makeRedOpaque();
-    // console.log("test");
-    // console.log(myLineChart.data.datasets[blueVal]["data"]);
+    DraggableGraphInput.getDraggableGraphAskData()
   }
-
-  const config = {
-    responsive: true,
-    maintainAspectRatio: false,
-
-    plugins: {
-      tooltip: { enabled: false },
-      dragData: {
-        round: 0,
-        dragX: true,
-        showTooltip: true,
-
-        // controls the ability to start dragging
-        onDragStart: function (e, datasetIndex, index, value) {
-          const isBlue = datasetIndex === DraggableGraphInput.blueVal;
-          const isRed = datasetIndex === DraggableGraphInput.redVal;
-
-          if (isFLO) {
-            // disable ability to start dragging for x point and top point
-            if (isBlue) {
-              makeBlueOpaque();
-              makeRedTransparent();
-
-              const isYPoint = index === DraggableGraphInput.yPointVal;
-              const isMiddlePoint = index === DraggableGraphInput.middlePointVal;
-              const isXPoint = index === DraggableGraphInput.xPointVal;
-              const isTopPoint = index === DraggableGraphInput.topPointVal;
-
-              if (isXPoint || isTopPoint) {
-                return false;
-              }
-            } else if (isRed) {
-              makeRedOpaque();
-              makeBlueTransparent();
-
-              const isYPoint = index === DraggableGraphInput.red_yPointVal;
-              const isBottomPoint = index === DraggableGraphInput.red_bottomPointVal;
-              const isTopPoint = index === DraggableGraphInput.red_topPointVal;
-
-              if (isBottomPoint || isTopPoint) {
-                return false;
-              }
-            }
-          } else if (isCDA) {
-            // disable ability to start dragging for x point and top point
-            if (isBlue) {
-              makeBlueOpaque();
-              makeRedTransparent();
-
-              const isYPoint = index === DraggableGraphInput.cdaYPointVal;
-              if (isYPoint) {
-                return false;
-              }
-
-              const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
-              if (isTopPoint) {
-                return false;
-              }
-            } else if (isRed) {
-              makeRedOpaque();
-              makeBlueTransparent();
-
-              const isYPoint = index === DraggableGraphInput.cdaYPointVal;
-              if (isYPoint) {
-                return false;
-              }
-
-              const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
-              if (isTopPoint) {
-                return false;
-              }
-            }
-          }
-        },
-
-        onDrag: function (e, datasetIndex, index, value) {
-          const isBlue = datasetIndex === DraggableGraphInput.blueVal;
-          const isRed = datasetIndex === DraggableGraphInput.redVal;
-
-          const bottomYLimit = 1;
-          const topYLimit = 19;
-
-          e.target.style.cursor = "grabbing";
-
-          if (isFLO) {
-            if (isBlue) {
-              const isYPoint = index === DraggableGraphInput.yPointVal;
-              const isMiddlePoint = index === DraggableGraphInput.middlePointVal;
-              const isXPoint = index === DraggableGraphInput.xPointVal;
-
-              // update xPoint when middlePoint is dragged
-              if (isMiddlePoint) {
-                myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.xPointVal]["x"] =
-                  value["x"];
-
-                // prevent yPoint going below limit
-                if (value["y"] <= bottomYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal][
-                    "y"
-                  ] = bottomYLimit;
-                }
-              }
-
-              // cont here
-              if (isYPoint) {
-                // prevent yPoint going above top y limit
-                if (value["y"] <= bottomYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal][
-                    "y"
-                  ] = bottomYLimit;
-                }
-                if (value["y"] >= topYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal][
-                    "y"
-                  ] = topYLimit;
-                }
-
-                const middlePointYVal =
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.middlePointVal]["y"];
-
-                // prevent yPoint going below middle
-                if (value["y"] <= middlePointYVal) {
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"] =
-                    middlePointYVal + DraggableGraphInput.pointMinDifference;
-                }
-
-                // prevent yPoint moving on x-axis
-                if (value["x"] > 0) {
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["x"] = 0;
-                }
-              }
-
-              // blue, prevent middlePoint going above yPoint
-              if (isMiddlePoint) {
-                const yPointYVal =
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"];
-                if (value["y"] >= yPointYVal) {
-                  value["y"] = yPointYVal - DraggableGraphInput.pointMinDifference;
-                }
-              }
-            } else if (isRed) {
-              const isYPoint = index === DraggableGraphInput.red_yPointVal;
-              const isMiddlePoint = index === DraggableGraphInput.red_middlePointVal;
-              const isTopPoint = index === DraggableGraphInput.red_topPointVal;
-
-              if (isMiddlePoint) {
-                // update topPoint when middlePoint is dragged
-                myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_topPointVal]["x"] =
-                  value["x"];
-
-                // prevent middlePoint going above top y limit
-                if (value["y"] >= topYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal][
-                    "y"
-                  ] = topYLimit;
-                }
-
-                if (value["y"] <= bottomYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal][
-                    "y"
-                  ] = bottomYLimit;
-                }
-              }
-
-              if (isYPoint) {
-                const middlePointYVal =
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_middlePointVal]["y"];
-
-                // prevent yPoint going above limit
-                if (value["y"] >= topYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal][
-                    "y"
-                  ] = topYLimit;
-                }
-
-                if (value["y"] <= bottomYLimit) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal][
-                    "y"
-                  ] = bottomYLimit;
-                }
-
-                // prevent yPoint going above middle
-                if (value["y"] >= middlePointYVal) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"] =
-                    middlePointYVal - DraggableGraphInput.pointMinDifference;
-                }
-
-                // prevent yPoint moving on x-axis
-                if (value["x"] > 0) {
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["x"] = 0;
-                }
-              }
-
-              // prevent middlePoint going below middle
-              if (isMiddlePoint) {
-                const yPointYVal =
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"];
-
-                if (value["y"] <= yPointYVal) {
-                  value["y"] = yPointYVal + DraggableGraphInput.pointMinDifference;
-                }
-
-                if (value["y"] <= bottomYLimit) {
-                  value["y"] = bottomYLimit;
-                }
-              }
-            }
-          } else if (isCDA) {
-            if (isBlue) {
-              const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
-              // make bottomPoint
-              if (isMiddlePoint) {
-                if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
-                  value["y"] = DraggableGraphInput.cdaTopLimit;
-                }
-
-                if (value["y"] <= DraggableGraphInput.cdaBottomLimit) {
-                  value["y"] = DraggableGraphInput.cdaBottomLimit;
-                }
-
-                myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
-                  value["y"];
-
-                if (value["x"] <= DraggableGraphInput.cdaXLimit) {
-                  value["x"] = DraggableGraphInput.cdaXLimit;
-
-                  myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
-                    value["y"] + DraggableGraphInput.CDA_DRAG_BUG_FIX;
-                }
-
-                myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaBottomPointVal]["x"] =
-                  value["x"];
-              }
-            } else if (isRed) {
-              const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
-              // make bottomPoint
-              if (isMiddlePoint) {
-                if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
-                  value["y"] = DraggableGraphInput.cdaTopLimit;
-                }
-
-                if (value["y"] <= DraggableGraphInput.cdaBottomLimit) {
-                  value["y"] = DraggableGraphInput.cdaBottomLimit;
-                }
-
-                myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
-                  value["y"];
-
-                if (value["x"] <= DraggableGraphInput.cdaXLimit) {
-                  value["x"] = DraggableGraphInput.cdaXLimit;
-
-                  myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
-                    value["y"] - DraggableGraphInput.CDA_DRAG_BUG_FIX;
-                }
-
-                myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaTopPointVal]["x"] =
-                  value["x"];
-              }
-            }
-          }
-        },
-
-        onDragEnd: function (e, datasetIndex, index, value) {
-          e.target.style.cursor = "default";
-        }
-      }
-    },
-
-    onHover: (e, chartElement) => {
-      // change cursor if hovering over a point
-      if (chartElement[0] != null) {
-        if (isFLO) {
-          // don't change hover for blue x-axis point and top point
-          const isBluePoint = chartElement[0].datasetIndex === DraggableGraphInput.blueVal;
-          const isXPoint = chartElement[0].index === DraggableGraphInput.xPointVal;
-          const isTopPoint = chartElement[0].index === DraggableGraphInput.topPointVal;
-
-          const isRedPoint = chartElement[0].datasetIndex === DraggableGraphInput.redVal;
-          const isRedBottomPoint = chartElement[0].index === DraggableGraphInput.red_bottomPointVal;
-          const isRedTopPoint = chartElement[0].index === DraggableGraphInput.red_topPointVal;
-
-          if (isBluePoint && !isXPoint && !isTopPoint) {
-            document.querySelector("#draggableGraphInput").style.cursor = "grab";
-          }
-
-          if (isRedPoint && !isRedBottomPoint && !isRedTopPoint) {
-            document.querySelector("#draggableGraphInput").style.cursor = "grab";
-          }
-        } else if (isCDA) {
-          const isBluePoint = chartElement[0].datasetIndex === DraggableGraphInput.blueVal;
-          const isRedPoint = chartElement[0].datasetIndex === DraggableGraphInput.redVal;
-          const isMiddlePoint = chartElement[0].index === DraggableGraphInput.cdaMiddlePoint;
-
-          if (isMiddlePoint) {
-            document.querySelector("#draggableGraphInput").style.cursor = "grab";
-          }
-        }
-      } else {
-        document.querySelector("#draggableGraphInput").style.cursor = "default";
-      }
-    },
-
-    hover: {
-      intersect: true
-    },
-
-    scales: {
-      y: {
-        title: {
-          display: true,
-          text: isCDA || isFBA ? "Price" : "Price"
-        },
-        beginAtZero: true,
-
-        suggestedMin: 0, // TODO maybe remove after dan's video
-        suggestedMax: 20
-      },
-
-      x: {
-        title: {
-          display: true,
-          text: isCDA || isFBA ? "Volume" : "Rate"
-        },
-        beginAtZero: true,
-
-        suggestedMin: 1, // TODO maybe remove after dan's video
-        suggestedMax: isCDA || isFBA ? 100 : 5
-      }
-    }
-  };
-
-  const myLineChart = new Chart(document.querySelector("#draggableGraphInput"), {
-    type: "scatter",
-    data: {
-      datasets: [
-        {
-          borderWidth: 2,
-          pointStyle: "line",
-
-          label: "Bids",
-          borderColor: BLUE_TRANSPARENT,
-          backgroundColor: BLUE_TRANSPARENT,
-          fill: false,
-          showLine: true,
-
-          pointStyle: isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle,
-
-          pointRadius: 6,
-          lineTension: 0,
-          pointHitRadius: 25,
-          data: isFLO ? DraggableGraphInput.floInitialDataBids : DraggableGraphInput.cdaInitialDataBids
-        },
-        {
-          borderWidth: 2,
-          pointStyle: "line",
-
-          label: "Asks",
-          borderColor: RED_TRANSPARENT,
-          backgroundColor: RED_TRANSPARENT,
-          fill: false,
-          showLine: true,
-          lineTension: 0,
-
-          pointStyle: isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle,
-
-          pointRadius: 6,
-          lineTension: 0,
-          pointHitRadius: 25,
-          data: isFLO ? DraggableGraphInput.floInitialDataAsks : DraggableGraphInput.cdaInitialDataAsks
-        }
-      ]
-    },
-
-    options: config
-  });
-
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1702,7 +1692,7 @@
   }
 
   function newBuyFromDraggableGraph() {
-    let { minPrice, maxPrice, volume, uMax } = getDraggableGraphBidData()
+    let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
 
     const order = {
       p_min: minPrice,
@@ -1749,7 +1739,7 @@
   }
 
   function newSellFromDraggableGraph() {
-    let { minPrice, maxPrice, volume, uMax } = getDraggableGraphAskData()
+    let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
 
     if (minPrice > maxPrice) {
       console.error("minPrice > maxPrice")
