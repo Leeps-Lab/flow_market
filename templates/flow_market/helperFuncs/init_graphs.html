@@ -30,11 +30,18 @@
 
         maxPadding: 0.5, // https://api.highcharts.com/highcharts/yAxis.maxPadding
         minPadding: 0.5,
+
+        // max: 5300, // hardcoded values for flo
+        // min: 4500
+
+        // max: 5100, // hardcoded values for cda
+        // min: 4100
       },
 
       xAxis: {
         title: {
-          text: 'Time',
+          text: 'Time      ㅤ',
+
         },
         min: 0,
         // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
@@ -66,6 +73,7 @@
 
       series: [
         {
+          lineWidth: 2,
           name: 'Cash',
           data: [parseInt('{{player.cash}}')],
           showInLegend: false,
@@ -109,11 +117,18 @@
 
         maxPadding: 0.5, // https://api.highcharts.com/highcharts/yAxis.maxPadding
         minPadding: 0.5,
+
+        // max: 570, // hardcoded values for flo
+        // min: 440
+
+        // max: 620, // hardcoded values for cda
+        // min: 400
       },
 
       xAxis: {
+
         title: {
-          text: 'Time',
+          text: 'Time  ㅤ',
         },
         min: 0,
         // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
@@ -145,6 +160,7 @@
 
       series: [
         {
+          lineWidth: 2,
           name: 'Inventory',
           showInLegend: false,
           color: '#17a2b8',
@@ -171,6 +187,13 @@
       type: 'scatter',
       options: {
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+            }
+          }
+        },
         scales: {
           y: {
             title: {
@@ -178,6 +201,9 @@
               text: isCDA || isFBA ? 'Volume' : 'Rate',
             },
             beginAtZero: true,
+
+            suggestedMin: 0, // TODO maybe remove after dan's video
+            suggestedMax: 20,
           },
 
           x: {
@@ -186,6 +212,9 @@
               text: isCDA || isFBA ? 'Price' : 'Price',
             },
             beginAtZero: true,
+
+            suggestedMin: 0, // TODO maybe remove after dan's video
+            suggestedMax: 5,
           },
         },
         title: {
@@ -194,7 +223,7 @@
         },
         elements: {
           point: {
-            radius: 3,
+            radius: 0,
             pointStyle: 'dash',
           },
         },
@@ -202,27 +231,38 @@
       data: {
         datasets: [
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Bids',
             borderColor: '#007bff',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            backgroundColor: '#007bff',
             fill: false, // TODO test
             showLine: true,
             lineTension: 0,
             data: [],
           },
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Asks',
             borderColor: '#dc3545',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            backgroundColor: '#dc3545',
+            // backgroundColor: 'rgba(0, 0, 0, 0)',
             fill: false,
             showLine: true,
             lineTension: 0,
             data: [],
           },
           {
+            borderWidth: 2,
+            pointStyle: 'line',
+
             label: 'Clearing Price',
-            borderColor: '#28a745',
-            backgroundColor: 'rgba(0, 0, 0, 0)',
+            borderColor: BLUE_GREEN,
+            backgroundColor: BLUE_GREEN,
+            // backgroundColor: 'rgba(0, 0, 0, 0)',
             fill: false,
             showLine: true,
             lineTension: 0,

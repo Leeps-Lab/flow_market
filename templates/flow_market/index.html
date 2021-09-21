@@ -5,12 +5,21 @@
 
 <style>
   :root {
-    --cardSpacing: 24px;
-    --borderRadius: .7rem;
-    --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+    /* --cardSpacing: 24px; */
+    --cardSpacing: 18px;
+    /* --borderRadius: .7rem; */
+    --borderRadius: 4px;
+    /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
+    --shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
+
+    --border: 1px solid rgba(101, 109, 119, .16);
+    /* --border: 1px solid rgba(255, 0, 0, 0.507);
   }
-
-
+  #GITHUB_CARD {
+    background-clip: border-box;
+    border-radius: 4px;
+    box-shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
+  }
   * {
     /* font-family: Tangerine; */
     font-family: Lato;
@@ -18,13 +27,20 @@
   }
 
   body {
-    background-color: #f8fbff;
+    /* background-color: #f8fbff; */
+    background-color: #f4f6fa;
   }
 
   #MANUAL {
     display: none;
   }
 
+
+  .otree-timer {
+    position: relative;
+    top: 50px;
+    /* display: none; */
+  }
 
 
   .fixedAlgoInputHeight {
@@ -85,7 +101,21 @@
   }
 
   #inv-bar,
-  #cash-bar,
+  #cash-bar {
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+  }
+
   .cardWrapper {
     /* copied from https://zuramai.github.io/mazer/demo/ */
     font-family: Nunito;
@@ -103,6 +133,8 @@
     border-radius: var(--borderRadius);
 
     /* border: solid; */
+    border: var(--border);
+    box-shadow: var(--shadow);
   }
 
   .header {
@@ -118,6 +150,8 @@
     z-index: 200;
     top: 0;
     border-radius: 0 !important;
+
+    border: var(--border);
   }
 
   .borderRadiusFix {
@@ -166,6 +200,10 @@
 
     .conditionalMarginLeft {
       margin-left: var(--cardSpacing);
+    }
+
+    .fixHeaderAlignment {
+      padding-right: 0px !important;
     }
   }
 
@@ -379,7 +417,8 @@
   }
 
   .containerMargin {
-    margin-top: 84px;
+    /* margin-top: 84px; */
+    margin-top: 0px;
   }
 
 
@@ -436,17 +475,52 @@
     padding-top: .25rem !important;
     text-align: center !important;
   }
+
+  .roundNum {
+    display: none;
+  }
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
+
+<div
+  class=" marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+  style="margin-top:80px;">
+  <div class=" shadow market minWidth  cardWrapper" id="DRAGGABLE_GRAPH_INPUT">
+    <div class="pb-5 pl-2 pr-3 w-100 h-100"
+      style="padding-top: 14px !important; padding-bottom: 40px !important">
+      <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+        Your Input</h5>
+      <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="mt-2">
+  <button type="button" id="sendBidDraggableGraphInput"
+    class="btn mr-3 btn-primary" onclick="newBuyFromDraggableGraph()">
+    Send Buy
+  </button>
+  <button type="button" id="sendAskDraggableGraphInput" class="btn btn-danger"
+    onclick="newSellFromDraggableGraph()">
+    Send Sell
+  </button>
+</div>
+
+
+<canvas id="blankPointStyle" width="1" height="1"></canvas>
+
+<!-- HEADER -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
   <div class=" col-xl-4  col-12 text-center  roundFixMargin"
     style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
+    <h2 class="roundNum">{{subsession.round_number}}</h2>
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
-  <div class="col-xl-4  col-6 text-center ">
+  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
+    style="padding-right: 155px;">
     <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
     <h2 id="" class=""
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
@@ -457,7 +531,8 @@
       {{ player.cash|floatformat:1 }}
     </h2>
   </div>
-  <div class="col-xl-4  col-6 text-center ">
+  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
+    style="padding-right: 60px; min-width: 300px;">
     <h2 id="" class="mt-0"
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Inventory&nbsp;
@@ -476,8 +551,7 @@
 
 <div class="container-fluid containerMargin hideDebug conditionalMarginTop">
   <div class="row justify-content-center">
-    <div
-      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -549,14 +623,59 @@
         </div>
       </div>
     </div>
-    <div class="col-8 shadow market minWidth cardWrapper conditionalMargin"
-      id="MARKET">
-      <div class="pb-5 pl-4 pr-4 w-100 h-100"
-        style="padding-top: 14px !important;">
-        <h5 class="mb-2 text-center">Market</h5>
-        <canvas id="klf-line" class="h-100 pb-2"></canvas>
+
+
+    <!-- class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight" -->
+
+
+    <!-- <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div> -->
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
+      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
+        <div class="pb-5 pl-2 pr-3 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 40px !important">
+          <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+            Market</h5>
+          <canvas id="klf-line" class="h-100 pb-2"></canvas>
+        </div>
       </div>
     </div>
+
+
+    <div class="col-4 minWidth marginBottomFix">
+      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
+        <div class="pl-3 pr-3 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 40px !important">
+          <h5 class="mb-2 text-center">
+            Profit</h5>
+          <canvas id="myChart" class="h-100 pb-2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div
+      class="col-4 mr-4 cardSpacingBottom cardWrapper marginLeft shadow minWidth justify-content-center"
+      id="">
+      <h5 class="mb-2 text-center">Market</h5>
+      <div style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div> -->
+
+
+
+
   </div>
   <div class="row justify-content-center" id="reactInputSelector">
     <div id="MANUAL_INPUT">
@@ -714,7 +833,8 @@
       <div class="shadow minWidth cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3 ">
           <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Cash</h5>
+            <h5 class="text-center mb-3">
+              Cash</h5>
           </div>
           <div class="" id="cash-bar"></div>
         </div>
@@ -727,16 +847,17 @@
       <div class="shadow cardWrapper graph">
         <div class="pt-4 pl-3 pb-2 pr-3">
           <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Inventory</h5>
+            <h5 class="text-center mb-3">
+              Inventory</h5>
           </div>
           <div class="" id="inv-bar"></div>
         </div>
       </div>
     </div>
+
   </div>
-  <div class="row justify-content-center">
-    <div
-      class="h-100 minWidth minHeight cardSpacingRight cardSpacingBottomMore marginBottom">
+  <div class=" row justify-content-center">
+    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -804,9 +925,31 @@
           </div>
         </div>
       </div>
+
+
     </div>
-    <div class="col-8 minWidth conditionalMargin">
+
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
+      <div class=" minWidth graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class=""></div>
+        </div>
+      </div>
     </div>
+
+    <div
+      class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2">
+      <div class="  graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="col-8 minWidth conditionalMargin">
+    </div> -->
+
   </div>
   <p class="h1">Payoff = <span class="payoff">payoff</span></p>
   <table class="table">
@@ -889,23 +1032,25 @@
   <div class="row justify-content-center" id="reactInputSelectorTest"></div>
 
   <div class="container testingContainer">
-
     <div class="row mt-0 mb-0">
-
       <div class="col">
         <hr class="mt-5 mb-5" />
         <p class="h1">Profit chart testing</p>
-        <div class="row justify-content-center" id=""
-          style="width:400px; height:400px">
-          <canvas id="myChart"></canvas>
-        </div>
+        <!-- <div class="row justify-content-center" id=""
+        style="width:400px; height:400px">
+        <canvas id="myChart"></canvas>
+      </div> -->
       </div>
 
-      <div class="col">
+      <div class="col-8">
         <hr class="mt-5 mb-5" />
-        <p class="h1 potentialProfit">potential profit: </p>
-      </div>
+        <p class="h3 potentialProfit">area (additional cash you will make from
+          the
+          bet, not including what you will recieve from the bet): </p>
+        <p class="h3 cashAfterBet">cash after bet: </p>
+        <p class="h3 invAfterBet">inventory after bet: </p>
 
+      </div>
     </div>
   </div>
 
