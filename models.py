@@ -414,6 +414,15 @@ class Group(BaseGroup):
         # situation #50 ends up here
         return index
 
+    @staticmethod
+    def addToCancellationQueue(order):
+        print("**cancel received order:", order)
+
+        # problem with accessing instance variables
+        # not sure how to fix, need to brainstorm
+        # https://www.google.com/search?q=make+a+static+method+access+instance+variables+python&sxsrf=AOaemvJvubJgXZRGL2GpLmkruEPNENPPTw%3A1632428274334&ei=8uBMYYPmE4P5-gT86LG4BQ&oq=make+a+static+method+access+instance+variables+python&gs_lcp=Cgdnd3Mtd2l6EAMyCAghEBYQHRAeOgcIABBHELADSgQIQRgAUJwUWI0aYLkbaAFwAngBgAHvAYgB8QiSAQUxLjQuMpgBAKABAcgBCMABAQ&sclient=gws-wiz&ved=0ahUKEwiDp6ab9ZXzAhWDvJ4KHXx0DFcQ4dUDCA4&uact=5
+        # print("**cancel test:", Group.buys())
+
     def update(self):
         # TEST does this update function follow frequency in config?
         # global time_last
@@ -425,6 +434,7 @@ class Group(BaseGroup):
         # times.append(current_time-time_last)
         # print("avg time elapsed:", statistics.median(times))
         # time_last = current_time
+        # self.handleCancellations()
 
         buys = self.buys()
         sells = self.sells()
@@ -441,10 +451,6 @@ class Group(BaseGroup):
             # print("*ORDERBUG sells", sells)
 
         if condition:
-            print("updating for treatment:", self.treatment_val)
-            print("buys", buys)
-            print("sells", sells)
-
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
             # print("new clearing_price", clearing_price)
@@ -945,6 +951,10 @@ class Player(BasePlayer):
         if data['direction'] == 'sell_algo':
             call_with_delay(0, self.group.new_sell_algo, data)
             return {0: {'type': 'sell_algo'}}
+
+        if data['direction'] == "cancel_buy":
+            print("**cancel buy")
+            Group.addToCancellationQueue(data)
 
         # BUG should be updating uuid here
         self.updateUUID(data["orderID"])

@@ -65,6 +65,10 @@
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   class DraggableGraphInput {
+    // for keeping track if button is either "Send Buy" (true) or "Cancel Buy" (false)
+    static isBuyButtonSend = true
+    static isSellButtonSend = true
+
     static blueVal = 0;
     static redVal = 1;
 
@@ -115,7 +119,7 @@
       document.querySelector("#blankPointStyle")
     ];
 
-    static floInitialDataAsks = [
+    static floDataAsks = [
       {
         x: 0, // point going to y = 20
         y: 0
@@ -134,7 +138,7 @@
       }
     ];
 
-    static floInitialDataBids = [
+    static floDataBids = [
       {
         x: 0, // point going to y = 0
         y: 20
@@ -156,7 +160,7 @@
     // for when middlePoint is x = 0, to allow for dragging of middlePoint instead of yPoint, since yPoint's z index is larger than middlePoint
     static CDA_DRAG_BUG_FIX = 1;
 
-    static cdaInitialDataAsks = [
+    static cdaDataAsks = [
       {
         x: 0, // x always 0, y always same as middle point (initial has .1 to fix drag bug)
         y: 17 - this.CDA_DRAG_BUG_FIX
@@ -171,7 +175,7 @@
       }
     ];
 
-    static cdaInitialDataBids = [
+    static cdaDataBids = [
       {
         x: 0, // x always 0, y always same as middle point
         y: 3 + this.CDA_DRAG_BUG_FIX
@@ -185,6 +189,13 @@
         y: 0
       }
     ];
+
+    // used for reverting to intial data
+    static floDataAsksCopy = JSON.parse(JSON.stringify(this.floDataAsks))
+    static floDataBidsCopy = JSON.parse(JSON.stringify(this.floDataBids))
+
+    static cdaDataAsksCopy = JSON.parse(JSON.stringify(this.cdaDataAsks))
+    static cdaDataBidsCopy = JSON.parse(JSON.stringify(this.cdaDataBids))
 
     static removeBlueHandles() {
       DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["pointStyle"] = isFLO ? DraggableGraphInput.floPointStyleBlank : DraggableGraphInput.cdaPointStyleBlank
@@ -223,6 +234,7 @@
     }
 
     static showBlueInactive() {
+      DraggableGraphInput.goToInitialPositionBlue()
       DraggableGraphInput.makeBlueTransparent()
       DraggableGraphInput.enableBlueDrag()
       DraggableGraphInput.putBackBlueHandles()
@@ -235,6 +247,7 @@
     }
 
     static showRedInactive() {
+      DraggableGraphInput.goToInitialPositionRed()
       DraggableGraphInput.makeRedTransparent()
       DraggableGraphInput.enableRedDrag()
       DraggableGraphInput.putBackRedHandles()
@@ -699,7 +712,7 @@
             pointRadius: 6,
             lineTension: 0,
             pointHitRadius: 25,
-            data: isFLO ? DraggableGraphInput.floInitialDataBids : DraggableGraphInput.cdaInitialDataBids
+            data: isFLO ? DraggableGraphInput.floDataBids : DraggableGraphInput.cdaDataBids
           },
           {
             borderWidth: 2,
@@ -717,7 +730,7 @@
             pointRadius: 6,
             lineTension: 0,
             pointHitRadius: 25,
-            data: isFLO ? DraggableGraphInput.floInitialDataAsks : DraggableGraphInput.cdaInitialDataAsks
+            data: isFLO ? DraggableGraphInput.floDataAsks : DraggableGraphInput.cdaDataAsks
           }
         ]
       },
@@ -725,7 +738,17 @@
       options: DraggableGraphInput.config
     });
 
-    static newBuyFromDraggableGraph() {
+    static goToInitialPositionRed() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["data"] = isFLO ? DraggableGraphInput.floDataAsksCopy : DraggableGraphInput.cdaDataAsksCopy
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static goToInitialPositionBlue() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"] = isFLO ? DraggableGraphInput.floDataBidsCopy : DraggableGraphInput.cdaDataBidsCopy
+      DraggableGraphInput.myLineChart.update()
+    }
+
+    static sendNewBuyFromDraggableGraph() {
       let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
 
       const order = {
@@ -738,6 +761,8 @@
         timestamp: performance.now(),
         orderID: uuidv4(),
       };
+
+      this.recentBuyOrder = order
 
       const valueToBeat = isNewOrderValid(order); // undefined means order is valid
 
@@ -768,7 +793,45 @@
       }
     }
 
-    static newSellFromDraggableGraph() {
+    static handleCancelBuyButtonClick() {
+      let order = this.recentBuyOrder
+      order.direction = 'cancel_buy'
+
+      liveSend(order);
+    }
+
+    static handleBuyButtonClick() {
+      if (!this.isBuyButtonSend) {
+        this.turnBuyButtonSend()
+        this.handleCancelBuyButtonClick()
+        // this.sendBuyOrderCancellation()
+      } else {
+        // turn button to "Cancel Sell"
+        this.turnBuyButtonCancel()
+        this.isBuyButtonSend = false
+
+        this.sendNewBuyFromDraggableGraph()
+      }
+    }
+
+    static handleSellButtonClick() {
+      if (!this.isSellButtonSend) {
+        this.turnSellButtonSend()
+
+        // this.sendSellOrderCancellation()
+      } else {
+        // turn button to "Cancel Sell"
+        this.turnSellButtonCancel()
+        this.isSellButtonSend = false
+
+        this.sendNewSellFromDraggableGraph()
+      }
+    }
+
+    static recentSellOrder = null
+    static recentBuyOrder = null
+
+    static sendNewSellFromDraggableGraph() {
       let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
 
       if (minPrice > maxPrice) {
@@ -786,6 +849,8 @@
         timestamp: performance.now(),
         orderID: uuidv4(),
       };
+
+      this.recentSellOrder = order
 
       const valueToBeat = isNewOrderValid(order); // undefined means order is good
       if (valueToBeat === undefined) {
@@ -815,18 +880,56 @@
       }
     }
 
+    static buyButton = document.querySelector("#sendBidDraggableGraphInput")
+    static sellButton = document.querySelector("#sendAskDraggableGraphInput")
+
+    static turnBuyButtonCancel() {
+      this.buyButton.innerText = "Cancel Buy"
+      this.buyButton.classList.remove('btn-primary');
+      this.buyButton.classList.add('btn-outline-primary');
+
+      this.showBlueActive()
+    }
+
+    static turnBuyButtonSend() {
+      this.buyButton.innerText = "Send Buy"
+      this.buyButton.classList.add('btn-primary');
+      this.buyButton.classList.remove('btn-outline-primary');
+
+      this.showBlueInactive()
+      this.isBuyButtonSend = true
+    }
+
+    static turnSellButtonCancel() {
+      this.sellButton.innerText = "Cancel Sell"
+      this.sellButton.classList.remove('btn-danger');
+      this.sellButton.classList.add('btn-outline-danger');
+
+      this.showRedActive()
+    }
+
+    static turnSellButtonSend() {
+      this.sellButton.innerText = "Send Sell"
+      this.sellButton.classList.add('btn-danger');
+      this.sellButton.classList.remove('btn-outline-danger');
+
+      this.showRedInactive()
+      this.isSellButtonSend = true
+    }
   }
 
   let testVar = 0
 
   function test() {
+    console.log("initial**")
     testVar++
-    // test red too
-    if (testVar % 2 === 0) {
-      DraggableGraphInput.showBlueActive()
-    } else {
-      DraggableGraphInput.showBlueInactive()
-    }
+    DraggableGraphInput.showBlueInactive()
+    DraggableGraphInput.showRedInactive()
+    // if (testVar % 2 === 0) {
+    //   DraggableGraphInput.turnSellButtonCancel()
+    // } else {
+    //   DraggableGraphInput.turnSellButtonSend()
+    // }
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -961,6 +1064,12 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
+        // turn "Cancel Buy" button into "Send Buy"
+        if (order.direction === 'buy')
+          DraggableGraphInput.turnBuyButtonSend();
+        if (order.direction === 'sell')
+          DraggableGraphInput.turnSellButtonSend();
+
         // remove from active orders table
         removeActiveOrderTable(order.orderID);
 
