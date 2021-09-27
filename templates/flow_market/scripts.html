@@ -234,10 +234,12 @@
     }
 
     static showBlueInactive() {
+      console.log("blue should be inactive")
       DraggableGraphInput.goToInitialPositionBlue()
       DraggableGraphInput.makeBlueTransparent()
       DraggableGraphInput.enableBlueDrag()
       DraggableGraphInput.putBackBlueHandles()
+      DraggableGraphInput.myLineChart.update()
     }
 
     static showRedActive() {
@@ -251,6 +253,7 @@
       DraggableGraphInput.makeRedTransparent()
       DraggableGraphInput.enableRedDrag()
       DraggableGraphInput.putBackRedHandles()
+      DraggableGraphInput.myLineChart.update()
     }
 
     static disableRedDrag() {
@@ -739,12 +742,13 @@
     });
 
     static goToInitialPositionRed() {
-      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["data"] = isFLO ? DraggableGraphInput.floDataAsksCopy : DraggableGraphInput.cdaDataAsksCopy
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["data"] = isFLO ? JSON.parse(JSON.stringify(DraggableGraphInput.floDataAsksCopy)) : JSON.parse(JSON.stringify(DraggableGraphInput.cdaDataAsksCopy))
       DraggableGraphInput.myLineChart.update();
     }
 
     static goToInitialPositionBlue() {
-      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"] = isFLO ? DraggableGraphInput.floDataBidsCopy : DraggableGraphInput.cdaDataBidsCopy
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"] = isFLO ? JSON.parse(JSON.stringify(DraggableGraphInput.floDataBidsCopy)) : JSON.parse(JSON.stringify(DraggableGraphInput.cdaDataBidsCopy))
+      console.log("***data:", DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"])
       DraggableGraphInput.myLineChart.update()
     }
 
@@ -921,10 +925,11 @@
   let testVar = 0
 
   function test() {
-    console.log("initial**")
-    testVar++
-    DraggableGraphInput.showBlueInactive()
-    DraggableGraphInput.showRedInactive()
+    // console.log("initial**")
+    console.log("***data click:", DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal]["data"])
+    // testVar++
+    // DraggableGraphInput.showBlueInactive()
+    // DraggableGraphInput.showRedInactive()
     // if (testVar % 2 === 0) {
     //   DraggableGraphInput.turnSellButtonCancel()
     // } else {
