@@ -798,8 +798,15 @@
     }
 
     static handleCancelBuyButtonClick() {
-      let order = this.recentBuyOrder
-      order.direction = 'cancel_buy'
+      let order = JSON.parse(JSON.stringify(this.recentBuyOrder))
+      order.direction = 'cancel'
+
+      liveSend(order);
+    }
+
+    static handleCancelSellButtonClick() {
+      let order = JSON.parse(JSON.stringify(this.recentSellOrder))
+      order.direction = 'cancel'
 
       liveSend(order);
     }
@@ -821,7 +828,7 @@
     static handleSellButtonClick() {
       if (!this.isSellButtonSend) {
         this.turnSellButtonSend()
-
+        this.handleCancelSellButtonClick()
         // this.sendSellOrderCancellation()
       } else {
         // turn button to "Cancel Sell"
@@ -1053,15 +1060,21 @@
 
   // update order history if an order has expired
   function updateOrderHistory(data) {
+    console.log("**cancel", data, orderHistory)
     orderHistory = orderHistory.filter((order) => {
+      console.log("**cancel do i come here?")
       let arrayToSearch;
       if (order.direction === 'buy') arrayToSearch = data.buys;
       if (order.direction === 'sell') arrayToSearch = data.sells;
       if (arrayToSearch === undefined) console.error('updateOrderHistory()');
 
+      console.log("**cancel arrayToSearch", arrayToSearch)
+
       const orderInData = arrayToSearch.find((orderInData) => {
         return orderInData.orderID === order.orderID;
       });
+
+      console.log("**cancel got id:", orderInData)
 
       // BUG orderInData is sometimes undefined, not sure if due to liveserver delay with orderHistory
       if (orderInData === undefined) {

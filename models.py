@@ -92,6 +92,7 @@ class Group(BaseGroup):
     should_pause_after_bet = models.BooleanField(initial=False)
     # order_copies[player_id_in_group][order_id]
     order_copies = JSONField(null=True, default=init_copies)
+    cancellationQueue = JSONField(null=True, default={})
 
     def set_should_pause_after_bet(self, should_pause=False):
         if should_pause:
@@ -414,14 +415,86 @@ class Group(BaseGroup):
         # situation #50 ends up here
         return index
 
-    @staticmethod
-    def addToCancellationQueue(order):
-        print("**cancel received order:", order)
-
+    def addToCancellationQueue(self, order):
+        # **cancel received order: {'p_min': 3, 'p_max': 15, 'q_max': 50, 'u_max': 3, 'direction': 'cancel_buy', 'status': 'active', 'timestamp': 21678.5, 'orderID': '482ee287-4c6b-4bc1-bc21-e449c9b82773', 'trader_id': 1}
+        # self.cancellationQueue[order["orderID"]] = None
+        temp = self.cancellationQueue
+        temp[order["orderID"]] = None
+        self.cancellationQueue = temp
+        self.save()
+        print("**cancel received order:", order, self.cancellationQueue)
         # problem with accessing instance variables
         # not sure how to fix, need to brainstorm
         # https://www.google.com/search?q=make+a+static+method+access+instance+variables+python&sxsrf=AOaemvJvubJgXZRGL2GpLmkruEPNENPPTw%3A1632428274334&ei=8uBMYYPmE4P5-gT86LG4BQ&oq=make+a+static+method+access+instance+variables+python&gs_lcp=Cgdnd3Mtd2l6EAMyCAghEBYQHRAeOgcIABBHELADSgQIQRgAUJwUWI0aYLkbaAFwAngBgAHvAYgB8QiSAQUxLjQuMpgBAKABAcgBCMABAQ&sclient=gws-wiz&ved=0ahUKEwiDp6ab9ZXzAhWDvJ4KHXx0DFcQ4dUDCA4&uact=5
         # print("**cancel test:", Group.buys())
+
+    def carryOutCancellations(self):
+        ordersToCancel = self.cancellationQueue.keys()
+        # print("old", self.cancellationQueue)
+
+        toDelete = []
+
+        buys = self.buys()
+        sells = self.sells()
+
+        for orderID in ordersToCancel:
+            # print("orderID", orderID)
+
+            cache = self.order_copies
+            print("old cache", cache)
+            # Search for order
+            for p in self.get_players():
+                for orderKey in self.order_copies[str(p.id_in_group)]:
+                    if orderKey == orderID:
+                        toDelete.append(orderID)
+                        # print("found", orderKey,
+                        #       self.order_copies[str(p.id_in_group)][orderKey])
+                        cache[str(p.id_in_group)
+                              ][orderID]["status"] = "expired"
+                        payloads = {}
+                        for player in self.get_players():
+                            payloads[player.participant.code] = {
+                                "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
+
+                        live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+                            0].participant._index_in_pages, payloads)
+
+            self.order_copies = cache
+            self.save()
+            print("new cache", cache)
+
+        cache = self.cancellationQueue
+        for id in toDelete:
+            del cache[id]
+
+        self.cancellationQueue = cache
+        self.save()
+        # print("new", self.cancellationQueue)
+
+        # for p in self.get_players():
+        #     for value in self.order_copies[str(p.id_in_group)].values():
+        #         if (self.treatment_val == "cda"):
+        #             if value['direction'] == 'buy' and not "expired_by_cda_sell" in value:
+        #                 buys_list.append(value)
+        #         else:
+        #             if value['direction'] == 'buy' and value['status'] == 'active':
+        #                 buys_list.append(value)
+        # return buys_list
+
+        # **cont
+        # cache[str(seller.id_in_group)][str(
+        #     sell['orderID'])]['status'] = 'expired'
+        # self.order_copies = cache
+        # self.save()
+        # sell['status'] = 'expired'
+        # # ReGraph KLF market since order expired
+        # # should_update_market_graph = True  # BUG think this is causing a bug
+        # for player in self.get_players():
+        #     payloads[player.participant.code] = {
+        #         "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
+
+        # live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+        #                         0].participant._index_in_pages, payloads)
 
     def update(self):
         # TEST does this update function follow frequency in config?
@@ -434,7 +507,12 @@ class Group(BaseGroup):
         # times.append(current_time-time_last)
         # print("avg time elapsed:", statistics.median(times))
         # time_last = current_time
+
         # self.handleCancellations()
+        # test = self.cancellationQueue
+        # print("cancellationQ:", self.cancellationQueue, test)
+        self.carryOutCancellations()
+        print("market", self.order_copies)
 
         buys = self.buys()
         sells = self.sells()
@@ -952,20 +1030,22 @@ class Player(BasePlayer):
             call_with_delay(0, self.group.new_sell_algo, data)
             return {0: {'type': 'sell_algo'}}
 
-        if data['direction'] == "cancel_buy":
-            print("**cancel buy")
-            Group.addToCancellationQueue(data)
-
         # BUG should be updating uuid here
         self.updateUUID(data["orderID"])
 
-        # Input new order
-        self.new_order(data)
+        if data['direction'] == "cancel":
+            print("**cancel buy")
+            self.group.addToCancellationQueue(data)
+        else:
+            # Input new order
+            self.new_order(data)
 
-        return_data = {'type': data['direction'], 'buys': self.group.buys(
-        ), 'sells': self.group.sells(), 'round': self.round_number}
+            return_data = {'type': data['direction'], 'buys': self.group.buys(
+            ), 'sells': self.group.sells(), 'round': self.round_number}
 
-        return {0: return_data}
+            return {0: return_data}
+
+        return
 
     def updateUUID(self, uuid):
         self.currentID = uuid
