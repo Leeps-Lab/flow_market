@@ -496,23 +496,34 @@ class Group(BaseGroup):
         # live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
         #                         0].participant._index_in_pages, payloads)
 
+    # def update(self):
+    #     global time_last
+    #     current_time = time.perf_counter()
+    #     global times
+    #     if len(times) > 50:
+    #         # pass
+    #         del times[0:48]
+    #     times.append(current_time-time_last)
+    #     print("avg time elapsed:", statistics.median(times))
+    #     time_last = current_time
+
     def update(self):
         # TEST does this update function follow frequency in config?
-        # global time_last
-        # current_time = time.perf_counter()
-        # global times
-        # if len(times) > 50:
-        #     # pass
-        #     del times[0:48]
-        # times.append(current_time-time_last)
-        # print("avg time elapsed:", statistics.median(times))
-        # time_last = current_time
+        global time_last
+        current_time = time.perf_counter()
+        global times
+        if len(times) > 50:
+            # pass
+            del times[0:48]
+        times.append(current_time-time_last)
+        print("avg time elapsed:", statistics.median(times))
+        time_last = current_time
 
         # self.handleCancellations()
         # test = self.cancellationQueue
         # print("cancellationQ:", self.cancellationQueue, test)
         self.carryOutCancellations()
-        print("market", self.order_copies)
+        # print("market", self.order_copies)
 
         buys = self.buys()
         sells = self.sells()
