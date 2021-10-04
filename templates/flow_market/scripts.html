@@ -65,6 +65,10 @@
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   class DraggableGraphInput {
+    // for keeping track if button is either "Send Buy" (true) or "Cancel Buy" (false)
+    static isBuyButtonSend = true
+    static isSellButtonSend = true
+
     static blueVal = 0;
     static redVal = 1;
 
@@ -102,7 +106,20 @@
       document.querySelector("#blankPointStyle")
     ];
 
-    static floInitialDataAsks = [
+    static floPointStyleBlank = [
+      document.querySelector("#blankPointStyle"),
+      document.querySelector("#blankPointStyle"),
+      document.querySelector("#blankPointStyle"),
+      document.querySelector("#blankPointStyle")
+    ];
+
+    static cdaPointStyleBlank = [
+      document.querySelector("#blankPointStyle"),
+      document.querySelector("#blankPointStyle"),
+      document.querySelector("#blankPointStyle")
+    ];
+
+    static floDataAsks = [
       {
         x: 0, // point going to y = 20
         y: 0
@@ -121,7 +138,7 @@
       }
     ];
 
-    static floInitialDataBids = [
+    static floDataBids = [
       {
         x: 0, // point going to y = 0
         y: 20
@@ -143,7 +160,7 @@
     // for when middlePoint is x = 0, to allow for dragging of middlePoint instead of yPoint, since yPoint's z index is larger than middlePoint
     static CDA_DRAG_BUG_FIX = 1;
 
-    static cdaInitialDataAsks = [
+    static cdaDataAsks = [
       {
         x: 0, // x always 0, y always same as middle point (initial has .1 to fix drag bug)
         y: 17 - this.CDA_DRAG_BUG_FIX
@@ -158,7 +175,7 @@
       }
     ];
 
-    static cdaInitialDataBids = [
+    static cdaDataBids = [
       {
         x: 0, // x always 0, y always same as middle point
         y: 3 + this.CDA_DRAG_BUG_FIX
@@ -173,10 +190,86 @@
       }
     ];
 
+    // used for reverting to intial data
+    static floDataAsksCopy = JSON.parse(JSON.stringify(this.floDataAsks))
+    static floDataBidsCopy = JSON.parse(JSON.stringify(this.floDataBids))
+
+    static cdaDataAsksCopy = JSON.parse(JSON.stringify(this.cdaDataAsks))
+    static cdaDataBidsCopy = JSON.parse(JSON.stringify(this.cdaDataBids))
+
+    static removeBlueHandles() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["pointStyle"] = isFLO ? DraggableGraphInput.floPointStyleBlank : DraggableGraphInput.cdaPointStyleBlank
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static putBackBlueHandles() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["pointStyle"] = isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static removeRedHandles() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["pointStyle"] = isFLO ? DraggableGraphInput.floPointStyleBlank : DraggableGraphInput.cdaPointStyleBlank
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static putBackRedHandles() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["pointStyle"] = isFLO ? DraggableGraphInput.floPointStyle : DraggableGraphInput.cdaPointStyle
+      DraggableGraphInput.myLineChart.update();
+    }
+
     static makeRedTransparent() {
       DraggableGraphInput.myLineChart.data.datasets[this.redVal]["borderColor"] = RED_TRANSPARENT;
-      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["backgroundColor"] = RED_TRANSPARENT;
+      // shouldn't change handle color
+      // DraggableGraphInput.myLineChart.data.datasets[this.redVal]["backgroundColor"] = RED_TRANSPARENT;
       DraggableGraphInput.myLineChart.update();
+    }
+
+    static shouldDisableRedDrag = false
+    static shouldDisableBlueDrag = false
+
+    static showBlueActive() {
+      DraggableGraphInput.makeBlueOpaque()
+      DraggableGraphInput.disableBlueDrag()
+      DraggableGraphInput.removeBlueHandles()
+    }
+
+    static showBlueInactive() {
+      console.log("blue should be inactive")
+      DraggableGraphInput.goToInitialPositionBlue()
+      DraggableGraphInput.makeBlueTransparent()
+      DraggableGraphInput.enableBlueDrag()
+      DraggableGraphInput.putBackBlueHandles()
+      DraggableGraphInput.myLineChart.update()
+    }
+
+    static showRedActive() {
+      DraggableGraphInput.makeRedOpaque()
+      DraggableGraphInput.disableRedDrag()
+      DraggableGraphInput.removeRedHandles()
+    }
+
+    static showRedInactive() {
+      DraggableGraphInput.goToInitialPositionRed()
+      DraggableGraphInput.makeRedTransparent()
+      DraggableGraphInput.enableRedDrag()
+      DraggableGraphInput.putBackRedHandles()
+      DraggableGraphInput.myLineChart.update()
+    }
+
+    static disableRedDrag() {
+      DraggableGraphInput.shouldDisableRedDrag = true
+    }
+
+    static enableRedDrag() {
+      DraggableGraphInput.shouldDisableRedDrag = false
+    }
+
+    static disableBlueDrag() {
+      DraggableGraphInput.shouldDisableBlueDrag = true
+    }
+
+    static enableBlueDrag() {
+      DraggableGraphInput.shouldDisableBlueDrag = false
     }
 
     static makeRedOpaque() {
@@ -193,7 +286,8 @@
 
     static makeBlueTransparent() {
       DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["borderColor"] = BLUE_TRANSPARENT;
-      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["backgroundColor"] = BLUE_TRANSPARENT;
+      // don't change handle color
+      // DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["backgroundColor"] = BLUE_TRANSPARENT;
       DraggableGraphInput.myLineChart.update();
     }
 
@@ -266,11 +360,19 @@
             const isBlue = datasetIndex === DraggableGraphInput.blueVal;
             const isRed = datasetIndex === DraggableGraphInput.redVal;
 
+            if (isBlue && DraggableGraphInput.shouldDisableBlueDrag) {
+              return false
+            }
+
+            if (isRed && DraggableGraphInput.shouldDisableRedDrag) {
+              return false
+            }
+
             if (isFLO) {
               // disable ability to start dragging for x point and top point
               if (isBlue) {
-                DraggableGraphInput.makeBlueOpaque();
-                DraggableGraphInput.makeRedTransparent();
+                // DraggableGraphInput.makeBlueOpaque();
+                // DraggableGraphInput.makeRedTransparent();
 
                 const isYPoint = index === DraggableGraphInput.yPointVal;
                 const isMiddlePoint = index === DraggableGraphInput.middlePointVal;
@@ -281,8 +383,8 @@
                   return false;
                 }
               } else if (isRed) {
-                DraggableGraphInput.makeRedOpaque();
-                DraggableGraphInput.makeBlueTransparent();
+                // DraggableGraphInput.makeRedOpaque();
+                // DraggableGraphInput.makeBlueTransparent();
 
                 const isYPoint = index === DraggableGraphInput.red_yPointVal;
                 const isBottomPoint = index === DraggableGraphInput.red_bottomPointVal;
@@ -295,8 +397,8 @@
             } else if (isCDA) {
               // disable ability to start dragging for x point and top point
               if (isBlue) {
-                DraggableGraphInput.makeBlueOpaque();
-                DraggableGraphInput.makeRedTransparent();
+                // DraggableGraphInput.makeBlueOpaque();
+                // DraggableGraphInput.makeRedTransparent();
 
                 const isYPoint = index === DraggableGraphInput.cdaYPointVal;
                 if (isYPoint) {
@@ -308,8 +410,8 @@
                   return false;
                 }
               } else if (isRed) {
-                DraggableGraphInput.makeRedOpaque();
-                DraggableGraphInput.makeBlueTransparent();
+                // DraggableGraphInput.makeRedOpaque();
+                // DraggableGraphInput.makeBlueTransparent();
 
                 const isYPoint = index === DraggableGraphInput.cdaYPointVal;
                 if (isYPoint) {
@@ -530,6 +632,13 @@
             const isRedBottomPoint = chartElement[0].index === DraggableGraphInput.red_bottomPointVal;
             const isRedTopPoint = chartElement[0].index === DraggableGraphInput.red_topPointVal;
 
+            if (isRedPoint && DraggableGraphInput.shouldDisableRedDrag) {
+              return
+            }
+            if (isBluePoint && DraggableGraphInput.shouldDisableBlueDrag) {
+              return
+            }
+
             if (isBluePoint && !isXPoint && !isTopPoint) {
               document.querySelector("#draggableGraphInput").style.cursor = "grab";
             }
@@ -541,6 +650,13 @@
             const isBluePoint = chartElement[0].datasetIndex === DraggableGraphInput.blueVal;
             const isRedPoint = chartElement[0].datasetIndex === DraggableGraphInput.redVal;
             const isMiddlePoint = chartElement[0].index === DraggableGraphInput.cdaMiddlePoint;
+
+            if (isRedPoint && DraggableGraphInput.shouldDisableRedDrag) {
+              return
+            }
+            if (isBluePoint && DraggableGraphInput.shouldDisableBlueDrag) {
+              return
+            }
 
             if (isMiddlePoint) {
               document.querySelector("#draggableGraphInput").style.cursor = "grab";
@@ -590,7 +706,7 @@
 
             label: "Bids",
             borderColor: BLUE_TRANSPARENT,
-            backgroundColor: BLUE_TRANSPARENT,
+            backgroundColor: BLUE,
             fill: false,
             showLine: true,
 
@@ -599,7 +715,7 @@
             pointRadius: 6,
             lineTension: 0,
             pointHitRadius: 25,
-            data: isFLO ? DraggableGraphInput.floInitialDataBids : DraggableGraphInput.cdaInitialDataBids
+            data: isFLO ? DraggableGraphInput.floDataBids : DraggableGraphInput.cdaDataBids
           },
           {
             borderWidth: 2,
@@ -607,7 +723,7 @@
 
             label: "Asks",
             borderColor: RED_TRANSPARENT,
-            backgroundColor: RED_TRANSPARENT,
+            backgroundColor: RED,
             fill: false,
             showLine: true,
             lineTension: 0,
@@ -617,20 +733,215 @@
             pointRadius: 6,
             lineTension: 0,
             pointHitRadius: 25,
-            data: isFLO ? DraggableGraphInput.floInitialDataAsks : DraggableGraphInput.cdaInitialDataAsks
+            data: isFLO ? DraggableGraphInput.floDataAsks : DraggableGraphInput.cdaDataAsks
           }
         ]
       },
 
       options: DraggableGraphInput.config
     });
+
+    static goToInitialPositionRed() {
+      DraggableGraphInput.myLineChart.data.datasets[this.redVal]["data"] = isFLO ? JSON.parse(JSON.stringify(DraggableGraphInput.floDataAsksCopy)) : JSON.parse(JSON.stringify(DraggableGraphInput.cdaDataAsksCopy))
+      DraggableGraphInput.myLineChart.update();
+    }
+
+    static goToInitialPositionBlue() {
+      DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"] = isFLO ? JSON.parse(JSON.stringify(DraggableGraphInput.floDataBidsCopy)) : JSON.parse(JSON.stringify(DraggableGraphInput.cdaDataBidsCopy))
+      console.log("***data:", DraggableGraphInput.myLineChart.data.datasets[this.blueVal]["data"])
+      DraggableGraphInput.myLineChart.update()
+    }
+
+    static sendNewBuyFromDraggableGraph() {
+      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
+
+      const order = {
+        p_min: minPrice,
+        p_max: maxPrice,
+        q_max: volume,
+        u_max: isFLO ? uMax : parseInt('{{max_u_max}}'),
+        direction: 'buy',
+        status: 'active',
+        timestamp: performance.now(),
+        orderID: uuidv4(),
+      };
+
+      this.recentBuyOrder = order
+
+      const valueToBeat = isNewOrderValid(order); // undefined means order is valid
+
+      if (valueToBeat === undefined) {
+        orderHistory.push(order);
+        appendActiveOrdersTable(order);
+        liveSend(order);
+      } else {
+        let errorText;
+        if (isCDA || isFBA) {
+          // cda/fba: can only buy when buy's p_max < sell's p_max
+          // cda/fba: can only sell when sell's p_max > buy's p_max
+          errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
+        } else if (isFLO) {
+          // flo: can only sell when p_min is > buy's p_max
+          // flo: can only buy when p_max < sell's p_min
+          errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
+        }
+
+        Swal.fire({
+          title: 'Cannot Trade With Yourself',
+          icon: 'warning',
+          text: errorText,
+          showClass: {
+            popup: 'animate__animated animate__fadeIn',
+          },
+        });
+      }
+    }
+
+    static handleCancelBuyButtonClick() {
+      let order = JSON.parse(JSON.stringify(this.recentBuyOrder))
+      order.direction = 'cancel'
+
+      liveSend(order);
+    }
+
+    static handleCancelSellButtonClick() {
+      let order = JSON.parse(JSON.stringify(this.recentSellOrder))
+      order.direction = 'cancel'
+
+      liveSend(order);
+    }
+
+    static handleBuyButtonClick() {
+      if (!this.isBuyButtonSend) {
+        this.turnBuyButtonSend()
+        this.handleCancelBuyButtonClick()
+        // this.sendBuyOrderCancellation()
+      } else {
+        // turn button to "Cancel Sell"
+        this.turnBuyButtonCancel()
+        this.isBuyButtonSend = false
+
+        this.sendNewBuyFromDraggableGraph()
+      }
+    }
+
+    static handleSellButtonClick() {
+      if (!this.isSellButtonSend) {
+        this.turnSellButtonSend()
+        this.handleCancelSellButtonClick()
+        // this.sendSellOrderCancellation()
+      } else {
+        // turn button to "Cancel Sell"
+        this.turnSellButtonCancel()
+        this.isSellButtonSend = false
+
+        this.sendNewSellFromDraggableGraph()
+      }
+    }
+
+    static recentSellOrder = null
+    static recentBuyOrder = null
+
+    static sendNewSellFromDraggableGraph() {
+      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
+
+      if (minPrice > maxPrice) {
+        console.error("minPrice > maxPrice")
+        return
+      }
+
+      const order = {
+        p_min: minPrice,
+        p_max: maxPrice,
+        q_max: volume,
+        u_max: uMax,
+        direction: 'sell',
+        status: 'active',
+        timestamp: performance.now(),
+        orderID: uuidv4(),
+      };
+
+      this.recentSellOrder = order
+
+      const valueToBeat = isNewOrderValid(order); // undefined means order is good
+      if (valueToBeat === undefined) {
+        orderHistory.push(order);
+        appendActiveOrdersTable(order);
+        liveSend(order);
+      } else {
+        let errorText;
+        if (isCDA || isFBA) {
+          // cda/fba: can only buy when buy's p_max < sell's p_max
+          // cda/fba: can only sell when sell's p_max > buy's p_max
+          errorText = `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
+        } else if (isFLO) {
+          // flo: can only sell when p_min is > buy's p_max
+          // flo: can only buy when p_max < sell's p_min
+          errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
+        }
+
+        Swal.fire({
+          title: 'Cannot Trade With Yourself',
+          icon: 'warning',
+          text: errorText,
+          showClass: {
+            popup: 'animate__animated animate__fadeIn',
+          },
+        });
+      }
+    }
+
+    static buyButton = document.querySelector("#sendBidDraggableGraphInput")
+    static sellButton = document.querySelector("#sendAskDraggableGraphInput")
+
+    static turnBuyButtonCancel() {
+      this.buyButton.innerText = "Cancel Buy"
+      this.buyButton.classList.remove('btn-primary');
+      this.buyButton.classList.add('btn-outline-primary');
+
+      this.showBlueActive()
+    }
+
+    static turnBuyButtonSend() {
+      this.buyButton.innerText = "Send Buy"
+      this.buyButton.classList.add('btn-primary');
+      this.buyButton.classList.remove('btn-outline-primary');
+
+      this.showBlueInactive()
+      this.isBuyButtonSend = true
+    }
+
+    static turnSellButtonCancel() {
+      this.sellButton.innerText = "Cancel Sell"
+      this.sellButton.classList.remove('btn-danger');
+      this.sellButton.classList.add('btn-outline-danger');
+
+      this.showRedActive()
+    }
+
+    static turnSellButtonSend() {
+      this.sellButton.innerText = "Send Sell"
+      this.sellButton.classList.add('btn-danger');
+      this.sellButton.classList.remove('btn-outline-danger');
+
+      this.showRedInactive()
+      this.isSellButtonSend = true
+    }
   }
 
+  let testVar = 0
+
   function test() {
-    console.log("bid data:");
-    DraggableGraphInput.getDraggableGraphBidData()
-    console.log("ask data:");
-    DraggableGraphInput.getDraggableGraphAskData()
+    // console.log("initial**")
+    console.log("***data click:", DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal]["data"])
+    // testVar++
+    // DraggableGraphInput.showBlueInactive()
+    // DraggableGraphInput.showRedInactive()
+    // if (testVar % 2 === 0) {
+    //   DraggableGraphInput.turnSellButtonCancel()
+    // } else {
+    //   DraggableGraphInput.turnSellButtonSend()
+    // }
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -749,15 +1060,21 @@
 
   // update order history if an order has expired
   function updateOrderHistory(data) {
+    console.log("**cancel", data, orderHistory)
     orderHistory = orderHistory.filter((order) => {
+      console.log("**cancel do i come here?")
       let arrayToSearch;
       if (order.direction === 'buy') arrayToSearch = data.buys;
       if (order.direction === 'sell') arrayToSearch = data.sells;
       if (arrayToSearch === undefined) console.error('updateOrderHistory()');
 
+      console.log("**cancel arrayToSearch", arrayToSearch)
+
       const orderInData = arrayToSearch.find((orderInData) => {
         return orderInData.orderID === order.orderID;
       });
+
+      console.log("**cancel got id:", orderInData)
 
       // BUG orderInData is sometimes undefined, not sure if due to liveserver delay with orderHistory
       if (orderInData === undefined) {
@@ -765,6 +1082,12 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
+        // turn "Cancel Buy" button into "Send Buy"
+        if (order.direction === 'buy')
+          DraggableGraphInput.turnBuyButtonSend();
+        if (order.direction === 'sell')
+          DraggableGraphInput.turnSellButtonSend();
+
         // remove from active orders table
         removeActiveOrderTable(order.orderID);
 
@@ -849,6 +1172,7 @@
   ///////////////////////////////////////////////////////////////////////////////////
 
   var ctx = document.getElementById('myChart').getContext('2d');
+  // profitGraph
   var myChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -1110,7 +1434,6 @@
     }
   }
 
-
   function debug() {
     test()
     // console.log("test")
@@ -1162,11 +1485,6 @@
       klf_line.update()
     }
   }
-
-  // let MarketGraph.flipAxes = true
-
-
-
 
   ///////////////////////////////////////////////////////////////////////////////////
 
@@ -1547,7 +1865,6 @@
     }
   }
 
-
   function liveRecv(data) {
     if (ROUND_NUMBER !== data['round']) {
       // console.log("wrong round")
@@ -1689,100 +2006,6 @@
     ProfitGraph.updateCashAfterBet()
 
     // console.error(parseFloat(data['cash']).toFixed(2));
-  }
-
-  function newBuyFromDraggableGraph() {
-    let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
-
-    const order = {
-      p_min: minPrice,
-      p_max: maxPrice,
-      q_max: volume,
-      u_max: isFLO ? uMax : parseInt('{{max_u_max}}'),
-      direction: 'buy',
-      status: 'active',
-      timestamp: performance.now(),
-      orderID: uuidv4(),
-    };
-
-    const valueToBeat = isNewOrderValid(order); // undefined means order is valid
-
-    if (valueToBeat === undefined) {
-
-      orderHistory.push(order);
-      appendActiveOrdersTable(order);
-      liveSend(order);
-
-    } else {
-
-      let errorText;
-      if (isCDA || isFBA) {
-        // cda/fba: can only buy when buy's p_max < sell's p_max
-        // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
-      } else if (isFLO) {
-        // flo: can only sell when p_min is > buy's p_max
-        // flo: can only buy when p_max < sell's p_min
-        errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
-      }
-
-      Swal.fire({
-        title: 'Cannot Trade With Yourself',
-        icon: 'warning',
-        text: errorText,
-        showClass: {
-          popup: 'animate__animated animate__fadeIn',
-        },
-      });
-
-    }
-  }
-
-  function newSellFromDraggableGraph() {
-    let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
-
-    if (minPrice > maxPrice) {
-      console.error("minPrice > maxPrice")
-      return
-    }
-
-    const order = {
-      p_min: minPrice,
-      p_max: maxPrice,
-      q_max: volume,
-      u_max: uMax,
-      direction: 'sell',
-      status: 'active',
-      timestamp: performance.now(),
-      orderID: uuidv4(),
-    };
-
-    const valueToBeat = isNewOrderValid(order); // undefined means order is good
-    if (valueToBeat === undefined) {
-      orderHistory.push(order);
-      appendActiveOrdersTable(order);
-      liveSend(order);
-    } else {
-      let errorText;
-      if (isCDA || isFBA) {
-        // cda/fba: can only buy when buy's p_max < sell's p_max
-        // cda/fba: can only sell when sell's p_max > buy's p_max
-        errorText = `Your sell order will cross with one of your buy orders. Try increasing the price above ${valueToBeat}.`;
-      } else if (isFLO) {
-        // flo: can only sell when p_min is > buy's p_max
-        // flo: can only buy when p_max < sell's p_min
-        errorText = `Your sell order will cross with one of your buy orders. Try increasing the minimum price above ${valueToBeat}.`;
-      }
-
-      Swal.fire({
-        title: 'Cannot Trade With Yourself',
-        icon: 'warning',
-        text: errorText,
-        showClass: {
-          popup: 'animate__animated animate__fadeIn',
-        },
-      });
-    }
   }
 
   function new_buy(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {

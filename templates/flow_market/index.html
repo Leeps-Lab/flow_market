@@ -498,13 +498,17 @@
 
 <div class="mt-2">
   <button type="button" id="sendBidDraggableGraphInput"
-    class="btn mr-3 btn-primary" onclick="newBuyFromDraggableGraph()">
+    class="btn mr-3 btn-primary"
+    onclick="DraggableGraphInput.handleBuyButtonClick()">
     Send Buy
   </button>
   <button type="button" id="sendAskDraggableGraphInput" class="btn btn-danger"
-    onclick="newSellFromDraggableGraph()">
+    onclick="DraggableGraphInput.handleSellButtonClick()">
     Send Sell
   </button>
+
+  <input id="buyVolumeInput" type="number" value="50" min="0" max="100" step="10"/>
+  <input id="sellVolumeInput" type="number" value="50" min="0" max="100" step="10"/>
 </div>
 
 
