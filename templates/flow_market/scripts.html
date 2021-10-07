@@ -82,10 +82,12 @@
     static red_middlePointVal = 2;
     static red_topPointVal = 3;
 
-    static cdaYPointVal = 0;
-    static cdaMiddlePoint = 1;
-    static cdaTopPointVal = 2;
-    static cdaBottomPointVal = 2;
+    static blue_cdaTopPointVal = 0;
+    static cdaYPointVal = 1;
+    static cdaMiddlePoint = 2;
+    static cdaTopPointVal = 3;
+    static cdaBottomPointVal = 3;
+    static cdaMiddlePointVal = 2
 
     static cdaTopLimit = 19;
     static cdaBottomLimit = 1;
@@ -101,6 +103,7 @@
     ];
 
     static cdaPointStyle = [
+      document.querySelector("#blankPointStyle"),
       document.querySelector("#blankPointStyle"),
       "rect",
       document.querySelector("#blankPointStyle")
@@ -121,38 +124,38 @@
 
     static floDataAsks = [
       {
-        x: 0, // point going to y = 20
+        x: 0, // point going to y = 0
         y: 0
       },
       {
-        x: 0, // should be same as next point
+        x: 0, // circle
         y: 17
       },
       {
-        x: 0,
+        x: 0, // square
         y: 19
       },
       {
-        x: 0, // point going to y = 0, same x as middle point
+        x: 0, // point going to y = 20, same x as middle point
         y: 20
       }
     ];
 
     static floDataBids = [
       {
-        x: 0, // point going to y = 0
+        x: 0, // point going to y = 20
         y: 20
       },
       {
-        x: 0,
+        x: 0, // circle
         y: 3
       },
       {
-        x: 0, // should be same as next point
+        x: 0, // square
         y: 1
       },
       {
-        x: 0, // point going to y = 20, same x as middle point
+        x: 0, // point going to y = 0, same x as middle point
         y: 0
       }
     ];
@@ -162,22 +165,32 @@
 
     static cdaDataAsks = [
       {
-        x: 0, // x always 0, y always same as middle point (initial has .1 to fix drag bug)
+        x: 0, // bottom point
+        y: 0
+      },
+      {
+        x: 0, // x point, x always 0, y always same as middle point (initial has .1 to fix drag bug)
         y: 17 - this.CDA_DRAG_BUG_FIX
       },
       {
-        x: 0,
+        x: 0, // mid point
         y: 17
       },
+      // todo add point here then change cda points
       {
-        x: 0, // point going to x = 20
+        x: 0, // top point
         y: 20
-      }
+      },
     ];
 
     static cdaDataBids = [
+      // todo add point here then change cda points
       {
-        x: 0, // x always 0, y always same as middle point
+        x: 0, // top point
+        y: 20
+      },
+      {
+        x: 0, // x point, x always 0, y always same as middle point
         y: 3 + this.CDA_DRAG_BUG_FIX
       },
       {
@@ -185,7 +198,7 @@
         y: 3
       },
       {
-        x: 0, // point going to x = 0
+        x: 0, // bottom point
         y: 0
       }
     ];
@@ -308,10 +321,10 @@
       } else if (isCDA) {
         maxPrice =
           DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePoint]["y"];
-        volume = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["x"];
+        volume = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePointVal]["x"];
         minPrice = maxPrice
         uMax = parseInt('{{max_u_max}}');
-        console.log(maxPrice, volume);
+        console.log("send order", maxPrice, volume);
       }
 
       return { minPrice, maxPrice, volume, uMax }
@@ -399,29 +412,36 @@
               if (isBlue) {
                 // DraggableGraphInput.makeBlueOpaque();
                 // DraggableGraphInput.makeRedTransparent();
+                console.log("index", index, DraggableGraphInput.cdaMiddlePointVal)
+                if (index !== DraggableGraphInput.cdaMiddlePointVal) return false
 
-                const isYPoint = index === DraggableGraphInput.cdaYPointVal;
-                if (isYPoint) {
-                  return false;
-                }
+                // const isYPoint = index === DraggableGraphInput.cdaYPointVal;
+                // const isTopPoint = index === DraggableGraphInput.blue_cdaTopPointVal;
+                // console.log("drag start", index, "yPoint", isYPoint, "topPoint", isTopPoint)
 
-                const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
-                if (isTopPoint) {
-                  return false;
-                }
+                // if (isYPoint) {
+                //   return false;
+                // }
+
+                // if (isTopPoint) {
+                //   return false;
+                // }
               } else if (isRed) {
+                console.log("index", index, DraggableGraphInput.cdaMiddlePointVal)
+                if (index !== DraggableGraphInput.cdaMiddlePointVal) return false
                 // DraggableGraphInput.makeRedOpaque();
                 // DraggableGraphInput.makeBlueTransparent();
 
-                const isYPoint = index === DraggableGraphInput.cdaYPointVal;
-                if (isYPoint) {
-                  return false;
-                }
+                // const isYPoint = index === DraggableGraphInput.cdaYPointVal;
+                // const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
+                // if (index === 0 || index == 2 || index === 3) return false // todo check
+                // if (isYPoint) {
+                //   return false;
+                // }
 
-                const isTopPoint = index === DraggableGraphInput.cdaTopPointVal;
-                if (isTopPoint) {
-                  return false;
-                }
+                // if (isTopPoint) {
+                //   return false;
+                // }
               }
             }
           },
@@ -579,17 +599,27 @@
                 const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
                 // make bottomPoint
                 if (isMiddlePoint) {
+                  // prevent crossing
+                  if (value["y"] >= DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaMiddlePointVal]["y"]) {
+                    console.log("corssing")
+                    value["y"] = DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.cdaMiddlePointVal]["y"] - DraggableGraphInput.pointMinDifference
+                  }
+
+                  // don't let go above top limit
                   if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
                     value["y"] = DraggableGraphInput.cdaTopLimit;
                   }
 
+                  // don't let go below bottom limit
                   if (value["y"] <= DraggableGraphInput.cdaBottomLimit) {
                     value["y"] = DraggableGraphInput.cdaBottomLimit;
                   }
 
+                  // set y point to same y value as middle point
                   DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaYPointVal]["y"] =
                     value["y"];
 
+                  // not sure what cdaXLimit is for...
                   if (value["x"] <= DraggableGraphInput.cdaXLimit) {
                     value["x"] = DraggableGraphInput.cdaXLimit;
 
@@ -597,13 +627,21 @@
                       value["y"] + DraggableGraphInput.CDA_DRAG_BUG_FIX;
                   }
 
+                  // set the x point to the same x value as middle point
                   DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaBottomPointVal]["x"] =
                     value["x"];
+
                 }
               } else if (isRed) {
                 const isMiddlePoint = index === DraggableGraphInput.cdaMiddlePoint;
                 // make bottomPoint
                 if (isMiddlePoint) {
+                  // prevent crossing
+                  if (value["y"] <= DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaMiddlePointVal]["y"]) {
+                    console.log("corssing 2")
+                    value["y"] = DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.cdaMiddlePointVal]["y"] + DraggableGraphInput.pointMinDifference
+                  }
+
                   if (value["y"] >= DraggableGraphInput.cdaTopLimit) {
                     value["y"] = DraggableGraphInput.cdaTopLimit;
                   }
