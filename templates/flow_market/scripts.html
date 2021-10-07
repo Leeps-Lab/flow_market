@@ -456,6 +456,7 @@
 
                 // cont here
                 if (isYPoint) {
+                  console.log("**isYPoint")
                   // prevent yPoint going above top y limit
                   if (value["y"] <= bottomYLimit) {
                     DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal][
@@ -475,6 +476,13 @@
                   if (value["y"] <= middlePointYVal) {
                     DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"] =
                       middlePointYVal + DraggableGraphInput.pointMinDifference;
+                  }
+
+                  // prevent blue yPoint going above red yPoint
+                  const redYPoint = DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"]
+                  if (value["y"] >= redYPoint) {
+                    console.log("**here", redYPoint)
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"] = redYPoint - DraggableGraphInput.pointMinDifference
                   }
 
                   // prevent yPoint moving on x-axis
@@ -530,6 +538,14 @@
                     DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal][
                       "y"
                     ] = bottomYLimit;
+                  }
+
+                  // prevent red yPoint going above blue yPoint
+                  // cont: test this
+                  const blueYPoint = DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal].data[DraggableGraphInput.yPointVal]["y"]
+                  if (value["y"] <= blueYPoint) {
+                    console.log("**here", blueYPoint)
+                    DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.redVal].data[DraggableGraphInput.red_yPointVal]["y"] = blueYPoint + DraggableGraphInput.pointMinDifference
                   }
 
                   // prevent yPoint going above middle
