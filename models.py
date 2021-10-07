@@ -509,15 +509,15 @@ class Group(BaseGroup):
 
     def update(self):
         # TEST does this update function follow frequency in config?
-        global time_last
-        current_time = time.perf_counter()
-        global times
-        if len(times) > 50:
-            # pass
-            del times[0:48]
-        times.append(current_time-time_last)
-        print("avg time elapsed:", statistics.median(times))
-        time_last = current_time
+        # global time_last
+        # current_time = time.perf_counter()
+        # global times
+        # if len(times) > 50:
+        #     # pass
+        #     del times[0:48]
+        # times.append(current_time-time_last)
+        # print("avg time elapsed:", statistics.median(times))
+        # time_last = current_time
 
         # self.handleCancellations()
         # test = self.cancellationQueue
