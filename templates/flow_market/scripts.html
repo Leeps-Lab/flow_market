@@ -316,7 +316,13 @@
         minPrice =
           DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["y"];
         uMax = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.middlePointVal]["x"];
-        volume = 50;
+        // volume = 50
+        volume = parseInt(DraggableGraphInput.buyVolInput.value, 10)
+        console.log("**got vol:", typeof volume)
+
+        // console.log("buy:", DraggableGraphInput.buyVolInput.value)
+        // console.log("sell:", DraggableGraphInput.sellVolInput.value)
+
         console.log(minPrice, maxPrice, uMax);
       } else if (isCDA) {
         maxPrice =
@@ -343,7 +349,8 @@
         maxPrice =
           DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["y"];
         uMax = DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["x"];
-        volume = 50;
+        // volume = 50;
+        volume = parseInt(DraggableGraphInput.sellVolInput.value, 10)
         console.log(minPrice, maxPrice, uMax);
       } else if (isCDA) {
         maxPrice =
@@ -665,6 +672,7 @@
                 }
               }
             }
+
           },
 
           onDragEnd: function (e, datasetIndex, index, value) {
@@ -948,6 +956,9 @@
     static buyButton = document.querySelector("#sendBidDraggableGraphInput")
     static sellButton = document.querySelector("#sendAskDraggableGraphInput")
 
+    static buyVolInput = document.querySelector("#buyVolumeInput")
+    static sellVolInput = document.querySelector("#sellVolumeInput")
+
     static turnBuyButtonCancel() {
       this.buyButton.innerText = "Cancel Buy"
       this.buyButton.classList.remove('btn-primary');
@@ -986,8 +997,11 @@
   let testVar = 0
 
   function test() {
+    console.log("buy:", DraggableGraphInput.buyVolInput.value)
+    // console.log("buy:", DraggableGraphInput.buyVolInput)
+    console.log("sell:", DraggableGraphInput.sellVolInput.value)
     // console.log("initial**")
-    console.log("***data click:", DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal]["data"])
+    // console.log("***data click:", DraggableGraphInput.myLineChart.data.datasets[DraggableGraphInput.blueVal]["data"])
     // testVar++
     // DraggableGraphInput.showBlueInactive()
     // DraggableGraphInput.showRedInactive()
