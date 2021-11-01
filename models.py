@@ -45,6 +45,7 @@ class Constants(BaseConstants):
     scripts_constants_template = 'flow_market/helperFuncs/constants.html'
 
     style_template = 'flow_market/style.html'
+    indexStyle_template = 'flow_market/indexStyle.html'
 
 
 def parse_config(config_file):
