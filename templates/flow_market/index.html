@@ -97,7 +97,10 @@
 
   #inv-bar,
   #cash-bar {
-    height: 328px;
+    /* height: 328px; */
+
+    /* FOR GIF UNCOMMENT */
+    height: 310px;
   }
 
 
@@ -494,7 +497,189 @@
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 
-<div
+<style>
+  .test {
+    width: 50px;
+    height: 50px;
+    background-color: black;
+  }
+
+  .GIFTesting {
+    margin-top: calc(59px + 20px);
+    /* padding-left: 0px; padding-right: 0px; */
+    padding-left: calc(0px + 2px);
+    padding-right: calc(2px + 14px);
+  }
+
+  .maxWidth {
+    max-width: 100%;
+  }
+
+  .marketGIF {
+    height: 100%;
+  }
+</style>
+
+<div class="container-fluid GIFTesting">
+  <div class="row">
+    <div class="col-6">
+      <div
+        class=" marginLeft marginBottomFix maxWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+        style="">
+        <div class=" shadow draggableMarket maxWidth cardWrapper"
+          id="DRAGGABLE_GRAPH_INPUT">
+          <div class="pb-5 pl-2 pr-3 w-100 h-100 d-flex justify-content-between"
+            style="padding-top: 14px !important; padding-bottom: 9px !important">
+
+            <div class="container d-flex flex-column justify-content-center"
+              style="padding-left: 0 !important; padding-right: 0 !important;">
+              <div class="row d-flex justify-content-center">
+                <div class="col-6">
+
+                  <div class="d-flex justify-content-center">
+                    <input id="sellVolumeInput" type="number" value="50" min="1"
+                      max="100" step="10" />
+                  </div>
+
+                  <div class="d-flex justify-content-center">
+                    <button type="button" id="sendAskDraggableGraphInput"
+                      class="btn btn-danger mt-2"
+                      onclick="DraggableGraphInput.handleSellButtonClick()">
+                      Send Sell
+                    </button>
+                  </div>
+
+
+                </div>
+
+
+              </div>
+
+              <div class="row  d-flex justify-content-center mt-5">
+                <div class="col-6">
+
+                  <div class="d-flex justify-content-center">
+                    <input id="buyVolumeInput" type="number" value="50" min="1"
+                      max="100" step="10" />
+                  </div>
+
+                  <div class="d-flex justify-content-center">
+                    <button type="button" id="sendBidDraggableGraphInput"
+                      class="btn btn-primary mt-2 mb-4"
+                      onclick="DraggableGraphInput.handleBuyButtonClick()">
+                      Send Buy
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="mb-2 text-center"
+                style="padding-left: 15px !important;">
+                Your Input</h5>
+              <div style="height: 388px; width:550px">
+                <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
+              </div>
+            </div>
+
+
+            <!-- <div class="container">
+              <div class="row">
+                <div class="col-6">
+
+                  <div class="d-flex justify-content-center">
+                    <input id="buyVolumeInput" type="number" value="50" min="1"
+                      max="100" step="10" />
+                  </div>
+
+                  <div class="d-flex justify-content-center">
+                    <button type="button" id="sendBidDraggableGraphInput"
+                      class="btn mr-3 btn-primary mt-2"
+                      onclick="DraggableGraphInput.handleBuyButtonClick()">
+                      Send Buy
+                    </button>
+                  </div>
+
+                </div>
+
+
+                <div class="col-6">
+
+                  <div class="d-flex justify-content-center">
+                    <input id="sellVolumeInput" type="number" value="50" min="1"
+                      max="100" step="10" />
+                  </div>
+
+                  <div class="d-flex justify-content-center">
+                    <button type="button" id="sendAskDraggableGraphInput"
+                      class="btn btn-danger mt-2"
+                      onclick="DraggableGraphInput.handleSellButtonClick()">
+                      Send Sell
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div
+        class="marginLeft marginBottomFix marketGIF maxWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
+        <div class=" shadow maxWidth  cardWrapper" id="MARKET"
+          style="height: 444px">
+          <div class="pb-5 pl-2 pr-3 w-100 h-100"
+            style="padding-top: 14px !important; padding-bottom: 40px !important">
+            <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+              Market</h5>
+            <canvas id="klf-line" class="h-100 pb-2"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <div
+        class="marginLeft marginBottomFix maxWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
+        id="CASH">
+        <div class="shadow minWidth cardWrapper graph">
+          <div class="pt-4 pl-3 pb-2 pr-3">
+            <div class="w-100 text-align-right">
+              <h5 class="text-center mb-3">
+                Cash</h5>
+            </div>
+            <div class="" id="cash-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div
+        class="conditionalMarginLeft maxWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
+        style="padding-left: 18px;" id="INVENTORY">
+        <div class="shadow cardWrapper graph">
+          <div class="pt-4 pl-3 pb-2 pr-3">
+            <div class="w-100 text-align-right">
+              <h5 class="text-center mb-3">
+                Inventory</h5>
+            </div>
+            <div class="" id="inv-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div
   class=" marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
   style="margin-top:80px;">
   <div class=" shadow draggableMarket minWidth  cardWrapper"
@@ -510,7 +695,6 @@
       <div class="container">
         <div class="row">
 
-          <!-- height -->
           <div class="col-6">
 
             <div class="d-flex justify-content-center">
@@ -549,7 +733,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <div class="mt-2">
 </div>
@@ -687,7 +871,9 @@
         </div>
       </div>
     </div> -->
-    <div
+
+    <!-- MARKET GRAPH UNCOMMENT -->
+    <!-- <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
       <div class=" shadow market minWidth  cardWrapper" id="MARKET">
         <div class="pb-5 pl-2 pr-3 w-100 h-100"
@@ -697,7 +883,7 @@
           <canvas id="klf-line" class="h-100 pb-2"></canvas>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
     <div class="col-4 minWidth marginBottomFix">
@@ -874,7 +1060,8 @@
     </div>
 
 
-    <div
+    <!-- CASH GRAPH UNCOMMENT -->
+    <!-- <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
@@ -886,9 +1073,10 @@
           <div class="" id="cash-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div
+    <!-- INVENTORY GRAPH UNCOMMENT -->
+    <!-- <div
       class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
@@ -900,7 +1088,7 @@
           <div class="" id="inv-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
   <div class=" row justify-content-center">

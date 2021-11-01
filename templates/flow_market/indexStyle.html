@@ -1,0 +1,475 @@
+<style>
+  :root {
+    /* --cardSpacing: 24px; */
+    --cardSpacing: 18px;
+    /* --borderRadius: .7rem; */
+    --borderRadius: 4px;
+    /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
+    --shadow: rgba(35, 46, 60, 0.04) 0 2px 4px 0;
+
+    --border: 1px solid rgba(101, 109, 119, 0.16);
+    /* --border: 1px solid rgba(255, 0, 0, 0.507);
+  }
+  #GITHUB_CARD {
+    background-clip: border-box;
+    border-radius: 4px;
+    box-shadow: rgba(35, 46, 60, .04) 0 2px 4px 0;
+  }
+  * {
+    /* font-family: Tangerine; */
+    font-family: Lato;
+    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
+  }
+
+  body {
+    /* background-color: #f8fbff; */
+    background-color: #f4f6fa;
+  }
+
+  #MANUAL {
+    display: none;
+  }
+
+  .otree-timer {
+    position: relative;
+    top: 50px;
+    /* display: none; */
+  }
+
+  .fixedAlgoInputHeight {
+    height: 550px;
+  }
+
+  .fixed {
+    width: 400px;
+    height: 400px;
+  }
+
+  #DRAGGABLE_GRAPH_INPUT {
+    /* height: 700px; */
+    height: 100%;
+  }
+
+  .market {
+    /* height: 800px; */
+    height: 400px;
+    min-width: 400px;
+    /* padding: 20px !important; */
+    /* padding-right: 32px !important; */
+    /* height: 700px; */
+  }
+
+  .minWidth {
+    min-width: 400px;
+  }
+
+  .maxWidth {
+    max-width: 400px;
+  }
+
+  .minHeight {
+    height: 800px;
+  }
+
+  .fixedHeight {
+    height: 400px;
+  }
+
+  .manualInput {
+    width: 100px;
+  }
+
+  .sliderWrapper {
+    min-width: 280px;
+  }
+
+  .shadow {
+    box-shadow: var(--shadow);
+  }
+
+  #inv-bar,
+  #cash-bar {
+    height: 328px;
+  }
+
+  .marginLeft {
+    margin-left: var(--cardSpacing);
+  }
+
+  #inv-bar,
+  #cash-bar {
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+  }
+
+  .cardWrapper {
+    /* copied from https://zuramai.github.io/mazer/demo/ */
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: var(--borderRadius);
+
+    /* border: solid; */
+    border: var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .header {
+    background-color: #fff;
+    font-family: Nunito;
+    color: black;
+    border-radius: var(--borderRadius);
+    background-color: #fff;
+    word-wrap: break-word;
+
+    position: fixed;
+    width: 100vw;
+    z-index: 200;
+    top: 0;
+    border-radius: 0 !important;
+
+    border: var(--border);
+  }
+
+  .borderRadiusFix {
+    border-radius: var(--borderRadius);
+  }
+
+  .input-group {
+    width: 150px;
+  }
+
+  .form-control {
+    width: 10px !important;
+  }
+
+  .cardSpacingRight {
+    padding-right: var(--cardSpacing) !important;
+  }
+
+  .cardSpacingBottom {
+    padding-bottom: var(--cardSpacing) !important;
+  }
+
+  .fixedHeightModified {
+    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
+    height: 400px !important;
+    /* height: calc(400px - var(--cardSpacing) - (800px - 800px)); */
+    /* height: 350px; */
+  }
+
+  .cardSpacingBottomMore {
+    height: 300px;
+  }
+
+  .rowSpacingTop {
+    margin-top: var(--cardSpacing);
+  }
+
+  .marginBottom {
+    margin-bottom: var(--cardSpacing);
+  }
+
+  .marginBottomFix {
+    margin-bottom: calc(var(--cardSpacing));
+  }
+
+  @media (max-width: 878px) {
+    .conditionalMarginBot {
+      margin-bottom: var(--cardSpacing);
+      /* margin-bottom: 1000px !important; */
+    }
+
+    .conditionalMarginLeft {
+      margin-left: var(--cardSpacing);
+    }
+
+    .fixHeaderAlignment {
+      padding-right: 0px !important;
+    }
+  }
+
+  @media (max-width: 1302px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+      margin-right: var(--cardSpacing);
+    }
+
+    .conditionalMargin2 {
+      margin-right: var(--cardSpacing);
+    }
+  }
+
+  @media (max-width: 1261px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+      margin-left: -0px;
+    }
+
+    .marginTop {
+      margin-top: 70px !important;
+    }
+
+    .roundFixMargin {
+      width: 100vw;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .conditionalMargin {
+      margin-bottom: var(--cardSpacing);
+      margin-left: -84 !important;
+    }
+
+    .marginTop {
+      margin-top: 116px !important;
+    }
+
+    .conditionalMarginTop {
+      margin-top: 130px !important;
+    }
+  }
+
+  @media (max-width: 448px) {
+    .marginTop {
+      margin-top: 154px !important;
+    }
+  }
+
+  @media (max-width: 596px) {
+    .conditionalMarginTop {
+      margin-top: 162px !important;
+    }
+  }
+
+  .col,
+  .col-1,
+  .col-2,
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    padding: 0px;
+  }
+
+  .hideDebug {
+    margin-bottom: 500px;
+  }
+
+  .noUiSlider {
+    position: relative;
+    bottom: -8px;
+  }
+
+  .noUi-handle:hover {
+    cursor: grab;
+    filter: brightness(95%);
+  }
+
+  .noUi-handle:active {
+    cursor: grabbing;
+    filter: brightness(90%);
+  }
+
+  .noUi-connect {
+    background: var(--info) !important;
+  }
+
+  .noUi-horizontal {
+    height: 10px !important;
+  }
+
+  .noUi-handle {
+    height: 20px !important;
+  }
+
+  .noUi-handle::before,
+  .noUi-handle::after {
+    height: 6px !important;
+  }
+
+  .noUi-tooltip {
+    height: 25px !important;
+    /* line-height: 30px; */
+    font-size: 15px;
+    line-height: 100%;
+    padding-top: 4px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .noUi-pips {
+    height: 10px;
+    font-size: 0.8rem;
+  }
+
+  .noUi-marker-large {
+    height: 5px !important;
+  }
+
+  .cardHeader {
+    margin-top: -10px;
+  }
+
+  .btn {
+    position: relative;
+    z-index: 100;
+  }
+
+  #noUiRateSlider {
+    position: relative;
+  }
+
+  .my-custom-scrollbar {
+    position: relative;
+    height: 90px;
+    overflow: auto;
+  }
+
+  .tableHeightFix {
+    min-height: 90px;
+  }
+
+  .table-wrapper-scroll-y {
+    display: block;
+    overflow: scroll;
+    /* cursor: ns-resize; */
+  }
+
+  .table-wrapper-scroll-y:hover {
+    cursor: ns-resize;
+    background-color: whitesmoke;
+    overflow-y: scroll;
+  }
+
+  .moveTableUp {
+    margin-top: -2px;
+    margin-bottom: 0;
+  }
+
+  .swal2-icon.swal2-warning {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .swal2-confirm.swal2-styled {
+    background-color: var(--primary);
+  }
+
+  .swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 3px var(--primary) !important;
+  }
+
+  #swal2-html-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  h4,
+  label {
+    color: #595959;
+  }
+
+  h5 {
+    font-weight: 600;
+  }
+
+  /* h2, h4 { */
+  /* color: black !important; */
+  /* } */
+
+  /* td {
+    width: 46px;
+  } */
+
+  .marginTop {
+    margin-top: 70px;
+  }
+
+  .containerMargin {
+    /* margin-top: 84px; */
+    margin-top: 0px;
+  }
+
+  .odometer.odometer-auto-theme.odometer-animating-up .odometer-ribbon-inner,
+  .odometer.odometer-theme-minimal.odometer-animating-up .odometer-ribbon-inner,
+  .odometer.odometer-auto-theme.odometer-animating-down.odometer-animating .odometer-ribbon-inner,
+  .odometer.odometer-theme-minimal.odometer-animating-down.odometer-animating .odometer-ribbon-inner {
+    -webkit-transition-duration: 1s !important;
+    -moz-transition-duration: 1s !important;
+    -ms-transition-duration: 1s !important;
+    -o-transition-duration: 1s !important;
+    transition-duration: 1s !important;
+  }
+
+  .dropdown-item {
+    cursor: pointer;
+  }
+
+  .active {
+    color: white !important;
+  }
+
+  .copyH5:hover {
+    cursor: grab;
+    filter: brightness(95%);
+  }
+
+  .copyH5 {
+    background-color: white !important;
+    color: black !important;
+    border: none !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --cardSpacing: 24px;
+    --borderRadius: 0.7rem;
+    --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    --animate-duration: 1s;
+    --animate-delay: 1s;
+    --animate-repeat: 1;
+    word-wrap: break-word;
+    -webkit-box-direction: normal !important;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.2;
+    color: inherit;
+    font-size: 1.25rem;
+    margin-top: 0;
+    font-weight: 600;
+    padding-top: 0.25rem !important;
+    text-align: center !important;
+  }
+
+  .roundNum {
+    display: none;
+  }
+</style>
