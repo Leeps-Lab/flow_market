@@ -361,7 +361,14 @@ class Group(BaseGroup):
         for p in self.get_players():
             for value in self.order_copies[str(p.id_in_group)].values():
                 if (self.treatment_val == "cda"):
-                    if value['direction'] == 'sell' and not "expired_by_cda_buy" in value:
+                    # condition = (value['direction'] == 'sell' and not "expired_by_cda_buy" in value) or (value['direction'] == 'algo_sell' and not "expired_by_cda_buy" in value)
+                    condition = (
+                        value['direction'] == 'sell' and not "expired_by_cda_buy" in value)
+
+                    if value['direction'] == 'algo_sell':
+                        if value['executed_units'] < value['q_total']:
+                            sells_list.append(value)
+                    elif condition:
                         sells_list.append(value)
                 else:
                     if value['direction'] == 'sell' and value['status'] == 'active':
@@ -492,8 +499,13 @@ class Group(BaseGroup):
                               ][orderID]["status"] = "expired"
 
                         if (self.treatment_val == "cda"):
-                            cache[str(p.id_in_group)
-                                  ][orderID]["direction"] = "expired_by_cda_sell"
+                            # cache[str(p.id_in_group)][orderID]["direction"] = "expired_by_cda_sell"
+                            if (cache[str(p.id_in_group)][orderID]["direction"] == "sell" or cache[str(p.id_in_group)][orderID]["direction"] == "algo_sell"):
+                                cache[str(p.id_in_group)
+                                      ][orderID]["expired_by_cda_buy"] = True
+                            if (cache[str(p.id_in_group)][orderID]["direction"] == "buy" or cache[str(p.id_in_group)][orderID]["direction"] == "algo_buy"):
+                                cache[str(p.id_in_group)
+                                      ][orderID]["expired_by_cda_sell"] = True
 
                         payloads = {}
                         for player in self.get_players():
@@ -737,6 +749,8 @@ class Group(BaseGroup):
 
                 # Update seller's profit and volume. TBH I need to look into what this actually does... I think it's for updating values in the database
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
+                    # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
+
                     print("sell update price old:", player.cash, "best_bid:",
                           best_bid['p_max'], "best_bid_price:", cda_clearing_price, "a*b:", best_bid["q_max"] * cda_clearing_price)
                     seller.updateProfit(
@@ -775,12 +789,76 @@ class Group(BaseGroup):
                 # Like removing the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= self.rounding_factor) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= self.rounding_factor):
                     cache = self.order_copies
-                    cache[str(seller.id_in_group)][str(
+                    # cache[str(seller.id_in_group)][str(
+                    #     sell['orderID'])]['status'] = 'expired'
+                    cache[str(sell['player'])][str(
                         sell['orderID'])]['status'] = 'expired'
                     self.order_copies = cache
                     self.save()
                     sell['status'] = 'expired'
 
+                    if sell['direction'] == 'algo_sell':
+                        sell['executed_units'] += sell['q_max']
+                        print("*TODO algo: sell algo order expired: ", sell)
+
+#################################
+
+                        # sell['status'] = 'active'
+
+                        # if ('q_max_cda_copy' in sell):
+                        #     del sell['q_max_cda_copy']
+                        # if ('expired_by_cda_buy' in sell):
+                        #     del sell['expired_by_cda_buy']
+
+                        # cache = self.order_copies
+                        # cache[str(sell['player'])][str(
+                        #     sell['orderID'])]['status'] = 'active'
+                        # self.order_copies = cache
+                        # self.save()
+
+#################################
+                        if sell['executed_units'] < sell['q_total']:
+                            #   if q_total - executed_units >= q_max (units at a time)
+                            #       reset
+                            if sell['q_total'] - sell['executed_units'] >= sell['q_max']:
+                                # reset
+                                # 'status': 'expired' 'q_max_cda_copy': 0, 'expired_by_cda_sell': True
+                                print("Algo debug algo_sell 1:", sell)
+                                sell['status'] = 'active'
+
+                                if ('q_max_cda_copy' in sell):
+                                    del sell['q_max_cda_copy']
+                                if ('expired_by_cda_buy' in sell):
+                                    del sell['expired_by_cda_buy']
+
+                                cache = self.order_copies
+                                cache[str(sell['player'])][str(
+                                    sell['orderID'])]['status'] = 'active'
+                                self.order_copies = cache
+                                self.save()
+
+                                print("*TODO algo1: ", sell)
+                            else:
+                                #   else (should set units at a time to a smaller value)
+                                #       reset but set units at a time = q_total - executed_units
+                                print("Algo debug algo_sell 2:", sell)
+
+                                sell['q_max'] = sell['q_total'] - \
+                                    sell['executed_units']
+
+                                sell['status'] = 'active'
+                                del sell['q_max_cda_copy']
+                                del sell['expired_by_cda_buy']
+
+                                cache = self.order_copies
+                                cache[str(sell['player'])][str(
+                                    sell['orderID'])]['status'] = 'active'
+                                self.order_copies = cache
+                                self.save()
+
+                                print("*TODO algo2: ", sell)
+
+                    ###########################################################
                     # ReGraph KLF market since order expired
                     # should_update_market_graph = True  # BUG think this is causing a bug
                     for player in self.get_players():
@@ -909,23 +987,48 @@ class Group(BaseGroup):
 
                 # update player cash and inventory
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    print("type best_ask", type(
-                        best_ask["q_max"]), "type cda", type(cda_clearing_price))
-                    print("buy update price old:", player.cash, "best_ask:",
-                          best_ask['p_max'], "clearing price:", cda_clearing_price, "a*b:", -best_ask["q_max"] * cda_clearing_price)
-                    buyer.updateProfit(-best_ask["q_max"] *
-                                       cda_clearing_price, False, buy["player"] == 1)
-                    buyer.updateVolume(best_ask["q_max"])
-                    # print("buy update price new:", player.cash)
+                    # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
+                    # if algo buy, then use algo_price
+                    if buy['direction'] == 'algo_buy':
+                        q_to_use = best_ask['q_max']
+                        if buy['q_max'] < best_ask['q_max']:
+                            q_to_use = buy['q_max']
 
-                    if "executedProfit" not in buy:
-                        buy['executedProfit'] = 0
-                    if "executedVolume" not in buy:
-                        buy['executedVolume'] = 0
+                        print("type best_ask", type(
+                            best_ask["q_max"]), "type cda", type(cda_clearing_price))
+                        print("buy update price old:", player.cash, "best_ask:",
+                              q_to_use, "clearing price:", cda_clearing_price, "a*b:", -q_to_use * cda_clearing_price)
+                        buyer.updateProfit(-q_to_use *
+                                           cda_clearing_price, False, buy["player"] == 1)
+                        buyer.updateVolume(q_to_use)
+                        # print("buy update price new:", player.cash)
 
-                    buy['executedProfit'] += - \
-                        best_ask["q_max"] * cda_clearing_price
-                    buy['executedVolume'] += best_ask["q_max"]
+                        if "executedProfit" not in buy:
+                            buy['executedProfit'] = 0
+                        if "executedVolume" not in buy:
+                            buy['executedVolume'] = 0
+
+                        buy['executedProfit'] += - \
+                            q_to_use * cda_clearing_price
+                        buy['executedVolume'] += q_to_use
+                    else:
+                        print("type best_ask", type(
+                            best_ask["q_max"]), "type cda", type(cda_clearing_price))
+                        print("buy update price old:", player.cash, "best_ask:",
+                              best_ask['q_max'], "clearing price:", cda_clearing_price, "a*b:", -best_ask["q_max"] * cda_clearing_price)
+                        buyer.updateProfit(-best_ask["q_max"] *
+                                           cda_clearing_price, False, buy["player"] == 1)
+                        buyer.updateVolume(best_ask["q_max"])
+                        # print("buy update price new:", player.cash)
+
+                        if "executedProfit" not in buy:
+                            buy['executedProfit'] = 0
+                        if "executedVolume" not in buy:
+                            buy['executedVolume'] = 0
+
+                        buy['executedProfit'] += - \
+                            best_ask["q_max"] * cda_clearing_price
+                        buy['executedVolume'] += best_ask["q_max"]
 
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
@@ -967,6 +1070,7 @@ class Group(BaseGroup):
                             if buy['q_total'] - buy['executed_units'] >= buy['q_max']:
                                 # reset
                                 # 'status': 'expired' 'q_max_cda_copy': 0, 'expired_by_cda_sell': True
+                                print("Algo debug algo_buy:", buy)
                                 buy['status'] = 'active'
                                 del buy['q_max_cda_copy']
                                 del buy['expired_by_cda_sell']
@@ -1167,7 +1271,7 @@ class Player(BasePlayer):
             print("**cancel buy")
             self.group.addToCancellationQueue(data)
         else:
-            if data['direction'] == 'algo_buy':
+            if data['direction'] == 'algo_buy' or data['direction'] == 'algo_sell':
                 self.new_algo_order(data)
             else:
                 # Input new order

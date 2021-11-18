@@ -998,6 +998,7 @@
 
   function test() {
     new_algo_buy()
+    // new_algo_sell()
     // console.log("buy:", DraggableGraphInput.buyVolInput.value)
     // console.log("buy:", DraggableGraphInput.buyVolInput)
     // console.log("sell:", DraggableGraphInput.sellVolInput.value)
@@ -2162,7 +2163,127 @@
       q_max: 6, // this is units at a time
       q_total: 50,
       executed_units: 10,
-      expiration_time: 4 // in SECONDS
+      expiration_time: 40 // in SECONDS
+    };
+
+    orderHistory.push(order);
+    appendActiveOrdersTable(order);
+    liveSend(order);
+
+    console.log("**error order:", order)
+
+    // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
+
+    // if (valueToBeat === undefined) {
+
+    //   orderHistory.push(order);
+    //   appendActiveOrdersTable(order);
+    //   liveSend(order);
+
+    // } else {
+
+    //   let errorText;
+    //   if (isCDA || isFBA) {
+    //     // cda/fba: can only buy when buy's p_max < sell's p_max
+    //     // cda/fba: can only sell when sell's p_max > buy's p_max
+    //     errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
+    //   } else if (isFLO) {
+    //     // flo: can only sell when p_min is > buy's p_max
+    //     // flo: can only buy when p_max < sell's p_min
+    //     errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
+    //   }
+
+    //   Swal.fire({
+    //     title: 'Cannot Trade With Yourself',
+    //     icon: 'warning',
+    //     text: errorText,
+    //     showClass: {
+    //       popup: 'animate__animated animate__fadeIn',
+    //     },
+    //   });
+
+    // }
+  }
+
+  function new_algo_sell(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
+    console.log("new algo_sell")
+    let maxPrice;
+    let minPrice;
+    let uMax
+    let volume
+
+    if (isAutomated) {
+      if (isCDA && tempMinPrice !== null && tempMinPrice !== tempMaxPrice) {
+        console.error("CDA prices are supposed to be the same")
+      }
+
+      maxPrice = tempMaxPrice
+      minPrice = isFLO ? tempMinPrice : tempMaxPrice
+
+
+      volume = tempVolume
+
+      if (isCDA || isFBA) {
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = tempUMax
+      }
+
+      console.log("*** using uMax", uMax)
+
+      Automate.setSliders(minPrice, maxPrice, volume, uMax)
+
+    } else {
+      if (isCDA || isFBA) {
+        maxPrice = parseInt(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()
+        );
+        minPrice = maxPrice;
+
+      } else if (isFLO) {
+        maxPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[1]
+        );
+        minPrice = parseFloat(
+          document.getElementById('noUiPriceSlider').noUiSlider.get()[0]
+        );
+      }
+
+      volume = parseInt(
+        document.getElementById('noUiVolSlider').noUiSlider.get()
+      );
+
+      if ('{{treatment}}' != 'flo') {
+        // use rate slider if flo
+        uMax = parseInt('{{max_u_max}}');
+      } else {
+        uMax = parseInt(document.getElementById('noUiRateSlider').noUiSlider.get());
+      }
+    }
+
+    if (minPrice > maxPrice) {
+      console.error("minPrice > maxPrice")
+      return
+    }
+
+    const order = {
+      // p_min: minPrice,
+      // p_max: maxPrice,
+      // q_max: volume,
+      // u_max: uMax,
+      p_min: 10,
+      p_max: 10,
+      u_max: uMax,
+      direction: 'algo_sell',
+      status: 'active',
+      timestamp: performance.now(),
+      orderID: uuidv4(),
+
+      q_max: 6, // this is units at a time
+      q_total: 50,
+      executed_units: 10,
+      // expiration_time: 4 // in SECONDS
+      expiration_time: 20 // in SECONDS
     };
 
     orderHistory.push(order);
