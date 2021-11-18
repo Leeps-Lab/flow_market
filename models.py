@@ -29,6 +29,8 @@ This is a continuous flow market game
 time_last = 0
 times = []
 
+# Update frontend?
+
 
 class Constants(BaseConstants):
     name_in_url = 'flow_market'
@@ -153,62 +155,63 @@ class Group(BaseGroup):
     def num_players(self):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['num_players']
 
-    def new_buy_algo(self, data):
-        time_start = time.time()
-        payloads = {}
-        print("data:", data)
-        while time.time() < time_start + data['expiration_time']:
-            print("new while")
+    # def new_buy_algo(self, data):
+        # time_start = time.time()
+        # payloads = {}
+        # print("data:", data)
+        # while time.time() < time_start + data['expiration_time']:
+        #     print("new while")
 
-            # create group of orders
-            for i in range(data['quantity_per']):
-                print("what? i:", i)
-                self.get_player_by_id(data['trader_id']).new_order({
-                    'p_min': data['p_min'],
-                    'p_max': data['p_max'],
-                    'q_max': data['q_max'],
-                    'u_max': data['u_max'],
-                    'direction': 'buy',
-                    'status': 'active',
-                    'timestamp': data['timestamp']
-                })
+        #     # create group of orders
+        #     for i in range(data['quantity_per']):
+        #         print("what? i:", i)
+        #         self.get_player_by_id(data['trader_id']).new_order({
+        #             'p_min': data['p_min'],
+        #             'p_max': data['p_max'],
+        #             'q_max': data['q_max'],
+        #             'u_max': data['u_max'],
+        #             'direction': 'buy',
+        #             'status': 'active',
+        #             'timestamp': data['timestamp']
+        #         })
 
-            # Send out updated orderbooks to update graph on frontend
-            for player in self.get_players():
-                payloads[player.participant.code] = {
-                    'type': 'buy', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
-            live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-                                 0].participant._index_in_pages, payloads)
+        #     # Send out updated orderbooks to update graph on frontend
+        #     for player in self.get_players():
+        #         payloads[player.participant.code] = {
+        #             'type': 'buy', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
+        #     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+        #                          0].participant._index_in_pages, payloads)
 
-            # time between groups of orders
-            time.sleep(2)
+        #     # time between groups of orders
+        #     time.sleep(2)
 
-    def new_sell_algo(self, data):
-        time_start = time.time()
-        payloads = {}
-        while time.time() < time_start + data['expiration_time']:
+    # def new_sell_algo(self, data):
+    #     time_start = time.time()
+    #     payloads = {}
+    #     while time.time() < time_start + data['expiration_time']:
 
-            # Create group of orders
-            for i in range(data['quantity_per']):
-                self.get_player_by_id(data['trader_id']).new_order({
-                    'p_min': data['p_min'],
-                    'p_max': data['p_max'],
-                    'q_max': data['q_max'],
-                    'u_max': data['u_max'],
-                    'direction': 'sell',
-                    'status': 'active',
-                    'timestamp': data['timestamp']
-                })
+    #         # Create group of orders
+    #         for i in range(data['quantity_per']):
+    #             self.get_player_by_id(data['trader_id']).new_order({
+    #                 'p_min': data['p_min'],
+    #                 'p_max': data['p_max'],
+    #                 'q_max': data['q_max'],
+    #                 'u_max': data['u_max'],
+    #                 'direction': 'sell',
+    #                 'status': 'active',
+    #                 'timestamp': data['timestamp']
+    #             })
 
-            # Send out updated orderbooks to update graph on frontend
-            for player in self.get_players():
-                payloads[player.participant.code] = {
-                    'type': 'sell', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
-            live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-                                 0].participant._index_in_pages, payloads)
+    #         # Send out updated orderbooks to update graph on frontend
+    #         for player in self.get_players():
+    #             payloads[player.participant.code] = {
+    #                 'type': 'sell', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
 
-            # time between groups of orders
-            time.sleep(2)
+    #         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
+    #                              0].participant._index_in_pages, payloads)
+
+    #         # time between groups of orders
+    #         time.sleep(2)
 
     def set_bets(self):
         bet_file = self.bet_file()
@@ -288,6 +291,32 @@ class Group(BaseGroup):
             live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                  0].participant._index_in_pages, payloads)
 
+    def new_algo_order(self, order, playerID, currentID):
+        # TODO check if this is called from Player
+        print("group algo order called")
+        cache = self.order_copies
+        cache[str(playerID)][str(currentID)] = {
+            'player': playerID,
+            'p_min': order['p_min'],
+            'p_max': order['p_max'],
+            'q_max': order['q_max'],
+            'u_max': order['u_max'],
+            'direction': order['direction'],
+            'status': order['status'],
+            'orderID': currentID,
+            'orderNum': self.order_num,
+
+            'executed_units': order['executed_units'],
+            'q_total': order['q_total'],
+            'expiration_time': order['expiration_time']
+        }
+
+        print("***cache", cache)
+
+        self.order_num += 1
+        self.order_copies = cache
+        self.save()
+
     def new_order(self, order, playerID, currentID):
         cache = self.order_copies
         cache[str(playerID)][str(currentID)] = {
@@ -311,10 +340,13 @@ class Group(BaseGroup):
         for p in self.get_players():
             for value in self.order_copies[str(p.id_in_group)].values():
                 if (self.treatment_val == "cda"):
-                    if value['direction'] == 'buy' and not "expired_by_cda_sell" in value:
+                    condition = (value['direction'] == 'buy' and not "expired_by_cda_sell" in value) or (
+                        value['direction'] == 'algo_buy' and not "expired_by_cda_sell" in value)
+                    if condition:
                         buys_list.append(value)
                 else:
-                    if value['direction'] == 'buy' and value['status'] == 'active':
+                    condition = value['direction'] == 'buy' and value['status'] == 'active'
+                    if condition:
                         buys_list.append(value)
         return buys_list
 
@@ -507,7 +539,7 @@ class Group(BaseGroup):
     #     print("avg time elapsed:", statistics.median(times))
     #     time_last = current_time
 
-    def update(self):
+    def update(self):  # -> event based
         # TEST does this update function follow frequency in config?
         # global time_last
         # current_time = time.perf_counter()
@@ -530,7 +562,13 @@ class Group(BaseGroup):
         payloads = {}
         should_update_market_graph = False
 
+        # how does regular buy and sell update fe?
+
         condition = None
+        print("\n\n")
+        print("buys:", buys)
+        print("sells:", sells)
+        # change condition to true if there is an algo order in list
         if (self.treatment_val == "cda"):
             # to fix Multiple remaining buy test 2, should include check if there are crossing orders
             condition = len(buys) > 0 or len(sells) > 0
@@ -539,6 +577,7 @@ class Group(BaseGroup):
             # print("*ORDERBUG buys", buys)
             # print("*ORDERBUG sells", sells)
 
+        # condition = True
         if condition:
             # Calculate the clearing price
             clearing_price = self.clearingPrice(buys, sells)
@@ -550,6 +589,7 @@ class Group(BaseGroup):
                 payloads[player.participant.code] = {
                     "type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells, 'round': self.round_number}
 
+            print("*graph sending clearing_price")
             live._live_send_back(
                 self.get_players()[0].participant._session_code,
                 self.get_players()[0].participant._index_in_pages,
@@ -583,6 +623,7 @@ class Group(BaseGroup):
                     min_price = obj["p_max"]
                     best_ask = obj
 
+            # TODO find out why cda_clearing_price is none
             cda_clearing_price = None
             if (best_ask != None and best_bid != None):
                 # print("both not equal to none best_ask:",
@@ -593,6 +634,8 @@ class Group(BaseGroup):
                 else:
                     cda_clearing_price = best_bid["p_max"]
                     # print("clearing price is best_bid")
+            else:
+                print("ERROR best_ask", best_ask, "best_bid", best_bid)
 
             for sell in sells:
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
@@ -738,12 +781,17 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
+                    # TODO algo: create new order here
+                    print("*TODO algo: sell algo order expired: ", sell)
+
                 # print("**vol0.5 id", sell['player'], "trader_vol", trader_vol,
                 #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
                     payloads[player.participant.code] = {
                         "type": 'update', "cash": player.cash, "inventory": player.inventory, "payoff_data": player.get_payoff_data(), 'round': self.round_number}
+
+                print("*graph update")
 
                 live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                      0].participant._index_in_pages, payloads)
@@ -847,7 +895,12 @@ class Group(BaseGroup):
                 self.order_copies = cache
                 self.save()
 
+                # bug: cda_clearing_price is none type
+
+                # update player cash and inventory
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
+                    print("type best_ask", type(
+                        best_ask["q_max"]), "type cda", type(cda_clearing_price))
                     print("buy update price old:", player.cash, "best_ask:",
                           best_ask['p_max'], "clearing price:", cda_clearing_price, "a*b:", -best_ask["q_max"] * cda_clearing_price)
                     buyer.updateProfit(-best_ask["q_max"] *
@@ -881,12 +934,61 @@ class Group(BaseGroup):
                 # remove the order if q_max <= 0
                 # if (buy['q_max'] <= 0.0):
                 if (self.treatment_val == "flo" and buy['q_max'] <= self.rounding_factor) or (self.treatment_val == "cda" and buy["q_max_cda_copy"] <= self.rounding_factor):
+
                     cache = self.order_copies
                     cache[str(buy['player'])][str(
                         buy['orderID'])]['status'] = 'expired'
                     self.order_copies = cache
                     self.save()
                     buy['status'] = 'expired'
+
+                    print("EXPIRED buy", buy)
+
+                    # TODO algo: create new order here
+                    # *TODO algo: buy algo order expired:  {'player': 1, 'p_min': 10, 'p_max': 10, 'q_max': 5, 'u_max': 1000000, 'direction': 'algo_buy', 'status': 'expired', 'orderID': 'b3c7986c-49dd-4afe-a64e-bfc518898ab7', 'orderNum': 0, 'executed_units': 10, 'q_total': 50, 'expiration_time': 4000, 'q_max_cda_copy': 0, 'expired_by_cda_sell': True, 'executedProfit': -940, 'executedVolume': 94}
+                    # add q_max (units at a time) to executed_units
+                    # if executed_units < q_total
+                    if buy['direction'] == 'algo_buy':
+                        buy['executed_units'] += buy['q_max']
+                        print("*TODO algo: buy algo order expired: ", buy)
+                        if buy['executed_units'] < buy['q_total']:
+                            #   if q_total - executed_units >= q_max (units at a time)
+                            #       reset
+                            if buy['q_total'] - buy['executed_units'] >= buy['q_max']:
+                                # reset
+                                # 'status': 'expired' 'q_max_cda_copy': 0, 'expired_by_cda_sell': True
+                                buy['status'] = 'active'
+                                del buy['q_max_cda_copy']
+                                del buy['expired_by_cda_sell']
+
+                                cache = self.order_copies
+                                cache[str(buy['player'])][str(
+                                    buy['orderID'])]['status'] = 'active'
+                                self.order_copies = cache
+                                self.save()
+
+                                print("*TODO algo1: ", buy)
+                            else:
+                                #   else (should set units at a time to a smaller value)
+                                #       reset but set units at a time = q_total - executed_units
+
+                                buy['q_max'] = buy['q_total'] - \
+                                    buy['executed_units']
+
+                                buy['status'] = 'active'
+                                del buy['q_max_cda_copy']
+                                del buy['expired_by_cda_sell']
+
+                                cache = self.order_copies
+                                cache[str(buy['player'])][str(
+                                    buy['orderID'])]['status'] = 'active'
+                                self.order_copies = cache
+                                self.save()
+
+                                print("*TODO algo2: ", buy)
+
+                    ###########################################################
+
                     # ReGraph KLF market since order expired
                     for player in self.get_players():
                         payloads[player.participant.code] = {
@@ -894,6 +996,7 @@ class Group(BaseGroup):
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
+
                 elif should_update_market_graph:  # BUG think this is causing a bug with ui not updating
                     for player in self.get_players():
                         payloads[player.participant.code] = {
@@ -950,6 +1053,11 @@ class Player(BasePlayer):
     p_min = models.FloatField()
     p_max = models.FloatField()
     status = models.StringField()
+
+    executed_units = models.IntegerField()
+    q_total = models.IntegerField()
+    expiration_time = models.IntegerField()
+
     updateRunning = models.BooleanField(initial=False)
     currentID = models.StringField()
 
@@ -988,7 +1096,7 @@ class Player(BasePlayer):
     # Done automatically in this class
     def update_money_gained_in_market(self, val):
         self.money_gained_in_market += abs(val)
-        self.save()
+        self.save()  # just use this
 
     # Done automatically in this class
     def update_money_lost_in_market(self, val):
@@ -1033,23 +1141,27 @@ class Player(BasePlayer):
             return {0: {'type': 'begin'}}
 
         data['trader_id'] = self.id_in_group
-        if data['direction'] == 'buy_algo':
-            call_with_delay(0, self.group.new_buy_algo, data)
-            return {0: {'type': 'buy_algo'}}
+        # if data['direction'] == 'buy_algo':
+        #     call_with_delay(0, self.group.new_buy_algo, data)
+        #     return {0: {'type': 'buy_algo'}}
 
-        if data['direction'] == 'sell_algo':
-            call_with_delay(0, self.group.new_sell_algo, data)
-            return {0: {'type': 'sell_algo'}}
+        # if data['direction'] == 'sell_algo':
+        #     call_with_delay(0, self.group.new_sell_algo, data)
+        #     return {0: {'type': 'sell_algo'}}
 
         # BUG should be updating uuid here
+        print("*error:", data)
         self.updateUUID(data["orderID"])
 
         if data['direction'] == "cancel":
             print("**cancel buy")
             self.group.addToCancellationQueue(data)
         else:
-            # Input new order
-            self.new_order(data)
+            if data['direction'] == 'algo_buy':
+                self.new_algo_order(data)
+            else:
+                # Input new order
+                self.new_order(data)
 
             return_data = {'type': data['direction'], 'buys': self.group.buys(
             ), 'sells': self.group.sells(), 'round': self.round_number}
@@ -1060,6 +1172,41 @@ class Player(BasePlayer):
 
     def updateUUID(self, uuid):
         self.currentID = uuid
+
+    def new_algo_order(self, order):
+        print("*error2")
+        self.direction = order['direction']
+        self.q_max = order['q_max']
+        self.u_max = order['u_max']
+        self.p_min = order['p_min']
+        self.p_max = order['p_max']
+        self.status = order['status']
+
+        self.executed_units = order['executed_units']
+        self.q_total = order['q_total']
+        self.expiration_time = order['expiration_time']
+
+        if order['direction'] == 'buy':
+            self.num_buys += 1
+        if order['direction'] == 'sell':
+            self.num_sells += 1
+
+        Order.objects.create(player=self,
+                             group=self.group,
+                             orderID=self.currentID,
+                             direction=order['direction'],
+                             q_max=order['q_max'],
+                             u_max=order['u_max'],
+                             p_min=order['p_min'],
+                             p_max=order['p_max'],
+                             status=order['status'],
+
+                             executed_units=order['executed_units'],
+                             q_total=order['q_total'],
+                             expiration_time=order['expiration_time'])
+
+        # self.group.new_order(order, self.id_in_group, self.currentID)
+        self.group.new_algo_order(order, self.id_in_group, self.currentID)
 
     def new_order(self, order):
         self.direction = order['direction']
@@ -1121,3 +1268,7 @@ class Order(ExtraModel):
     p_min = models.FloatField()
     p_max = models.FloatField()
     status = models.StringField()
+
+    executed_units = models.IntegerField()
+    q_total = models.IntegerField()
+    expiration_time = models.IntegerField()
