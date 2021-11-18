@@ -318,7 +318,7 @@ class Group(BaseGroup):
         self.save()
 
         print("Algo: will call addToCancellationQueue")
-        call_with_delay(order['expiration_time']/1000, self.addToCancellationQueue,
+        call_with_delay(order['expiration_time'], self.addToCancellationQueue,
                         cache[str(playerID)][str(currentID)])
 
     def new_order(self, order, playerID, currentID):
