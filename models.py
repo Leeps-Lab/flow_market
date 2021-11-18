@@ -750,22 +750,42 @@ class Group(BaseGroup):
                 # Update seller's profit and volume. TBH I need to look into what this actually does... I think it's for updating values in the database
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
+                    if sell['direction'] == 'algo_sell':
+                        q_to_use = best_bid['q_max']
+                        if sell['q_max'] < best_bid['q_max']:
+                            q_to_use = sell['q_max']
 
-                    print("sell update price old:", player.cash, "best_bid:",
-                          best_bid['p_max'], "best_bid_price:", cda_clearing_price, "a*b:", best_bid["q_max"] * cda_clearing_price)
-                    seller.updateProfit(
-                        best_bid["q_max"] * cda_clearing_price, False, sell['player'] == 1)
-                    seller.updateVolume(-best_bid["q_max"])
-                    # print("sell update price new:", player.cash)
+                        print("algo sell update price old:", player.cash, "best_bid:",
+                              q_to_use, "best_bid_price:", cda_clearing_price, "a*b:", q_to_use * cda_clearing_price)
+                        seller.updateProfit(
+                            q_to_use * cda_clearing_price, False, sell['player'] == 1)
+                        seller.updateVolume(-q_to_use)
+                        # print("sell update price new:", player.cash)
 
-                    if "executedProfit" not in sell:
-                        sell['executedProfit'] = 0
-                    if "executedVolume" not in sell:
-                        sell['executedVolume'] = 0
+                        if "executedProfit" not in sell:
+                            sell['executedProfit'] = 0
+                        if "executedVolume" not in sell:
+                            sell['executedVolume'] = 0
 
-                    sell['executedProfit'] += best_bid["q_max"] * \
-                        cda_clearing_price
-                    sell['executedVolume'] += -best_bid["q_max"]
+                        sell['executedProfit'] += q_to_use * \
+                            cda_clearing_price
+                        sell['executedVolume'] += -q_to_use
+                    else:
+                        print("sell update price old:", player.cash, "best_bid:",
+                              best_bid['p_max'], "best_bid_price:", cda_clearing_price, "a*b:", best_bid["q_max"] * cda_clearing_price)
+                        seller.updateProfit(
+                            best_bid["q_max"] * cda_clearing_price, False, sell['player'] == 1)
+                        seller.updateVolume(-best_bid["q_max"])
+                        # print("sell update price new:", player.cash)
+
+                        if "executedProfit" not in sell:
+                            sell['executedProfit'] = 0
+                        if "executedVolume" not in sell:
+                            sell['executedVolume'] = 0
+
+                        sell['executedProfit'] += best_bid["q_max"] * \
+                            cda_clearing_price
+                        sell['executedVolume'] += -best_bid["q_max"]
                 elif self.treatment_val == 'flo':
                     # print("**vol1 id", sell['player'], "trader_vol", trader_vol,
                     #       "old vol: ", seller.inventory, "new: ", seller.inventory - trader_vol)
@@ -801,8 +821,6 @@ class Group(BaseGroup):
                         sell['executed_units'] += sell['q_max']
                         print("*TODO algo: sell algo order expired: ", sell)
 
-#################################
-
                         # sell['status'] = 'active'
 
                         # if ('q_max_cda_copy' in sell):
@@ -816,7 +834,6 @@ class Group(BaseGroup):
                         # self.order_copies = cache
                         # self.save()
 
-#################################
                         if sell['executed_units'] < sell['q_total']:
                             #   if q_total - executed_units >= q_max (units at a time)
                             #       reset
@@ -984,7 +1001,6 @@ class Group(BaseGroup):
                 self.save()
 
                 # bug: cda_clearing_price is none type
-
                 # update player cash and inventory
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
@@ -996,7 +1012,7 @@ class Group(BaseGroup):
 
                         print("type best_ask", type(
                             best_ask["q_max"]), "type cda", type(cda_clearing_price))
-                        print("buy update price old:", player.cash, "best_ask:",
+                        print("algo buy update price old:", player.cash, "best_ask:",
                               q_to_use, "clearing price:", cda_clearing_price, "a*b:", -q_to_use * cda_clearing_price)
                         buyer.updateProfit(-q_to_use *
                                            cda_clearing_price, False, buy["player"] == 1)
