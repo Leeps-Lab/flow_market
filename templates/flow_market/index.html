@@ -54,7 +54,8 @@
 
   #DRAGGABLE_GRAPH_INPUT {
     /* height: 700px; */
-    height: 100%;
+    /* height: 100%; */
+    height: 444px;
   }
 
   .market {
@@ -66,7 +67,18 @@
     /* height: 700px; */
   }
 
+  .market2 {
+    height: 444px;
+    /* height: 100%; */
+    min-width: 400px;
+  }
+
+
   .minWidth {
+    min-width: 400px;
+  }
+
+  .minWidth2 {
     min-width: 400px;
   }
 
@@ -494,62 +506,7 @@
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 
-<div
-  class=" marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-  style="margin-top:80px;">
-  <div class=" shadow draggableMarket minWidth  cardWrapper"
-    id="DRAGGABLE_GRAPH_INPUT">
-    <div class="pb-5 pl-2 pr-3 w-100 h-100"
-      style="padding-top: 14px !important; padding-bottom: 14px !important">
-      <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
-        Your Input</h5>
-      <div style="height:400px">
-        <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
-      </div>
 
-      <div class="container">
-        <div class="row">
-
-          <!-- height -->
-          <div class="col-6">
-
-            <div class="d-flex justify-content-center">
-              <input id="buyVolumeInput" type="number" value="50" min="1"
-                max="100" step="10" />
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <button type="button" id="sendBidDraggableGraphInput"
-                class="btn mr-3 btn-primary mt-2"
-                onclick="DraggableGraphInput.handleBuyButtonClick()">
-                Send Buy
-              </button>
-            </div>
-
-          </div>
-
-
-          <div class="col-6">
-
-            <div class="d-flex justify-content-center">
-              <input id="sellVolumeInput" type="number" value="50" min="1"
-                max="100" step="10" />
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <button type="button" id="sendAskDraggableGraphInput"
-                class="btn btn-danger mt-2"
-                onclick="DraggableGraphInput.handleSellButtonClick()">
-                Send Sell
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="mt-2">
 </div>
@@ -592,7 +549,116 @@
 </div>
 
 
+<div class="container-fluid containerMargin hideDebug"
+  style="margin-top: 45px;">
+  <div class="row justify-content-center">
 
+    <!-- INPUT -->
+    <div
+      class="marginLeft marginBottomFix  minWidth2 conditionalMargin2  col-5 cardSpacingRight  marginRight">
+      <div class=" shadow draggableMarket  minWidth2 cardWrapper"
+        id="DRAGGABLE_GRAPH_INPUT">
+        <div class="pb-5 pl-2 pr-2 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 14px !important">
+          <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+            Your Input</h5>
+          <div style="height:300px">
+            <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
+          </div>
+
+          <div class="container">
+            <div class="row">
+
+              <!-- height -->
+              <div class="col-6">
+
+                <div class="d-flex justify-content-center">
+                  <input id="buyVolumeInput" type="number" value="50" min="1"
+                    max="100" step="10" />
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="button" id="sendBidDraggableGraphInput"
+                    class="btn mr-3 btn-primary mt-2"
+                    onclick="DraggableGraphInput.handleBuyButtonClick()">
+                    Send Buy
+                  </button>
+                </div>
+
+              </div>
+
+
+              <div class="col-6">
+
+                <div class="d-flex justify-content-center">
+                  <input id="sellVolumeInput" type="number" value="50" min="1"
+                    max="100" step="10" />
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="button" id="sendAskDraggableGraphInput"
+                    class="btn btn-danger mt-2"
+                    onclick="DraggableGraphInput.handleSellButtonClick()">
+                    Send Sell
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET -->
+    <div
+      class="marginBottomFix minWidth2 conditionalMargin2  col-5   marginRight">
+      <div class="shadow market2 minWidth cardWrapper" id="MARKET">
+        <div class="pb-5 pl-2 pr-3 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 40px !important">
+          <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+            Market</h5>
+          <canvas id="klf-line" class="h-100 pb-2"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row justify-content-center">
+
+    <!-- CASH -->
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-5 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">
+              Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div
+      class="conditionalMarginLeft minWidth marginBottom col-5  borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
+      <div class="shadow cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">
+              Inventory</h5>
+          </div>
+          <div class="" id="inv-bar"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 
 
@@ -672,22 +738,7 @@
     </div>
 
 
-    <!-- class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight" -->
-
-
     <!-- <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-      id="CASH">
-      <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Cash</h5>
-          </div>
-          <div class="" id="cash-bar"></div>
-        </div>
-      </div>
-    </div> -->
-    <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
       <div class=" shadow market minWidth  cardWrapper" id="MARKET">
         <div class="pb-5 pl-2 pr-3 w-100 h-100"
@@ -697,7 +748,7 @@
           <canvas id="klf-line" class="h-100 pb-2"></canvas>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
     <div class="col-4 minWidth marginBottomFix">
@@ -874,7 +925,7 @@
     </div>
 
 
-    <div
+    <!-- <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
@@ -886,9 +937,9 @@
           <div class="" id="cash-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div
+    <!-- <div
       class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
@@ -900,7 +951,7 @@
           <div class="" id="inv-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
   <div class=" row justify-content-center">
