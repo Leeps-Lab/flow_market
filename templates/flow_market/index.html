@@ -517,14 +517,15 @@
 <!-- HEADER -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
-  <div class=" col-xl-4  col-12 text-center  roundFixMargin"
-    style="padding-top: 2px;">
+
+
+  <div class=" col-xl-3  col-12 text-center  roundFixMargin"
+    style="padding-left: 120px; padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
     <h2 class="roundNum">{{subsession.round_number}}</h2>
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
-  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
-    style="padding-right: 155px;">
+  <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
     <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
     <h2 id="" class=""
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
@@ -535,8 +536,8 @@
       {{ player.cash|floatformat:1 }}
     </h2>
   </div>
-  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
-    style="padding-right: 60px; min-width: 300px;">
+  <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
+    style="margin-left: -30px; min-width: 300px;">
     <h2 id="" class="mt-0"
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Inventory&nbsp;
@@ -546,6 +547,8 @@
       {{ player.inventory|floatformat:1 }}
     </h2>
   </div>
+
+
 </div>
 
 
