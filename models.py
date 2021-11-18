@@ -311,11 +311,15 @@ class Group(BaseGroup):
             'expiration_time': order['expiration_time']
         }
 
-        print("***cache", cache)
+        # print("***cache", cache)
 
         self.order_num += 1
         self.order_copies = cache
         self.save()
+
+        print("Algo: will call addToCancellationQueue")
+        call_with_delay(order['expiration_time']/1000, self.addToCancellationQueue,
+                        cache[str(playerID)][str(currentID)])
 
     def new_order(self, order, playerID, currentID):
         cache = self.order_copies
@@ -348,6 +352,8 @@ class Group(BaseGroup):
                     condition = value['direction'] == 'buy' and value['status'] == 'active'
                     if condition:
                         buys_list.append(value)
+
+        # Sort by time priority: earlier placed first
         return buys_list
 
     def sells(self):
@@ -450,6 +456,7 @@ class Group(BaseGroup):
     def addToCancellationQueue(self, order):
         # **cancel received order: {'p_min': 3, 'p_max': 15, 'q_max': 50, 'u_max': 3, 'direction': 'cancel_buy', 'status': 'active', 'timestamp': 21678.5, 'orderID': '482ee287-4c6b-4bc1-bc21-e449c9b82773', 'trader_id': 1}
         # self.cancellationQueue[order["orderID"]] = None
+        print("Algo: addToCancellationQueue called with order:", order)
         temp = self.cancellationQueue
         temp[order["orderID"]] = None
         self.cancellationQueue = temp
@@ -483,6 +490,11 @@ class Group(BaseGroup):
                         #       self.order_copies[str(p.id_in_group)][orderKey])
                         cache[str(p.id_in_group)
                               ][orderID]["status"] = "expired"
+
+                        if (self.treatment_val == "cda"):
+                            cache[str(p.id_in_group)
+                                  ][orderID]["direction"] = "expired_by_cda_sell"
+
                         payloads = {}
                         for player in self.get_players():
                             payloads[player.participant.code] = {
@@ -607,6 +619,7 @@ class Group(BaseGroup):
 
             # Update the traders' profits and orders
 
+            # Determine values required for CDA: best_bid, best_ask and max_price, min_price
             best_bid = None
             max_price = float('-inf')
             for obj in buys:
@@ -623,7 +636,7 @@ class Group(BaseGroup):
                     min_price = obj["p_max"]
                     best_ask = obj
 
-            # TODO find out why cda_clearing_price is none
+            # Determine CDA clearing price
             cda_clearing_price = None
             if (best_ask != None and best_bid != None):
                 # print("both not equal to none best_ask:",
@@ -638,25 +651,18 @@ class Group(BaseGroup):
                 print("ERROR best_ask", best_ask, "best_bid", best_bid)
 
             for sell in sells:
+                # Required for CDA execution: add an additional key to the best_bid item
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
                     best_bid["q_max_cda_copy"] = best_bid["q_max"]
-
                 if (not ("q_max_cda_copy" in sell)):
                     sell["q_max_cda_copy"] = sell["q_max"]
-
-                # print("**in sells")
-                # print("got best_bid", best_bid)
-                # print("")
 
                 seller = self.get_player_by_id(sell['player'])
                 best_bid_q = None
 
-                # TODO copy
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
 
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
-
-                        # print("1")
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
@@ -729,6 +735,7 @@ class Group(BaseGroup):
                 #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
                 # print("sells 2b:", sells)
 
+                # Update seller's profit and volume. TBH I need to look into what this actually does... I think it's for updating values in the database
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     print("sell update price old:", player.cash, "best_bid:",
                           best_bid['p_max'], "best_bid_price:", cda_clearing_price, "a*b:", best_bid["q_max"] * cda_clearing_price)
@@ -764,7 +771,8 @@ class Group(BaseGroup):
                 # print("**vol0.4 id", sell['player'], "trader_vol", trader_vol,
                 #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
 
-                # remove the order if q_max <= 0
+                # Expire the order depending on various conditions...
+                # Like removing the order if q_max <= 0
                 if (self.treatment_val == "flo" and sell['q_max'] <= self.rounding_factor) or (self.treatment_val == "cda" and sell["q_max_cda_copy"] <= self.rounding_factor):
                     cache = self.order_copies
                     cache[str(seller.id_in_group)][str(
@@ -772,6 +780,7 @@ class Group(BaseGroup):
                     self.order_copies = cache
                     self.save()
                     sell['status'] = 'expired'
+
                     # ReGraph KLF market since order expired
                     # should_update_market_graph = True  # BUG think this is causing a bug
                     for player in self.get_players():
@@ -798,6 +807,7 @@ class Group(BaseGroup):
                 # print("**vol0.6 id", sell['player'], "trader_vol", trader_vol,
                 #       "old q_max: ", sell['q_max'], "new: ", sell['q_max'] - trader_vol)
 
+            # This should be a mirror image of the "for sell in sells" loop
             for buy in buys:
 
                 # print("**in buys")
