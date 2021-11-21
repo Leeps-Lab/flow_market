@@ -54,7 +54,8 @@
 
   #DRAGGABLE_GRAPH_INPUT {
     /* height: 700px; */
-    height: 100%;
+    /* height: 100%; */
+    height: 444px;
   }
 
   .market {
@@ -66,7 +67,18 @@
     /* height: 700px; */
   }
 
+  .market2 {
+    height: 444px;
+    /* height: 100%; */
+    min-width: 400px;
+  }
+
+
   .minWidth {
+    min-width: 400px;
+  }
+
+  .minWidth2 {
     min-width: 400px;
   }
 
@@ -494,62 +506,7 @@
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
 
-<div
-  class=" marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-  style="margin-top:80px;">
-  <div class=" shadow draggableMarket minWidth  cardWrapper"
-    id="DRAGGABLE_GRAPH_INPUT">
-    <div class="pb-5 pl-2 pr-3 w-100 h-100"
-      style="padding-top: 14px !important; padding-bottom: 14px !important">
-      <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
-        Your Input</h5>
-      <div style="height:400px">
-        <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
-      </div>
 
-      <div class="container">
-        <div class="row">
-
-          <!-- height -->
-          <div class="col-6">
-
-            <div class="d-flex justify-content-center">
-              <input id="buyVolumeInput" type="number" value="50" min="1"
-                max="100" step="10" />
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <button type="button" id="sendBidDraggableGraphInput"
-                class="btn mr-3 btn-primary mt-2"
-                onclick="DraggableGraphInput.handleBuyButtonClick()">
-                Send Buy
-              </button>
-            </div>
-
-          </div>
-
-
-          <div class="col-6">
-
-            <div class="d-flex justify-content-center">
-              <input id="sellVolumeInput" type="number" value="50" min="1"
-                max="100" step="10" />
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <button type="button" id="sendAskDraggableGraphInput"
-                class="btn btn-danger mt-2"
-                onclick="DraggableGraphInput.handleSellButtonClick()">
-                Send Sell
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="mt-2">
 </div>
@@ -560,14 +517,15 @@
 <!-- HEADER -->
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
-  <div class=" col-xl-4  col-12 text-center  roundFixMargin"
-    style="padding-top: 2px;">
+
+
+  <div class=" col-xl-3  col-12 text-center  roundFixMargin"
+    style="padding-left: 120px; padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
     <h2 class="roundNum">{{subsession.round_number}}</h2>
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
-  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
-    style="padding-right: 155px;">
+  <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
     <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
     <h2 id="" class=""
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
@@ -578,8 +536,8 @@
       {{ player.cash|floatformat:1 }}
     </h2>
   </div>
-  <div class="col-xl-4  col-6 text-center fixHeaderAlignment"
-    style="padding-right: 60px; min-width: 300px;">
+  <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
+    style="margin-left: -30px; min-width: 300px;">
     <h2 id="" class="mt-0"
       style="padding-top: 2px; float: left; width: 50%; text-align: right;">
       Inventory&nbsp;
@@ -589,16 +547,294 @@
       {{ player.inventory|floatformat:1 }}
     </h2>
   </div>
+
+
 </div>
 
 
+<!-- NEW LAYOUT -->
+<div class="container-fluid containerMargin hideDebug"
+  style="margin-top: 45px;">
 
+  <!-- ROW 1: INPUT AND MARKET -->
+  <div class="row justify-content-center">
+
+    <!-- INPUT -->
+    <div
+      class="marginLeft marginBottomFix  minWidth2 conditionalMargin2  col-5 cardSpacingRight  marginRight">
+      <div class=" shadow draggableMarket  minWidth2 cardWrapper"
+        id="DRAGGABLE_GRAPH_INPUT">
+        <div class="pb-5 pl-2 pr-2 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 14px !important">
+          <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+            Your Input</h5>
+          <div style="height:300px">
+            <canvas id="draggableGraphInput" class="h-100 pb-2"></canvas>
+          </div>
+
+          <div class="container">
+            <div class="row">
+
+              <!-- height -->
+              <div class="col-6">
+
+                <div class="d-flex justify-content-center">
+                  <input id="buyVolumeInput" type="number" value="50" min="1"
+                    max="100" step="10" />
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="button" id="sendBidDraggableGraphInput"
+                    class="btn mr-3 btn-primary mt-2"
+                    onclick="DraggableGraphInput.handleBuyButtonClick()">
+                    Send Buy
+                  </button>
+                </div>
+
+              </div>
+
+
+              <div class="col-6">
+
+                <div class="d-flex justify-content-center">
+                  <input id="sellVolumeInput" type="number" value="50" min="1"
+                    max="100" step="10" />
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="button" id="sendAskDraggableGraphInput"
+                    class="btn btn-danger mt-2"
+                    onclick="DraggableGraphInput.handleSellButtonClick()">
+                    Send Sell
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET -->
+    <div
+      class="marginBottomFix minWidth2 conditionalMargin2  col-5   marginRight">
+      <div class="shadow market2 minWidth cardWrapper" id="MARKET">
+        <div class="pb-5 pl-2 pr-3 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 40px !important">
+          <h5 class="mb-2 text-center" style="padding-left: 15px !important;">
+            Market</h5>
+          <canvas id="klf-line" class="h-100 pb-2"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: CASH AND INVENTORY -->
+  <div class="row justify-content-center">
+
+    <!-- CASH -->
+    <div
+      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-5 cardSpacingRight  marginRight"
+      id="CASH">
+      <div class="shadow minWidth cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">
+              Cash</h5>
+          </div>
+          <div class="" id="cash-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div
+      class="conditionalMarginLeft minWidth marginBottom col-5  borderRadiusFix conditionalMargin2"
+      id="INVENTORY">
+      <div class="shadow cardWrapper graph">
+        <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="w-100 text-align-right">
+            <h5 class="text-center mb-3">
+              Inventory</h5>
+          </div>
+          <div class="" id="inv-bar"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3: ACTIVE AND EXPIRED -->
+  <div class="row justify-content-center">
+
+    <div class="col-4">
+
+      <!-- ACTIVE -->
+      <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
+        <div class="col">
+          <div
+            class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
+            id="HISTORY">
+            <div class="row justify-content-center">
+              <div class="" id="BETS">
+                <div class="" id="bets2">
+                  <div class="cardHeader w-100 text-align-right">
+                    <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets
+                    </h5>
+                  </div>
+                  <table class="table mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Direction</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Deadline</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="tableHeightFix table moveTableUp">
+                      <tbody id="activeBets">
+                        {% for bet in bets %}
+                        <tr id="a{{bet.bet_id}}">
+                          <td class="betDirection"
+                            style="width:91px; height:23px;">{{bet.direction}}
+                          </td>
+                          <td class="betPrice" style="width:61px;">
+                            {{bet.limit_price}}</td>
+                          <td class="betQuantity" style="width:88px;">
+                            {{bet.quantity}}</td>
+                          <td class="betDeadline">{{bet.deadline}} ms</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class=" row justify-content-center">
+              <div>
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-2 text-center" id="ACTIVE_ORDERS">
+                    Active Orders
+                  </h5>
+                </div>
+                <table class="table mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col" id="activeOrdersDirection">Direction</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col" id="activeOrdersRate">Rate</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div id="activeOrdersTableWrapper" style="min-width: 242px;"
+                  class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="table moveTableUp">
+                    <tbody id="activeOrdersTable">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-1">
+    </div>
+
+    <div class="col-4">
+
+      <!-- EXPIRED -->
+      <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
+        <div class="col">
+          <div
+            class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
+            id="EXECUTED_HISTORY">
+            <div class="row justify-content-center">
+              <div class="" id="EXECUTEDBETS">
+                <div class="" id="bets2">
+                  <div class="cardHeader w-100 text-align-right">
+                    <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
+                      Bets
+                    </h5>
+                  </div>
+                  <table class="table mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Direction</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Deadline</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="tableHeightFix table moveTableUp">
+                      <tbody id="executedBetsTable">
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class=" row justify-content-center">
+              <div>
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
+                    Executed Orders
+                  </h5>
+                </div>
+                <table class="table mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col" id="executedOrdersDirection">Direction
+                      </th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col" id="executedOrdersRate">Rate</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div id="executedOrdersTableWrapper" style="min-width: 242px;"
+                  class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="table moveTableUp">
+                    <tbody id="executedOrdersTable">
+                      {% for bet in bets %}
+                      {% comment %} <tr>
+                        <td style="width:91px;">{{bet.direction}}</td>
+                        <td style="width:62px;">{{bet.limit_price}}</td>
+                        <td style="width:88px;">{{bet.quantity}}</td>
+                      </tr> {% endcomment %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
 
 
 <div class="container-fluid containerMargin hideDebug conditionalMarginTop">
   <div class="row justify-content-center">
-    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
+
+    <!-- <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -669,25 +905,10 @@
           </div>
         </div>
       </div>
-    </div>
-
-
-    <!-- class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight" -->
+    </div> -->
 
 
     <!-- <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
-      id="CASH">
-      <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">Cash</h5>
-          </div>
-          <div class="" id="cash-bar"></div>
-        </div>
-      </div>
-    </div> -->
-    <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
       <div class=" shadow market minWidth  cardWrapper" id="MARKET">
         <div class="pb-5 pl-2 pr-3 w-100 h-100"
@@ -697,7 +918,7 @@
           <canvas id="klf-line" class="h-100 pb-2"></canvas>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
     <div class="col-4 minWidth marginBottomFix">
@@ -874,7 +1095,7 @@
     </div>
 
 
-    <div
+    <!-- <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight"
       id="CASH">
       <div class="shadow minWidth cardWrapper graph">
@@ -886,9 +1107,9 @@
           <div class="" id="cash-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div
+    <!-- <div
       class="conditionalMarginLeft minWidth marginBottom col-4  borderRadiusFix conditionalMargin2"
       id="INVENTORY">
       <div class="shadow cardWrapper graph">
@@ -900,11 +1121,12 @@
           <div class="" id="inv-bar"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
   <div class=" row justify-content-center">
-    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
+
+    <!-- <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
       <div class="col">
         <div
           class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
@@ -972,9 +1194,7 @@
           </div>
         </div>
       </div>
-
-
-    </div>
+    </div> -->
 
     <div
       class="marginLeft marginBottomFix minWidth conditionalMargin2  col-4 cardSpacingRight  marginRight">
