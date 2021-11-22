@@ -19,6 +19,8 @@ import copy
 from timeit import default_timer as timer
 import statistics
 import threading
+import math
+import otree.common
 
 author = 'LeepsLab'
 
@@ -73,11 +75,60 @@ def parse_config(config_file):
 
 
 class Subsession(BaseSubsession):
+    # def creating_session(self):
+    #     # ENABLE
+    #     # self.group_randomly()
+    #     for p in self.get_players():
+    #         p.init_cash_inv()
+
     def creating_session(self):
-        # ENABLE
-        # self.group_randomly()
+        config = self.config
+        if not config:
+            return
+
+        # num_silos = self.session.config['num_silos']
+        num_silos = 1
+
+        # fixed_id_in_group = not config['shuffle_role']
+        fixed_id_in_group = False  # false
+
+        #print("num_silos: ", num_silos)
+
+        players = self.get_players()
+        num_players = len(players)
+        #print("num_players: ", num_players)
+        silos = [[] for _ in range(num_silos)]
+        for i, player in enumerate(players):
+            if self.round_number == 1:
+                player.silo_num = math.floor(num_silos * i/num_players)
+            else:
+                player.silo_num = player.in_round(1).silo_num
+            silos[player.silo_num].append(player)
+        # print(silos)
+        group_matrix = []
+        for silo in silos:
+            # if config['mean_matching']:
+            #     silo_matrix = [silo]
+            # else:
+            silo_matrix = []
+            ppg = self.config['num_players']
+            for i in range(0, len(silo), ppg):
+                silo_matrix.append(silo[i:i+ppg])
+            group_matrix.extend(otree.common._group_randomly(
+                silo_matrix, fixed_id_in_group))
+        # print(silo_matrix)
+        # print(group_matrix)
+        self.set_group_matrix(group_matrix)
+
         for p in self.get_players():
             p.init_cash_inv()
+
+    @property
+    def config(self):
+        try:
+            return parse_config(self.session.config['config_file'])[self.round_number-1]
+        except IndexError:
+            return None
 
 
 def init_copies():
@@ -1028,6 +1079,8 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    silo_num = models.IntegerField()
+
     cash = models.FloatField(initial=5000)
     inventory = models.FloatField(initial=500)
     num_buys = models.IntegerField(initial=0)
