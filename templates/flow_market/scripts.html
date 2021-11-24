@@ -1939,11 +1939,13 @@
   }
 
   function liveRecv(data) {
-    if (ROUND_NUMBER !== data['round']) {
-      // console.log("wrong round")
-      console.log("data", data)
-      return;
-    }
+    // This was a hack for preventing previous update()'s from affecting the current round
+    // A better solution would be to just find a way to get a reference to the interval in the backend and delete it before moving on to the next round
+    // if (ROUND_NUMBER !== data['round']) {
+    //   // console.log("wrong round")
+    //   console.log("data", data)
+    //   return;
+    // }
 
 
     // console.timeEnd(`timing`);
