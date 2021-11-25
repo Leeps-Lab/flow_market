@@ -1235,7 +1235,7 @@ class Player(BasePlayer):
             self.num_buys += 1
         if order['direction'] == 'sell':
             self.num_sells += 1
-
+        '''
         Order.objects.create(player=self,
                              group=self.group,
                              orderID=self.currentID,
@@ -1249,7 +1249,7 @@ class Player(BasePlayer):
                              executed_units=order['executed_units'],
                              q_total=order['q_total'],
                              expiration_time=order['expiration_time'])
-
+        '''
         # self.group.new_order(order, self.id_in_group, self.currentID)
         self.group.new_algo_order(order, self.id_in_group, self.currentID)
 
@@ -1266,15 +1266,13 @@ class Player(BasePlayer):
         if order['direction'] == 'sell':
             self.num_sells += 1
 
-        Order.objects.create(player=self,
+        State.objects.create(player=self,
                              group=self.group,
-                             orderID=self.currentID,
-                             direction=order['direction'],
-                             q_max=order['q_max'],
-                             u_max=order['u_max'],
-                             p_min=order['p_min'],
-                             p_max=order['p_max'],
-                             status=order['status'])
+                             cash=self.cash,
+                             inventory=self.inventory,
+                             trading=False,
+                             bet=False,
+                             time=time.time())
 
         self.group.new_order(order, self.id_in_group, self.currentID)
 
@@ -1300,17 +1298,26 @@ class Player(BasePlayer):
         self.update_negative_inventory()
 
 
-class Order(ExtraModel):
+class State(ExtraModel):
     player = models.Link(Player)
     group = models.Link(Group)
-    orderID = models.StringField()
-    direction = models.StringField()  # 'buy', 'sell'
-    q_max = models.FloatField()
-    u_max = models.FloatField()
-    p_min = models.FloatField()
-    p_max = models.FloatField()
-    status = models.StringField()
 
-    executed_units = models.IntegerField()
-    q_total = models.IntegerField()
-    expiration_time = models.IntegerField()
+    cash = models.FloatField()
+    inventory = models.FloatField()
+
+    trading = models.BooleanField()
+
+    bet = models.BooleanField() # Active or Inactive
+
+    time = models.FloatField()
+
+def custom_export(players):
+    yield ['participant', 'cash', 'inventory', 'trading', 'bet', 'time']
+
+    for player in players:
+        participant = player.participant
+
+        states = State.objects.filter(player=player)
+
+        for s in states:
+            yield [participant.code, s.cash, s.inventory, s.trading, s.bet, s.time]
