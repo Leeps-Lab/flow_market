@@ -120,6 +120,9 @@ class Subsession(BaseSubsession):
         # print(group_matrix)
         self.set_group_matrix(group_matrix)
 
+        for g in self.get_groups():
+            g.begin_time()
+
         for p in self.get_players():
             p.init_cash_inv()
 
@@ -136,6 +139,8 @@ def init_copies():
 
 
 class Group(BaseGroup):
+    begin_time = models.FloatField()
+
     # probably don't need this since it can be inferred from index
     order_num = models.IntegerField(initial=0)
     round_number_old = models.IntegerField(initial=1)
@@ -146,6 +151,9 @@ class Group(BaseGroup):
     # order_copies[player_id_in_group][order_id]
     order_copies = JSONField(null=True, default=init_copies)
     cancellationQueue = JSONField(null=True, default={})
+
+    def begin_time(self):
+        self.begin_time = time.time()
 
     def set_should_pause_after_bet(self, should_pause=False):
         if should_pause:
@@ -288,6 +296,8 @@ class Group(BaseGroup):
     # HERE works execute_bet
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
+        for p in self.get_players():
+            p.record_state('begin bet')
 
         if data['direction'] == 'buy':
             player.updateProfit(
@@ -313,6 +323,8 @@ class Group(BaseGroup):
             "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data, 'round': self.round_number}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
+        for p in self.get_players():
+            player.record_state('end bet')
 
     def input_order_file(self):
         order_file = self.order_file()
@@ -565,6 +577,7 @@ class Group(BaseGroup):
 
                         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                             0].participant._index_in_pages, payloads)
+                p.record_state("cancelled order")
 
             self.order_copies = cache
             self.save()
@@ -1046,6 +1059,7 @@ class Group(BaseGroup):
                     for player in self.get_players():
                         payloads[player.participant.code] = {
                             "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
+                        player.record_state("expired order")
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
@@ -1265,16 +1279,21 @@ class Player(BasePlayer):
             self.num_buys += 1
         if order['direction'] == 'sell':
             self.num_sells += 1
+        
+        for p in self.group.get_players():
+            p.record_state('new order') # Record State on New Order
 
+        self.group.new_order(order, self.id_in_group, self.currentID)
+    
+    def record_state(self, event):
         State.objects.create(player=self,
                              group=self.group,
                              cash=self.cash,
                              inventory=self.inventory,
                              trading=False,
                              bet=False,
-                             time=time.time())
-
-        self.group.new_order(order, self.id_in_group, self.currentID)
+                             time=self.group.begin_time - time.time(),
+                             event=event)
 
     def updateProfit(self, profit, calling_from_bets=False, debug=False):
         self.cash += profit
@@ -1311,8 +1330,10 @@ class State(ExtraModel):
 
     time = models.FloatField()
 
+    event = models.StringField()
+
 def custom_export(players):
-    yield ['participant', 'cash', 'inventory', 'trading', 'bet', 'time']
+    yield ['participant', 'cash', 'inventory', 'trading', 'bet', 'time', 'event']
 
     for player in players:
         participant = player.participant
@@ -1320,4 +1341,4 @@ def custom_export(players):
         states = State.objects.filter(player=player)
 
         for s in states:
-            yield [participant.code, s.cash, s.inventory, s.trading, s.bet, s.time]
+            yield [participant.code, s.cash, s.inventory, s.trading, s.bet, s.time, s.event]
