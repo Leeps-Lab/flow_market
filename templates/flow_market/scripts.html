@@ -336,6 +336,7 @@
       return { minPrice, maxPrice, volume, uMax }
     }
 
+    static expirationTimeInput = document.querySelector("#expirationTimeInput")
     static getDraggableGraphAlgoBidData() {
       // console.log(myLineChart.data.datasets[blueVal]["data"]);
       let minPrice // y-axis
@@ -343,6 +344,7 @@
       let unitsAtATime // x-axis
       let uMax // set by default setting
       let totalVolume // input value
+      let expirationTimeInput
 
       // p_min: minPrice,
       // p_max: maxPrice,
@@ -355,13 +357,15 @@
       minPrice = maxPrice
       uMax = parseInt('{{max_u_max}}');
       totalVolume = parseInt(DraggableGraphInput.buyVolInput.value, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput, 10)
 
       return {
         minPrice,
         maxPrice,
         unitsAtATime,
         uMax,
-        totalVolume
+        totalVolume,
+        expirationTimeInput
       }
     }
 
@@ -399,6 +403,7 @@
       let unitsAtATime // x-axis
       let uMax // set by default setting
       let totalVolume // input value
+      let expirationTimeInput
 
       // p_min: minPrice,
       // p_max: maxPrice,
@@ -411,6 +416,7 @@
       minPrice = maxPrice
       uMax = parseInt('{{max_u_max}}');
       totalVolume = parseInt(DraggableGraphInput.sellVolInput.value, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput, 10)
 
       return {
         minPrice,
@@ -923,7 +929,8 @@
         maxPrice,
         unitsAtATime,
         uMax,
-        totalVolume
+        totalVolume,
+        expirationTimeInput
       } = this.getDraggableGraphAlgoBidData();
 
       const order = {
@@ -938,7 +945,7 @@
 
         q_total: totalVolume, // should be determined by input field
         executed_units: 0,
-        expiration_time: 40 // in SECONDS
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentBuyOrder = order
@@ -1060,7 +1067,8 @@
         maxPrice,
         unitsAtATime,
         uMax,
-        totalVolume
+        totalVolume,
+        expirationTimeInput
       } = this.getDraggableGraphAlgoAskData();
 
       const order = {
@@ -1125,6 +1133,20 @@
 
       this.showRedInactive()
       this.isSellButtonSend = true
+    }
+
+    static handleAlgorithmicOrderToggle(e) {
+      this.algoToggle = e.target.checked
+
+      // Change x-axis
+      if (this.algoToggle) {
+        this.config.scales.x.title.text = "Units at a Time"
+      } else {
+        this.config.scales.x.title.text = "Volume"
+      }
+
+      this.myLineChart.options = this.config
+      this.myLineChart.update()
     }
   }
 
