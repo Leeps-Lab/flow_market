@@ -626,6 +626,8 @@ class Group(BaseGroup):
             else:
                 print("ERROR best_ask", best_ask, "best_bid", best_bid)
 
+            future_tx_volume = None
+
             for sell in sells:
                 # Required for CDA execution: add an additional key to the best_bid item
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
@@ -639,6 +641,10 @@ class Group(BaseGroup):
 
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
+                        print("****sell tx_volume 0")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
                         tx_volume = best_bid["q_max_cda_copy"]
 
                         sell_q = sell['q_max_cda_copy']
@@ -647,7 +653,13 @@ class Group(BaseGroup):
                         sell['q_max_cda_copy'] -= best_bid_q
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
+
+                        future_tx_volume = sell_q
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
+                        print("****sell tx_volume 1")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
                         tx_volume = sell['q_max_cda_copy']
 
                         sell_q = sell['q_max_cda_copy']
@@ -657,8 +669,12 @@ class Group(BaseGroup):
                         best_bid['q_max_cda_copy'] -= sell_q
                         best_bid['expired_by_cda_sell'] = True
 
-                        pass
+                        future_tx_volume = sell_q
                     else:  # TODO look into
+                        print("****sell tx_volume 2")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
                         tx_volume = sell['q_max_cda_copy']
 
                         sell_q = sell['q_max_cda_copy']
@@ -666,7 +682,8 @@ class Group(BaseGroup):
 
                         sell['q_max_cda_copy'] = 0
                         best_bid['q_max_cda_copy'] -= sell_q
-                        pass
+
+                        future_tx_volume = sell_q
                 elif self.treatment_val == "flo":  # TODO copy
                     # Decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
@@ -809,8 +826,18 @@ class Group(BaseGroup):
                 if (not ("q_max_cda_copy" in buy)):
                     buy["q_max_cda_copy"] = buy["q_max"]
 
+                tx_volume = None
+
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:  # TODO look into
+                    if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:
+                        print("****tx_volume 0")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = best_ask["q_max_cda_copy"]
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -819,6 +846,14 @@ class Group(BaseGroup):
                         best_ask['expired_by_cda_buy'] = True
 
                     elif buy['q_max_cda_copy'] == best_ask["q_max_cda_copy"]:
+                        print("****tx_volume 1")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = buy['q_max_cda_copy']
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -827,7 +862,15 @@ class Group(BaseGroup):
                         best_ask['expired_by_cda_buy'] = True
 
                         pass
-                    else:  # TODO look into
+                    else:
+                        print("****tx_volume 2")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = buy['q_max_cda_copy']
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -850,42 +893,29 @@ class Group(BaseGroup):
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
                     # if algo buy, then use algo_price
-                    if buy['direction'] == 'algo_buy':
-                        q_to_use = best_ask['q_max']
-                        if buy['q_max'] < best_ask['q_max']:
-                            q_to_use = buy['q_max']
+                    print("***buy:", buy)
+                    print("***best_ask:", best_ask)
+                    # print("**buy update price old:", player.cash, "best_ask_q:",
+                    #       best_ask['q_max'], "clearing price:", cda_clearing_price, "-best_ask_q*clearing_price:", -best_ask["q_max"] * cda_clearing_price)
+                    # buyer.updateProfit(-best_ask["q_max"] *
+                    #                    cda_clearing_price, False, buy["player"] == 1)
+                    # buyer.updateVolume(best_ask["q_max"])
 
-                        print("type best_ask", type(
-                            best_ask["q_max"]), "type cda", type(cda_clearing_price))
-                        print("algo buy update price old:", player.cash, "best_ask:",
-                              q_to_use, "clearing price:", cda_clearing_price, "a*b:", -q_to_use * cda_clearing_price)
-                        buyer.updateProfit(-q_to_use *
-                                           cda_clearing_price, False, buy["player"] == 1)
-                        buyer.updateVolume(q_to_use)
+                    print("***tx_volume:", tx_volume, "cda_clearing_price:",
+                          cda_clearing_price, "updateProfit:", -tx_volume*cda_clearing_price)
 
-                        if "executedProfit" not in buy:
-                            buy['executedProfit'] = 0
-                        if "executedVolume" not in buy:
-                            buy['executedVolume'] = 0
+                    buyer.updateProfit(-tx_volume *
+                                       cda_clearing_price, False, buy["player"] == 1)
+                    buyer.updateVolume(tx_volume)
 
-                        buy['executedProfit'] += - \
-                            q_to_use * cda_clearing_price
-                        buy['executedVolume'] += q_to_use
-                    else:
-                        print("**buy update price old:", player.cash, "best_ask_q:",
-                              best_ask['q_max'], "clearing price:", cda_clearing_price, "-best_ask_q*clearing_price:", -best_ask["q_max"] * cda_clearing_price)
-                        buyer.updateProfit(-best_ask["q_max"] *
-                                           cda_clearing_price, False, buy["player"] == 1)
-                        buyer.updateVolume(best_ask["q_max"])
+                    if "executedProfit" not in buy:
+                        buy['executedProfit'] = 0
+                    if "executedVolume" not in buy:
+                        buy['executedVolume'] = 0
 
-                        if "executedProfit" not in buy:
-                            buy['executedProfit'] = 0
-                        if "executedVolume" not in buy:
-                            buy['executedVolume'] = 0
-
-                        buy['executedProfit'] += - \
-                            best_ask["q_max"] * cda_clearing_price
-                        buy['executedVolume'] += best_ask["q_max"]
+                    buy['executedProfit'] += - \
+                        tx_volume * cda_clearing_price
+                    buy['executedVolume'] += tx_volume
 
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
