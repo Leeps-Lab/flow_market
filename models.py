@@ -654,7 +654,7 @@ class Group(BaseGroup):
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
 
-                        future_tx_volume = sell_q
+                        future_tx_volume = best_bid_q
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
                         print("****sell tx_volume 1")
                         print("****sell", sell)
