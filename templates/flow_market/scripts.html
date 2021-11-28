@@ -954,7 +954,7 @@
       appendActiveOrdersTable(order);
       liveSend(order);
 
-      console.log("sent algo buy order: ", order)
+      console.log("**sent algo buy order: ", order)
     }
 
     static handleCancelBuyButtonClick() {
@@ -971,7 +971,7 @@
       liveSend(order);
     }
 
-    static algoToggle = true;
+    static algoToggle = false;
 
     static handleBuyButtonClick() {
       if (!this.isBuyButtonSend) {
@@ -2334,7 +2334,7 @@
     appendActiveOrdersTable(order);
     liveSend(order);
 
-    console.log("**error order:", order)
+    console.log("**sending algo_buy:", order)
 
     // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
 
@@ -2454,7 +2454,7 @@
     appendActiveOrdersTable(order);
     liveSend(order);
 
-    console.log("**error order:", order)
+    console.log("**sending algo_sell:", order)
 
     // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
 
