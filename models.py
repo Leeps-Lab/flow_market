@@ -121,7 +121,7 @@ class Subsession(BaseSubsession):
         self.set_group_matrix(group_matrix)
 
         for g in self.get_groups():
-            g.begin_time()
+            g.set_begin_time()
 
         for p in self.get_players():
             p.init_cash_inv()
@@ -152,7 +152,7 @@ class Group(BaseGroup):
     order_copies = JSONField(null=True, default=init_copies)
     cancellationQueue = JSONField(null=True, default={})
 
-    def begin_time(self):
+    def set_begin_time(self):
         self.begin_time = time.time()
 
     def set_should_pause_after_bet(self, should_pause=False):
@@ -287,6 +287,8 @@ class Group(BaseGroup):
                 'deadline': int(row['deadline']),
                 'bet_id': self.get_bet_id(rowNum),
             }
+            player.record_state('begin bet')
+            player.activate_bet(data['quantity'], data['limit_price'], data['deadline'])
             call_with_delay((int(row['deadline'])/1000),
                             self.execute_bet, data)
             rowNum += 1
@@ -296,8 +298,6 @@ class Group(BaseGroup):
     # HERE works execute_bet
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
-        for p in self.get_players():
-            p.record_state('begin bet')
 
         if data['direction'] == 'buy':
             player.updateProfit(
@@ -323,8 +323,9 @@ class Group(BaseGroup):
             "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data, 'round': self.round_number}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
-        for p in self.get_players():
-            player.record_state('end bet')
+        
+        player.deactivate_bet()
+        player.record_state('end bet')
 
     def input_order_file(self):
         order_file = self.order_file()
@@ -735,10 +736,12 @@ class Group(BaseGroup):
                         sell['q_max_cda_copy'] = 0
                         best_bid['q_max_cda_copy'] -= sell_q
                         pass
+                    seller.update_trading_state(True, '-', best_bid['p_max'], sell_q)
                 elif self.treatment_val == "flo":  # TODO copy
                     # Decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
                     sell['q_max'] -= trader_vol
+                    seller.update_trading_state(True, '-', clearing_price, trade_vol)
 
                 cache = self.order_copies
 
@@ -805,6 +808,7 @@ class Group(BaseGroup):
                     self.order_copies = cache
                     self.save()
                     sell['status'] = 'expired'
+                    seller.update_trading_state(False, None, None, None)
 
                     if sell['direction'] == 'algo_sell':
                         sell['executed_units'] += sell['q_max']
@@ -871,6 +875,7 @@ class Group(BaseGroup):
                     for player in self.get_players():
                         payloads[player.participant.code] = {
                             "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
+                        player.record_state("expired order")
 
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
@@ -929,10 +934,12 @@ class Group(BaseGroup):
                         buy['q_max_cda_copy'] = 0
                         best_ask['q_max_cda_copy'] -= buy_q
                         pass
+                    buyer.update_trading_state(True, '+', best_ask['p_max'], buy_q)
                 elif (self.treatment_val == "flo"):
                     # decrement remaining quantity of order
                     trader_vol = self.calcDemand(buy, clearing_price)
                     buy['q_max'] -= trader_vol
+                    buyer.update_trading_state(True, '+', clearing_price, trade_vol)
                 else:
                     if (best_ask != None):
                         pass
@@ -1008,6 +1015,8 @@ class Group(BaseGroup):
                     self.order_copies = cache
                     self.save()
                     buy['status'] = 'expired'
+
+                    buyer.update_trading_state(False, None, None, None)
 
                     print("EXPIRED buy", buy)
 
@@ -1129,6 +1138,16 @@ class Player(BasePlayer):
     updateRunning = models.BooleanField(initial=False)
     currentID = models.StringField()
 
+    trading = models.BooleanField(initial=False)
+    sign = models.StringField()
+    trading_price = models.FloatField()
+    trading_rate = models.FloatField()
+
+    active_bet = models.BooleanField(initial=False)
+    bet_quantity = models.IntegerField()
+    bet_price = models.IntegerField()
+    bet_deadline = models.IntegerField()
+
     def init_cash_inv(self):
         self.cash = self.group.start_cash()
         self.inventory = self.group.start_inv()
@@ -1249,7 +1268,7 @@ class Player(BasePlayer):
             self.num_buys += 1
         if order['direction'] == 'sell':
             self.num_sells += 1
-        '''
+
         Order.objects.create(player=self,
                              group=self.group,
                              orderID=self.currentID,
@@ -1263,7 +1282,7 @@ class Player(BasePlayer):
                              executed_units=order['executed_units'],
                              q_total=order['q_total'],
                              expiration_time=order['expiration_time'])
-        '''
+
         # self.group.new_order(order, self.id_in_group, self.currentID)
         self.group.new_algo_order(order, self.id_in_group, self.currentID)
 
@@ -1280,6 +1299,16 @@ class Player(BasePlayer):
         if order['direction'] == 'sell':
             self.num_sells += 1
         
+        Order.objects.create(player=self,
+                             group=self.group,
+                             orderID=self.currentID,
+                             direction=order['direction'],
+                             q_max=order['q_max'],
+                             u_max=order['u_max'],
+                             p_min=order['p_min'],
+                             p_max=order['p_max'],
+                             status=order['status'])
+
         for p in self.group.get_players():
             p.record_state('new order') # Record State on New Order
 
@@ -1290,10 +1319,34 @@ class Player(BasePlayer):
                              group=self.group,
                              cash=self.cash,
                              inventory=self.inventory,
-                             trading=False,
-                             bet=False,
-                             time=self.group.begin_time - time.time(),
+                             trading=self.trading,
+                             sign=self.sign,
+                             trading_price=self.trading_price,
+                             trading_rate=self.trading_rate,
+                             bet=self.active_bet,
+                             bet_quantity=self.bet_quantity,
+                             bet_price=self.bet_price,
+                             bet_deadline=self.bet_deadline,
+                             time=(time.time() - self.group.begin_time),
                              event=event)
+    
+    def update_trading_state(self, trading, sign, price, rate):
+        self.trading = trading
+        self.sign = sign
+        self.trading_price = price
+        self.trading_rate = rate
+    
+    def activate_bet(self, quantity, price, deadline):
+        self.active_bet = True
+        self.bet_quantity = quantity
+        self.bet_price = price
+        self.bet_deadline = deadline
+
+    def deactivate_bet(self):
+        self.active_bet = False
+        self.bet_quantity = None
+        self.bet_price = None
+        self.bet_deadline = None
 
     def updateProfit(self, profit, calling_from_bets=False, debug=False):
         self.cash += profit
@@ -1316,6 +1369,20 @@ class Player(BasePlayer):
 
         self.update_negative_inventory()
 
+class Order(ExtraModel):
+    player = models.Link(Player)
+    group = models.Link(Group)
+    orderID = models.StringField()
+    direction = models.StringField()  # 'buy', 'sell'
+    q_max = models.FloatField()
+    u_max = models.FloatField()
+    p_min = models.FloatField()
+    p_max = models.FloatField()
+    status = models.StringField()
+
+    executed_units = models.IntegerField()
+    q_total = models.IntegerField()
+    expiration_time = models.IntegerField()
 
 class State(ExtraModel):
     player = models.Link(Player)
@@ -1325,15 +1392,22 @@ class State(ExtraModel):
     inventory = models.FloatField()
 
     trading = models.BooleanField()
+    sign = models.StringField()
+    trading_price = models.FloatField()
+    trading_rate = models.FloatField()
 
     bet = models.BooleanField() # Active or Inactive
+    # If Active
+    bet_quantity = models.IntegerField()
+    bet_price = models.IntegerField()
+    bet_deadline = models.IntegerField()
 
     time = models.FloatField()
 
     event = models.StringField()
 
 def custom_export(players):
-    yield ['participant', 'cash', 'inventory', 'trading', 'bet', 'time', 'event']
+    yield ['participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
 
     for player in players:
         participant = player.participant
@@ -1341,4 +1415,4 @@ def custom_export(players):
         states = State.objects.filter(player=player)
 
         for s in states:
-            yield [participant.code, s.cash, s.inventory, s.trading, s.bet, s.time, s.event]
+            yield [participant.code, s.cash, s.inventory, s.trading, s.sign, s.trading_price, s.trading_rate, s.bet, s.bet_quantity, s.bet_price, s.bet_deadline, s.time, s.event]
