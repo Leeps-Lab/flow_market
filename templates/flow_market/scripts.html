@@ -304,12 +304,14 @@
       DraggableGraphInput.myLineChart.update();
     }
 
+    static expirationTimeInput = document.querySelector("#expirationTimeInput")
     static getDraggableGraphBidData() {
       // console.log(myLineChart.data.datasets[blueVal]["data"]);
       let minPrice
       let maxPrice
       let volume
       let uMax
+      let expirationTimeInput
 
       if (isFLO) {
         maxPrice = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.yPointVal]["y"];
@@ -324,6 +326,7 @@
         // console.log("sell:", DraggableGraphInput.sellVolInput.value)
 
         console.log(minPrice, maxPrice, uMax);
+
       } else if (isCDA) {
         maxPrice =
           DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePoint]["y"];
@@ -333,10 +336,13 @@
         console.log("send order", maxPrice, volume);
       }
 
-      return { minPrice, maxPrice, volume, uMax }
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+      console.log("**time0:", this.expirationTimeInput)
+      console.log("**time0:", expirationTimeInput)
+
+      return { minPrice, maxPrice, volume, uMax, expirationTimeInput }
     }
 
-    static expirationTimeInput = document.querySelector("#expirationTimeInput")
     static getDraggableGraphAlgoBidData() {
       // console.log(myLineChart.data.datasets[blueVal]["data"]);
       let minPrice // y-axis
@@ -357,7 +363,9 @@
       minPrice = maxPrice
       uMax = parseInt('{{max_u_max}}');
       totalVolume = parseInt(DraggableGraphInput.buyVolInput.value, 10)
-      expirationTimeInput = parseInt(this.expirationTimeInput, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+
+      console.log("**time1:", expirationTimeInput)
 
       return {
         minPrice,
@@ -375,6 +383,7 @@
       let maxPrice
       let volume
       let uMax
+      let expirationTimeInput
 
       // console.log(myLineChart.data.datasets[redVal]["data"]);
       if (isFLO) {
@@ -394,7 +403,9 @@
         console.log(maxPrice, volume);
       }
 
-      return { minPrice, maxPrice, volume, uMax }
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+
+      return { minPrice, maxPrice, volume, uMax, expirationTimeInput }
     }
 
     static getDraggableGraphAlgoAskData() {
@@ -416,7 +427,7 @@
       minPrice = maxPrice
       uMax = parseInt('{{max_u_max}}');
       totalVolume = parseInt(DraggableGraphInput.sellVolInput.value, 10)
-      expirationTimeInput = parseInt(this.expirationTimeInput, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
 
       return {
         minPrice,
@@ -878,8 +889,10 @@
     }
 
     static sendNewBuyFromDraggableGraph() {
-      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
+      let { minPrice, maxPrice, volume, uMax, expirationTimeInput } = DraggableGraphInput.getDraggableGraphBidData()
 
+      // expirationTimeInput = 99
+      console.log("**time:", expirationTimeInput)
       const order = {
         p_min: minPrice,
         p_max: maxPrice,
@@ -889,6 +902,7 @@
         status: 'active',
         timestamp: performance.now(),
         orderID: uuidv4(),
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentBuyOrder = order
@@ -1013,7 +1027,7 @@
     static recentBuyOrder = null
 
     static sendNewSellFromDraggableGraph() {
-      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
+      let { minPrice, maxPrice, volume, uMax, expirationTimeInput } = DraggableGraphInput.getDraggableGraphAskData()
 
       if (minPrice > maxPrice) {
         console.error("minPrice > maxPrice")
@@ -1029,12 +1043,15 @@
         status: 'active',
         timestamp: performance.now(),
         orderID: uuidv4(),
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentSellOrder = order
+      console.log("**sendSell order:", order)
 
       const valueToBeat = isNewOrderValid(order); // undefined means order is good
       if (valueToBeat === undefined) {
+        console.log("**sendSell order1:", order)
         orderHistory.push(order);
         appendActiveOrdersTable(order);
         liveSend(order);
@@ -1083,7 +1100,7 @@
 
         q_total: totalVolume, // should be determined by input field
         executed_units: 0,
-        expiration_time: 40 // in SECONDS
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentBuyOrder = order

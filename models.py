@@ -324,11 +324,16 @@ class Group(BaseGroup):
             'status': order['status'],
             'orderID': currentID,
             'orderNum': self.order_num,
+
+            'expiration_time': order['expiration_time']
         }
 
         self.order_num += 1
         self.order_copies = cache
         self.save()
+
+        call_with_delay(order['expiration_time'], self.addToCancellationQueue,
+                        cache[str(playerID)][str(currentID)])
 
     def buys(self):
         buys_list = []
@@ -1152,6 +1157,7 @@ class Player(BasePlayer):
                 self.new_algo_order(data)
             else:
                 # Input new order
+                print("**expirationDebug:", data)
                 self.new_order(data)
 
             return_data = {'type': data['direction'], 'buys': self.group.buys(
@@ -1207,6 +1213,8 @@ class Player(BasePlayer):
         self.p_max = order['p_max']
         self.status = order['status']
 
+        self.expiration_time = order['expiration_time']
+
         if order['direction'] == 'buy':
             self.num_buys += 1
         if order['direction'] == 'sell':
@@ -1220,7 +1228,8 @@ class Player(BasePlayer):
                              u_max=order['u_max'],
                              p_min=order['p_min'],
                              p_max=order['p_max'],
-                             status=order['status'])
+                             status=order['status'],
+                             expiration_time=order['expiration_time'])
 
         self.group.new_order(order, self.id_in_group, self.currentID)
 
