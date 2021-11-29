@@ -230,7 +230,8 @@ class Group(BaseGroup):
                 'bet_id': self.get_bet_id(rowNum),
             }
             player.record_state('begin bet')
-            player.activate_bet(data['quantity'], data['limit_price'], data['deadline'])
+            player.activate_bet(
+                data['quantity'], data['limit_price'], data['deadline'])
             call_with_delay((int(row['deadline'])/1000),
                             self.execute_bet, data)
             rowNum += 1
@@ -263,7 +264,7 @@ class Group(BaseGroup):
             "type": 'bets update', "cash": player.cash, "inventory": player.inventory, "bet": data, 'round': self.round_number}
         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                              0].participant._index_in_pages, payloads)
-        
+
         player.deactivate_bet()
         player.record_state('end bet')
 
@@ -702,17 +703,18 @@ class Group(BaseGroup):
                         sell['q_max_cda_copy'] = 0
                         best_bid['q_max_cda_copy'] -= sell_q
 
-
                         future_tx_volume = sell_q
 
                         pass
-                    seller.update_trading_state(True, '-', best_bid['p_max'], sell_q)
+                    seller.update_trading_state(
+                        True, '-', best_bid['p_max'], sell_q)
 
                 elif self.treatment_val == "flo":  # TODO copy
                     # Decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
                     sell['q_max'] -= trader_vol
-                    seller.update_trading_state(True, '-', clearing_price, trade_vol)
+                    seller.update_trading_state(
+                        True, '-', clearing_price, trader_vol)
 
                 cache = self.order_copies
 
@@ -904,12 +906,14 @@ class Group(BaseGroup):
                         buy['q_max_cda_copy'] = 0
                         best_ask['q_max_cda_copy'] -= buy_q
                         pass
-                    buyer.update_trading_state(True, '+', best_ask['p_max'], buy_q)
+                    buyer.update_trading_state(
+                        True, '+', best_ask['p_max'], buy_q)
                 elif (self.treatment_val == "flo"):
                     # decrement remaining quantity of order
                     trader_vol = self.calcDemand(buy, clearing_price)
                     buy['q_max'] -= trader_vol
-                    buyer.update_trading_state(True, '+', clearing_price, trade_vol)
+                    buyer.update_trading_state(
+                        True, '+', clearing_price, trader_vol)
                 else:
                     if (best_ask != None):
                         pass
@@ -1256,7 +1260,7 @@ class Player(BasePlayer):
             self.num_buys += 1
         if order['direction'] == 'sell':
             self.num_sells += 1
-        
+
         Order.objects.create(player=self,
                              group=self.group,
                              orderID=self.currentID,
@@ -1269,10 +1273,10 @@ class Player(BasePlayer):
                              expiration_time=order['expiration_time'])
 
         for p in self.group.get_players():
-            p.record_state('new order') # Record State on New Order
+            p.record_state('new order')  # Record State on New Order
 
         self.group.new_order(order, self.id_in_group, self.currentID)
-    
+
     def record_state(self, event):
         State.objects.create(player=self,
                              group=self.group,
@@ -1288,13 +1292,13 @@ class Player(BasePlayer):
                              bet_deadline=self.bet_deadline,
                              time=(time.time() - self.group.begin_time),
                              event=event)
-    
+
     def update_trading_state(self, trading, sign, price, rate):
         self.trading = trading
         self.sign = sign
         self.trading_price = price
         self.trading_rate = rate
-    
+
     def activate_bet(self, quantity, price, deadline):
         self.active_bet = True
         self.bet_quantity = quantity
@@ -1328,6 +1332,7 @@ class Player(BasePlayer):
 
         self.update_negative_inventory()
 
+
 class Order(ExtraModel):
     player = models.Link(Player)
     group = models.Link(Group)
@@ -1343,6 +1348,7 @@ class Order(ExtraModel):
     q_total = models.IntegerField()
     expiration_time = models.IntegerField()
 
+
 class State(ExtraModel):
     player = models.Link(Player)
     group = models.Link(Group)
@@ -1355,7 +1361,7 @@ class State(ExtraModel):
     trading_price = models.FloatField()
     trading_rate = models.FloatField()
 
-    bet = models.BooleanField() # Active or Inactive
+    bet = models.BooleanField()  # Active or Inactive
     # If Active
     bet_quantity = models.IntegerField()
     bet_price = models.IntegerField()
@@ -1364,6 +1370,7 @@ class State(ExtraModel):
     time = models.FloatField()
 
     event = models.StringField()
+
 
 def custom_export(players):
     yield ['participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
