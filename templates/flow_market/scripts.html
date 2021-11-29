@@ -304,12 +304,14 @@
       DraggableGraphInput.myLineChart.update();
     }
 
+    static expirationTimeInput = document.querySelector("#expirationTimeInput")
     static getDraggableGraphBidData() {
       // console.log(myLineChart.data.datasets[blueVal]["data"]);
       let minPrice
       let maxPrice
       let volume
       let uMax
+      let expirationTimeInput
 
       if (isFLO) {
         maxPrice = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.yPointVal]["y"];
@@ -324,6 +326,7 @@
         // console.log("sell:", DraggableGraphInput.sellVolInput.value)
 
         console.log(minPrice, maxPrice, uMax);
+
       } else if (isCDA) {
         maxPrice =
           DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePoint]["y"];
@@ -333,7 +336,45 @@
         console.log("send order", maxPrice, volume);
       }
 
-      return { minPrice, maxPrice, volume, uMax }
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+      console.log("**time0:", this.expirationTimeInput)
+      console.log("**time0:", expirationTimeInput)
+
+      return { minPrice, maxPrice, volume, uMax, expirationTimeInput }
+    }
+
+    static getDraggableGraphAlgoBidData() {
+      // console.log(myLineChart.data.datasets[blueVal]["data"]);
+      let minPrice // y-axis
+      let maxPrice // same as minPrice
+      let unitsAtATime // x-axis
+      let uMax // set by default setting
+      let totalVolume // input value
+      let expirationTimeInput
+
+      // p_min: minPrice,
+      // p_max: maxPrice,
+      // q_max: unitsAtATime, // units at a time, should be determined by x-axis
+      // q_total: tempTotalVolume, // should be determined by input field
+
+      maxPrice =
+        DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePoint]["y"];
+      unitsAtATime = DraggableGraphInput.myLineChart.data.datasets[this.blueVal].data[this.cdaMiddlePointVal]["x"];
+      minPrice = maxPrice
+      uMax = parseInt('{{max_u_max}}');
+      totalVolume = parseInt(DraggableGraphInput.buyVolInput.value, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+
+      console.log("**time1:", expirationTimeInput)
+
+      return {
+        minPrice,
+        maxPrice,
+        unitsAtATime,
+        uMax,
+        totalVolume,
+        expirationTimeInput
+      }
     }
 
     static getDraggableGraphAskData() {
@@ -342,6 +383,7 @@
       let maxPrice
       let volume
       let uMax
+      let expirationTimeInput
 
       // console.log(myLineChart.data.datasets[redVal]["data"]);
       if (isFLO) {
@@ -361,7 +403,39 @@
         console.log(maxPrice, volume);
       }
 
-      return { minPrice, maxPrice, volume, uMax }
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+
+      return { minPrice, maxPrice, volume, uMax, expirationTimeInput }
+    }
+
+    static getDraggableGraphAlgoAskData() {
+      let minPrice // y-axis
+      let maxPrice // same as minPrice
+      let unitsAtATime // x-axis
+      let uMax // set by default setting
+      let totalVolume // input value
+      let expirationTimeInput
+
+      // p_min: minPrice,
+      // p_max: maxPrice,
+      // q_max: unitsAtATime, // units at a time, should be determined by x-axis
+      // q_total: tempTotalVolume, // should be determined by input field
+
+      maxPrice =
+        DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.cdaMiddlePoint]["y"];
+      unitsAtATime = DraggableGraphInput.myLineChart.data.datasets[this.redVal].data[this.middlePointVal]["x"];
+      minPrice = maxPrice
+      uMax = parseInt('{{max_u_max}}');
+      totalVolume = parseInt(DraggableGraphInput.sellVolInput.value, 10)
+      expirationTimeInput = parseInt(this.expirationTimeInput.value, 10)
+
+      return {
+        minPrice,
+        maxPrice,
+        unitsAtATime,
+        uMax,
+        totalVolume
+      }
     }
 
     static config = {
@@ -815,8 +889,10 @@
     }
 
     static sendNewBuyFromDraggableGraph() {
-      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphBidData()
+      let { minPrice, maxPrice, volume, uMax, expirationTimeInput } = DraggableGraphInput.getDraggableGraphBidData()
 
+      // expirationTimeInput = 99
+      console.log("**time:", expirationTimeInput)
       const order = {
         p_min: minPrice,
         p_max: maxPrice,
@@ -826,6 +902,7 @@
         status: 'active',
         timestamp: performance.now(),
         orderID: uuidv4(),
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentBuyOrder = order
@@ -859,6 +936,41 @@
       }
     }
 
+    // TODO: copy from new_algo_buy
+    static sendNewAlgoBuyFromDraggableGraph() {
+      let {
+        minPrice,
+        maxPrice,
+        unitsAtATime,
+        uMax,
+        totalVolume,
+        expirationTimeInput
+      } = this.getDraggableGraphAlgoBidData();
+
+      const order = {
+        p_min: minPrice,
+        p_max: maxPrice,
+        q_max: unitsAtATime, // units at a time, should be determined by x-axis
+        u_max: uMax,
+        direction: 'algo_buy',
+        status: 'active',
+        timestamp: performance.now(),
+        orderID: uuidv4(),
+
+        q_total: totalVolume, // should be determined by input field
+        executed_units: 0,
+        expiration_time: expirationTimeInput // in SECONDS
+      };
+
+      this.recentBuyOrder = order
+
+      orderHistory.push(order);
+      appendActiveOrdersTable(order);
+      liveSend(order);
+
+      console.log("**sent algo buy order: ", order)
+    }
+
     static handleCancelBuyButtonClick() {
       let order = JSON.parse(JSON.stringify(this.recentBuyOrder))
       order.direction = 'cancel'
@@ -873,6 +985,8 @@
       liveSend(order);
     }
 
+    static algoToggle = false;
+
     static handleBuyButtonClick() {
       if (!this.isBuyButtonSend) {
         this.turnBuyButtonSend()
@@ -883,7 +997,11 @@
         this.turnBuyButtonCancel()
         this.isBuyButtonSend = false
 
-        this.sendNewBuyFromDraggableGraph()
+        if (this.algoToggle) {
+          this.sendNewAlgoBuyFromDraggableGraph()
+        } else {
+          this.sendNewBuyFromDraggableGraph()
+        }
       }
     }
 
@@ -897,7 +1015,11 @@
         this.turnSellButtonCancel()
         this.isSellButtonSend = false
 
-        this.sendNewSellFromDraggableGraph()
+        if (this.algoToggle) {
+          this.sendNewAlgoSellFromDraggableGraph()
+        } else {
+          this.sendNewSellFromDraggableGraph()
+        }
       }
     }
 
@@ -905,7 +1027,7 @@
     static recentBuyOrder = null
 
     static sendNewSellFromDraggableGraph() {
-      let { minPrice, maxPrice, volume, uMax } = DraggableGraphInput.getDraggableGraphAskData()
+      let { minPrice, maxPrice, volume, uMax, expirationTimeInput } = DraggableGraphInput.getDraggableGraphAskData()
 
       if (minPrice > maxPrice) {
         console.error("minPrice > maxPrice")
@@ -921,12 +1043,15 @@
         status: 'active',
         timestamp: performance.now(),
         orderID: uuidv4(),
+        expiration_time: expirationTimeInput // in SECONDS
       };
 
       this.recentSellOrder = order
+      console.log("**sendSell order:", order)
 
       const valueToBeat = isNewOrderValid(order); // undefined means order is good
       if (valueToBeat === undefined) {
+        console.log("**sendSell order1:", order)
         orderHistory.push(order);
         appendActiveOrdersTable(order);
         liveSend(order);
@@ -951,6 +1076,40 @@
           },
         });
       }
+    }
+
+    static sendNewAlgoSellFromDraggableGraph() {
+      let {
+        minPrice,
+        maxPrice,
+        unitsAtATime,
+        uMax,
+        totalVolume,
+        expirationTimeInput
+      } = this.getDraggableGraphAlgoAskData();
+
+      const order = {
+        p_min: minPrice,
+        p_max: maxPrice,
+        q_max: unitsAtATime, // units at a time, should be determined by x-axis
+        u_max: uMax,
+        direction: 'algo_sell',
+        status: 'active',
+        timestamp: performance.now(),
+        orderID: uuidv4(),
+
+        q_total: totalVolume, // should be determined by input field
+        executed_units: 0,
+        expiration_time: expirationTimeInput // in SECONDS
+      };
+
+      this.recentBuyOrder = order
+
+      orderHistory.push(order);
+      appendActiveOrdersTable(order);
+      liveSend(order);
+
+      console.log("sent algo buy order: ", order)
     }
 
     static buyButton = document.querySelector("#sendBidDraggableGraphInput")
@@ -991,6 +1150,20 @@
 
       this.showRedInactive()
       this.isSellButtonSend = true
+    }
+
+    static handleAlgorithmicOrderToggle(e) {
+      this.algoToggle = e.target.checked
+
+      // Change x-axis
+      if (this.algoToggle) {
+        this.config.scales.x.title.text = "Units at a Time"
+      } else {
+        this.config.scales.x.title.text = "Volume"
+      }
+
+      this.myLineChart.options = this.config
+      this.myLineChart.update()
     }
   }
 
@@ -1132,10 +1305,10 @@
   function updateOrderHistory(data) {
     console.log("**cancel", data, orderHistory)
     orderHistory = orderHistory.filter((order) => {
-      console.log("**cancel do i come here?")
+      console.log("**cancel do i come here?", order)
       let arrayToSearch;
-      if (order.direction === 'buy') arrayToSearch = data.buys;
-      if (order.direction === 'sell') arrayToSearch = data.sells;
+      if (order.direction === 'buy' || order.direction === 'algo_buy') arrayToSearch = data.buys;
+      if (order.direction === 'sell' || order.direction === 'algo_sell') arrayToSearch = data.sells;
       if (arrayToSearch === undefined) console.error('updateOrderHistory()');
 
       console.log("**cancel arrayToSearch", arrayToSearch)
@@ -1152,10 +1325,12 @@
       }
 
       if (orderInData === undefined || orderInData.status === 'expired') {
+        console.log("**algoCancel: got order:", orderInData)
+
         // turn "Cancel Buy" button into "Send Buy"
-        if (order.direction === 'buy')
+        if (order.direction === 'buy' || order.direction === 'algo_buy')
           DraggableGraphInput.turnBuyButtonSend();
-        if (order.direction === 'sell')
+        if (order.direction === 'sell' || order.direction === 'algo_sell')
           DraggableGraphInput.turnSellButtonSend();
 
         // remove from active orders table
@@ -2088,7 +2263,7 @@
     // console.error(parseFloat(data['cash']).toFixed(2));
   }
 
-  function new_algo_buy(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
+  function new_algo_buy(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null, tempTotalVolume = null) {
     console.log("new algo_buy")
     let maxPrice;
     let minPrice;
@@ -2154,16 +2329,20 @@
       // p_max: maxPrice,
       // q_max: volume,
       // u_max: uMax,
-      p_min: 10,
-      p_max: 10,
+      ///////////////////////
+      // p_min: 10,
+      p_min: minPrice,
+      // p_max: 10,
+      p_max: maxPrice,
       u_max: uMax,
       direction: 'algo_buy',
       status: 'active',
       timestamp: performance.now(),
       orderID: uuidv4(),
 
-      q_max: 6, // this is units at a time
-      q_total: 50,
+      q_max: volume, // this is units at a time
+      // q_total: 50, // TODO: need to make new function parameter
+      q_total: tempTotalVolume,
       executed_units: 10,
       expiration_time: 40 // in SECONDS
     };
@@ -2172,7 +2351,7 @@
     appendActiveOrdersTable(order);
     liveSend(order);
 
-    console.log("**error order:", order)
+    console.log("**sending algo_buy:", order)
 
     // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
 
@@ -2292,7 +2471,7 @@
     appendActiveOrdersTable(order);
     liveSend(order);
 
-    console.log("**error order:", order)
+    console.log("**sending algo_sell:", order)
 
     // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
 

@@ -92,11 +92,11 @@ class Subsession(BaseSubsession):
         # fixed_id_in_group = not config['shuffle_role']
         fixed_id_in_group = False  # false
 
-        #print("num_silos: ", num_silos)
+        # print("num_silos: ", num_silos)
 
         players = self.get_players()
         num_players = len(players)
-        #print("num_players: ", num_players)
+        # print("num_players: ", num_players)
         silos = [[] for _ in range(num_silos)]
         for i, player in enumerate(players):
             if self.round_number == 1:
@@ -214,64 +214,6 @@ class Group(BaseGroup):
     def num_players(self):
         return parse_config(self.session.config['config_file'])[self.round_number-1]['num_players']
 
-    # def new_buy_algo(self, data):
-        # time_start = time.time()
-        # payloads = {}
-        # print("data:", data)
-        # while time.time() < time_start + data['expiration_time']:
-        #     print("new while")
-
-        #     # create group of orders
-        #     for i in range(data['quantity_per']):
-        #         print("what? i:", i)
-        #         self.get_player_by_id(data['trader_id']).new_order({
-        #             'p_min': data['p_min'],
-        #             'p_max': data['p_max'],
-        #             'q_max': data['q_max'],
-        #             'u_max': data['u_max'],
-        #             'direction': 'buy',
-        #             'status': 'active',
-        #             'timestamp': data['timestamp']
-        #         })
-
-        #     # Send out updated orderbooks to update graph on frontend
-        #     for player in self.get_players():
-        #         payloads[player.participant.code] = {
-        #             'type': 'buy', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
-        #     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-        #                          0].participant._index_in_pages, payloads)
-
-        #     # time between groups of orders
-        #     time.sleep(2)
-
-    # def new_sell_algo(self, data):
-    #     time_start = time.time()
-    #     payloads = {}
-    #     while time.time() < time_start + data['expiration_time']:
-
-    #         # Create group of orders
-    #         for i in range(data['quantity_per']):
-    #             self.get_player_by_id(data['trader_id']).new_order({
-    #                 'p_min': data['p_min'],
-    #                 'p_max': data['p_max'],
-    #                 'q_max': data['q_max'],
-    #                 'u_max': data['u_max'],
-    #                 'direction': 'sell',
-    #                 'status': 'active',
-    #                 'timestamp': data['timestamp']
-    #             })
-
-    #         # Send out updated orderbooks to update graph on frontend
-    #         for player in self.get_players():
-    #             payloads[player.participant.code] = {
-    #                 'type': 'sell', 'buys': self.buys(), 'sells': self.sells(), 'round': self.round_number}
-
-    #         live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-    #                              0].participant._index_in_pages, payloads)
-
-    #         # time between groups of orders
-    #         time.sleep(2)
-
     def set_bets(self):
         bet_file = self.bet_file()
         with open('flow_market/bets/' + bet_file) as f:
@@ -294,8 +236,6 @@ class Group(BaseGroup):
             rowNum += 1
         return
 
-    # seems to be updating price and inv correctly here for executing bets
-    # HERE works execute_bet
     def execute_bet(self, data):
         player = self.get_player_by_id(data['trader_id'])
 
@@ -397,11 +337,16 @@ class Group(BaseGroup):
             'status': order['status'],
             'orderID': currentID,
             'orderNum': self.order_num,
+
+            'expiration_time': order['expiration_time']
         }
 
         self.order_num += 1
         self.order_copies = cache
         self.save()
+
+        call_with_delay(order['expiration_time'], self.addToCancellationQueue,
+                        cache[str(playerID)][str(currentID)])
 
     def buys(self):
         buys_list = []
@@ -628,7 +573,7 @@ class Group(BaseGroup):
     #     print("avg time elapsed:", statistics.median(times))
     #     time_last = current_time
 
-    def update(self):  # -> event based
+    def update(self):
         # TEST does this update function follow frequency in config?
         # global time_last
         # current_time = time.perf_counter()
@@ -667,7 +612,6 @@ class Group(BaseGroup):
                 payloads[player.participant.code] = {
                     "type": 'clearing_price', "clearing_price": clearing_price, "buys": buys, "sells": sells, 'round': self.round_number}
 
-            print("*graph sending clearing_price")
             live._live_send_back(
                 self.get_players()[0].participant._session_code,
                 self.get_players()[0].participant._index_in_pages,
@@ -701,6 +645,8 @@ class Group(BaseGroup):
             else:
                 print("ERROR best_ask", best_ask, "best_bid", best_bid)
 
+            future_tx_volume = None
+
             for sell in sells:
                 # Required for CDA execution: add an additional key to the best_bid item
                 if (best_bid != None and not ("q_max_cda_copy" in best_bid)):
@@ -710,17 +656,31 @@ class Group(BaseGroup):
 
                 seller = self.get_player_by_id(sell['player'])
                 best_bid_q = None
+                tx_volume = None
 
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-
                     if sell['q_max_cda_copy'] > best_bid["q_max_cda_copy"]:  # TODO look into
+                        print("****sell tx_volume 0")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
+                        tx_volume = best_bid["q_max_cda_copy"]
+
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
                         sell['q_max_cda_copy'] -= best_bid_q
                         best_bid['q_max_cda_copy'] = 0
                         best_bid['expired_by_cda_sell'] = True
+
+                        future_tx_volume = best_bid_q
                     elif sell['q_max_cda_copy'] == best_bid["q_max_cda_copy"]:
+                        print("****sell tx_volume 1")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
+                        tx_volume = sell['q_max_cda_copy']
+
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
@@ -728,15 +688,26 @@ class Group(BaseGroup):
                         best_bid['q_max_cda_copy'] -= sell_q
                         best_bid['expired_by_cda_sell'] = True
 
-                        pass
+                        future_tx_volume = sell_q
                     else:  # TODO look into
+                        print("****sell tx_volume 2")
+                        print("****sell", sell)
+                        print("****best_bid", best_bid)
+
+                        tx_volume = sell['q_max_cda_copy']
+
                         sell_q = sell['q_max_cda_copy']
                         best_bid_q = best_bid['q_max_cda_copy']
 
                         sell['q_max_cda_copy'] = 0
                         best_bid['q_max_cda_copy'] -= sell_q
+
+
+                        future_tx_volume = sell_q
+
                         pass
                     seller.update_trading_state(True, '-', best_bid['p_max'], sell_q)
+
                 elif self.treatment_val == "flo":  # TODO copy
                     # Decrement remaining quantity of order
                     trader_vol = self.calcSupply(sell, clearing_price)
@@ -750,41 +721,28 @@ class Group(BaseGroup):
 
                 # Update seller's profit and volume. TBH I need to look into what this actually does... I think it's for updating values in the database
                 if (self.treatment_val == "cda" and best_bid != None and sell['p_max'] <= best_bid['p_max']):
-                    # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
-                    if sell['direction'] == 'algo_sell':
-                        q_to_use = best_bid['q_max']
-                        if sell['q_max'] < best_bid['q_max']:
-                            q_to_use = sell['q_max']
+                    print("***sell:", sell)
+                    print("***best_bid:", best_bid)
+                    # print("**sell update player.cash:", player.cash, "best_bid_q:",
+                    #       best_bid['q_max'], "clearing_price:", cda_clearing_price, "best_bid_q*clearing_price:", best_bid["q_max"] * cda_clearing_price)
+                    # seller.updateProfit(
+                    #     best_bid["q_max"] * cda_clearing_price, False, sell['player'] == 1)
+                    # seller.updateVolume(-best_bid["q_max"])
+                    seller.updateProfit(
+                        tx_volume * cda_clearing_price, False, sell['player'] == 1)
+                    seller.updateVolume(-tx_volume)
 
-                        print("algo sell update price old:", player.cash, "best_bid:",
-                              q_to_use, "best_bid_price:", cda_clearing_price, "a*b:", q_to_use * cda_clearing_price)
-                        seller.updateProfit(
-                            q_to_use * cda_clearing_price, False, sell['player'] == 1)
-                        seller.updateVolume(-q_to_use)
+                    if "executedProfit" not in sell:
+                        sell['executedProfit'] = 0
+                    if "executedVolume" not in sell:
+                        sell['executedVolume'] = 0
 
-                        if "executedProfit" not in sell:
-                            sell['executedProfit'] = 0
-                        if "executedVolume" not in sell:
-                            sell['executedVolume'] = 0
-
-                        sell['executedProfit'] += q_to_use * \
-                            cda_clearing_price
-                        sell['executedVolume'] += -q_to_use
-                    else:
-                        print("sell update player.cash:", player.cash, "best_bid_q:",
-                              best_bid['q_max'], "clearing_price:", cda_clearing_price, "q_max*clearing_price:", best_bid["q_max"] * cda_clearing_price)
-                        seller.updateProfit(
-                            best_bid["q_max"] * cda_clearing_price, False, sell['player'] == 1)
-                        seller.updateVolume(-best_bid["q_max"])
-
-                        if "executedProfit" not in sell:
-                            sell['executedProfit'] = 0
-                        if "executedVolume" not in sell:
-                            sell['executedVolume'] = 0
-
-                        sell['executedProfit'] += best_bid["q_max"] * \
-                            cda_clearing_price
-                        sell['executedVolume'] += -best_bid["q_max"]
+                    # sell['executedProfit'] += best_bid["q_max"] * \
+                    #     cda_clearing_price
+                    # sell['executedVolume'] += -best_bid["q_max"]
+                    sell['executedProfit'] += tx_volume * \
+                        cda_clearing_price
+                    sell['executedVolume'] += -tx_volume
                 elif self.treatment_val == 'flo':
                     seller.updateProfit(trader_vol * clearing_price)
                     seller.updateVolume(-trader_vol)
@@ -812,20 +770,6 @@ class Group(BaseGroup):
 
                     if sell['direction'] == 'algo_sell':
                         sell['executed_units'] += sell['q_max']
-                        print("*TODO algo: sell algo order expired: ", sell)
-
-                        # sell['status'] = 'active'
-
-                        # if ('q_max_cda_copy' in sell):
-                        #     del sell['q_max_cda_copy']
-                        # if ('expired_by_cda_buy' in sell):
-                        #     del sell['expired_by_cda_buy']
-
-                        # cache = self.order_copies
-                        # cache[str(sell['player'])][str(
-                        #     sell['orderID'])]['status'] = 'active'
-                        # self.order_copies = cache
-                        # self.save()
 
                         if sell['executed_units'] < sell['q_total']:
                             #   if q_total - executed_units >= q_max (units at a time)
@@ -880,7 +824,7 @@ class Group(BaseGroup):
                     live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
                                          0].participant._index_in_pages, payloads)
 
-                    print("*TODO algo: sell algo order expired: ", sell)
+                    print("**sell order expired: ", sell)
 
                 # Use live send back to update seller's frontend
                 for player in self.get_players():
@@ -909,8 +853,18 @@ class Group(BaseGroup):
                 if (not ("q_max_cda_copy" in buy)):
                     buy["q_max_cda_copy"] = buy["q_max"]
 
+                tx_volume = None
+
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
-                    if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:  # TODO look into
+                    if buy['q_max_cda_copy'] > best_ask["q_max_cda_copy"]:
+                        print("****tx_volume 0")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = best_ask["q_max_cda_copy"]
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -919,6 +873,14 @@ class Group(BaseGroup):
                         best_ask['expired_by_cda_buy'] = True
 
                     elif buy['q_max_cda_copy'] == best_ask["q_max_cda_copy"]:
+                        print("****tx_volume 1")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = buy['q_max_cda_copy']
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -927,7 +889,15 @@ class Group(BaseGroup):
                         best_ask['expired_by_cda_buy'] = True
 
                         pass
-                    else:  # TODO look into
+                    else:
+                        print("****tx_volume 2")
+                        print("****buy", buy)
+                        print("****best_ask", best_ask)
+                        tx_volume = buy['q_max_cda_copy']
+                        if (tx_volume == 0):
+                            tx_volume = future_tx_volume
+                        print("****tx_volume", tx_volume)
+
                         buy_q = buy['q_max_cda_copy']
                         best_ask_q = best_ask['q_max_cda_copy']
 
@@ -952,44 +922,29 @@ class Group(BaseGroup):
                 if (self.treatment_val == "cda" and best_ask != None and buy['p_max'] >= best_ask['p_max']):
                     # if best_bid is algo_buy or sell is algo_sell, use the lower q_max of the two
                     # if algo buy, then use algo_price
-                    if buy['direction'] == 'algo_buy':
-                        q_to_use = best_ask['q_max']
-                        if buy['q_max'] < best_ask['q_max']:
-                            q_to_use = buy['q_max']
+                    print("***buy:", buy)
+                    print("***best_ask:", best_ask)
+                    # print("**buy update price old:", player.cash, "best_ask_q:",
+                    #       best_ask['q_max'], "clearing price:", cda_clearing_price, "-best_ask_q*clearing_price:", -best_ask["q_max"] * cda_clearing_price)
+                    # buyer.updateProfit(-best_ask["q_max"] *
+                    #                    cda_clearing_price, False, buy["player"] == 1)
+                    # buyer.updateVolume(best_ask["q_max"])
 
-                        print("type best_ask", type(
-                            best_ask["q_max"]), "type cda", type(cda_clearing_price))
-                        print("algo buy update price old:", player.cash, "best_ask:",
-                              q_to_use, "clearing price:", cda_clearing_price, "a*b:", -q_to_use * cda_clearing_price)
-                        buyer.updateProfit(-q_to_use *
-                                           cda_clearing_price, False, buy["player"] == 1)
-                        buyer.updateVolume(q_to_use)
+                    print("***tx_volume:", tx_volume, "cda_clearing_price:",
+                          cda_clearing_price, "updateProfit:", -tx_volume*cda_clearing_price)
 
-                        if "executedProfit" not in buy:
-                            buy['executedProfit'] = 0
-                        if "executedVolume" not in buy:
-                            buy['executedVolume'] = 0
+                    buyer.updateProfit(-tx_volume *
+                                       cda_clearing_price, False, buy["player"] == 1)
+                    buyer.updateVolume(tx_volume)
 
-                        buy['executedProfit'] += - \
-                            q_to_use * cda_clearing_price
-                        buy['executedVolume'] += q_to_use
-                    else:
-                        print("type best_ask", type(
-                            best_ask["q_max"]), "type cda", type(cda_clearing_price))
-                        print("buy update price old:", player.cash, "best_ask_q:",
-                              best_ask['q_max'], "clearing price:", cda_clearing_price, "-best_ask_q*clearing_price:", -best_ask["q_max"] * cda_clearing_price)
-                        buyer.updateProfit(-best_ask["q_max"] *
-                                           cda_clearing_price, False, buy["player"] == 1)
-                        buyer.updateVolume(best_ask["q_max"])
+                    if "executedProfit" not in buy:
+                        buy['executedProfit'] = 0
+                    if "executedVolume" not in buy:
+                        buy['executedVolume'] = 0
 
-                        if "executedProfit" not in buy:
-                            buy['executedProfit'] = 0
-                        if "executedVolume" not in buy:
-                            buy['executedVolume'] = 0
-
-                        buy['executedProfit'] += - \
-                            best_ask["q_max"] * cda_clearing_price
-                        buy['executedVolume'] += best_ask["q_max"]
+                    buy['executedProfit'] += - \
+                        tx_volume * cda_clearing_price
+                    buy['executedVolume'] += tx_volume
 
                 elif self.treatment_val == "flo":
                     buyer.updateProfit(-trader_vol * clearing_price)
@@ -1239,6 +1194,7 @@ class Player(BasePlayer):
                 self.new_algo_order(data)
             else:
                 # Input new order
+                print("**expirationDebug:", data)
                 self.new_order(data)
 
             return_data = {'type': data['direction'], 'buys': self.group.buys(
@@ -1294,6 +1250,8 @@ class Player(BasePlayer):
         self.p_max = order['p_max']
         self.status = order['status']
 
+        self.expiration_time = order['expiration_time']
+
         if order['direction'] == 'buy':
             self.num_buys += 1
         if order['direction'] == 'sell':
@@ -1307,7 +1265,8 @@ class Player(BasePlayer):
                              u_max=order['u_max'],
                              p_min=order['p_min'],
                              p_max=order['p_max'],
-                             status=order['status'])
+                             status=order['status'],
+                             expiration_time=order['expiration_time'])
 
         for p in self.group.get_players():
             p.record_state('new order') # Record State on New Order
