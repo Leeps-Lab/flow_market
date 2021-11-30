@@ -229,6 +229,7 @@ class Group(BaseGroup):
                 'deadline': int(row['deadline']),
                 'bet_id': self.get_bet_id(rowNum),
             }
+            player = self.get_player_by_id(data['trader_id'])
             player.record_state('begin bet')
             player.activate_bet(
                 data['quantity'], data['limit_price'], data['deadline'])
