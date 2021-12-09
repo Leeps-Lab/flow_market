@@ -1374,12 +1374,15 @@ class State(ExtraModel):
 
 
 def custom_export(players):
-    yield ['participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
+    yield ['session_code', 'subsession_id', 'id_in_subsession','participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
+
+    groups = set()
 
     for player in players:
-        participant = player.participant
+        groups.add(player.group)
 
-        states = State.objects.filter(player=player)
+    for group in groups:
+        states = State.objects.filter(group=group)
 
         for s in states:
-            yield [participant.code, s.cash, s.inventory, s.trading, s.sign, s.trading_price, s.trading_rate, s.bet, s.bet_quantity, s.bet_price, s.bet_deadline, s.time, s.event]
+            yield [s.group.session.code, s.group.subsession_id, s.group.id_in_subsession, s.player.participant.code, s.cash, s.inventory, s.trading, s.sign, s.trading_price, s.trading_rate, s.bet, s.bet_quantity, s.bet_price, s.bet_deadline, s.time, s.event]
