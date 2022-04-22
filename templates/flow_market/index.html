@@ -87,6 +87,10 @@
     width: 300px;
   }
 
+  .width15 {
+    width: 15%;
+  }
+
   .minWidth3 {
     min-width: 500px;
   }
@@ -111,6 +115,9 @@
     min-width: 280px;
   }
 
+  .pt-5 {
+    padding-top: 0.5rem !important;
+  }
   .shadow {
     box-shadow: var(--shadow);
   }
@@ -118,7 +125,7 @@
 
   #inv-bar,
   #cash-bar {
-    height: 250px;
+    height: 150px;
   }
 
 
@@ -758,9 +765,9 @@
 
     <!-- EARNINGS -->
     <div
-      class="h-100 width500 minHeight cardSpacingBottomMore marginBottom"
+      class="h-100 width15 minHeight cardSpacingBottomMore marginBottom"
       id="CASH">
-        <div class="p-4 shadow d-flex flex-column justify-content-between align-items-center width500 history fixedHeight cardWrapper">
+        <div class="p-4 shadow d-flex flex-column justify-content-between align-items-center history fixedHeight cardWrapper" style="width: 100%;">
           <div class="w-100 text-align-right">
             <h5 class="text-center mb-3">
               Earnings this period</h5>
@@ -797,7 +804,7 @@
         class=" marginBottomFix minWidth3 conditionalMargin2 col-5 marginRight"
         id="CASH">
         <div class="shadow cardWrapper graph">
-          <div class="pt-4 pl-3 pb-2 pr-3 ">
+          <div class="pt-5 pl-3 pr-3 ">
             <div class="w-100 text-align-right">
               <h5 class="text-center mb-3">
                 Cash</h5>
@@ -812,7 +819,7 @@
         class="conditionalMarginLeft minWidth3 marginBottom col-5 borderRadiusFix conditionalMargin2"
         id="INVENTORY">
         <div class="shadow cardWrapper graph">
-          <div class="pt-4 pl-3 pb-2 pr-3">
+          <div class="pt-5 pl-3 pr-3">
             <div class="w-100 text-align-right">
               <h5 class="text-center mb-3">
                 Inventory</h5>
