@@ -538,6 +538,26 @@
   max-width: 33.33333333%;
   }
 
+  .longBox {
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: var(--borderRadius);
+
+    /* border: solid; */
+    border: var(--border);
+    box-shadow: var(--shadow);
+  }
+
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
@@ -763,28 +783,75 @@
   <!-- ROW 2: CASH AND INVENTORY -->
   <div class="row justify-content-center" id="activeAndGraphs">
 
-    <!-- EARNINGS -->
-    <div
-      class="h-100 width15 minHeight cardSpacingBottomMore marginBottom"
-      id="CASH">
-        <div class="p-4 shadow d-flex flex-column justify-content-between align-items-center history fixedHeight cardWrapper" style="width: 100%;">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">
-              Earnings this period</h5>
-            <h6 class="text-center mb-3">
-              Past contracts: $$$
-            </h6>
-            <h6 class="text-center mb-3">
-              Current contacts: $$$
-            </h6>
-            <h6 class="text-center mb-3">
-              From trading: $$$
-            </h6>
-            <h6 class="text-center mb-3">
-              Total so far: $$$
-            </h6>
+    <!-- EXPIRED -->
+    <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
+      <div class="col">
+        <div
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
+          id="EXECUTED_HISTORY">
+          <div class="row justify-content-center">
+            <div class="" id="EXECUTEDBETS">
+              <div class="" id="bets2">
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
+                    Contracts
+                  </h5>
+                </div>
+                <table class="table mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Direction</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Deadline</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="tableHeightFix table moveTableUp">
+                    <tbody id="executedBetsTable">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class=" row justify-content-center">
+            <div>
+              <div class="cardHeader w-100 text-align-right">
+                <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
+                  Executed Orders
+                </h5>
+              </div>
+              <table class="table mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col" id="executedOrdersDirection">Direction
+                    </th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" id="executedOrdersRate">Rate</th>
+                  </tr>
+                </thead>
+              </table>
+              <div id="executedOrdersTableWrapper" style="min-width: 242px;"
+                class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table moveTableUp">
+                  <tbody id="executedOrdersTable">
+                    {% for bet in bets %}
+                    {% comment %} <tr>
+                      <td style="width:91px;">{{bet.direction}}</td>
+                      <td style="width:62px;">{{bet.limit_price}}</td>
+                      <td style="width:88px;">{{bet.quantity}}</td>
+                    </tr> {% endcomment %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
     </div>
 
     <div class="col-4 minWidth marginBottomFix">
@@ -832,87 +899,45 @@
 
   </div>
 
-  <!-- ROW 3: ACTIVE AND EXPIRED -->
+  <!-- ROW 3 -->
   
 
-    <div class="col-1">
+    <!--<div class="col-1">
     </div>
 
     <div class="col-4">
 
-      <!-- EXPIRED -->
-      <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
-        <div class="col">
-          <div
-            class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
-            id="EXECUTED_HISTORY">
-            <div class="row justify-content-center">
-              <div class="" id="EXECUTEDBETS">
-                <div class="" id="bets2">
-                  <div class="cardHeader w-100 text-align-right">
-                    <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
-                      Contracts
-                    </h5>
-                  </div>
-                  <table class="table mb-0">
-                    <thead class="thead-light">
-                      <tr>
-                        <th scope="col">Direction</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Deadline</th>
-                      </tr>
-                    </thead>
-                  </table>
-                  <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                    <table class="tableHeightFix table moveTableUp">
-                      <tbody id="executedBetsTable">
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class=" row justify-content-center">
-              <div>
-                <div class="cardHeader w-100 text-align-right">
-                  <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
-                    Executed Orders
-                  </h5>
-                </div>
-                <table class="table mb-0">
-                  <thead class="thead-light">
-                    <tr>
-                      <th scope="col" id="executedOrdersDirection">Direction
-                      </th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col" id="executedOrdersRate">Rate</th>
-                    </tr>
-                  </thead>
-                </table>
-                <div id="executedOrdersTableWrapper" style="min-width: 242px;"
-                  class="table-wrapper-scroll-y my-custom-scrollbar">
-                  <table class="table moveTableUp">
-                    <tbody id="executedOrdersTable">
-                      {% for bet in bets %}
-                      {% comment %} <tr>
-                        <td style="width:91px;">{{bet.direction}}</td>
-                        <td style="width:62px;">{{bet.limit_price}}</td>
-                        <td style="width:88px;">{{bet.quantity}}</td>
-                      </tr> {% endcomment %}
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
 
+  </div>
+
+</div>-->
+
+<div class="row justify-content-center"
+
+  <!-- EARNINGS -->
+  <div
+    class="h-100 cardSpacingBottomMore marginBottom"
+    id="CASH">
+      <div class="p-4 shadow d-flex justify-content-between align-items-center history longBox" style="width: 100%;">
+        <div class="w-100 text-align-right">
+          <h5 class="text-center mb-3">
+            Earnings this period</h5>
+          <h6 class="text-center mb-3">
+            Past contracts: $$$
+          </h6>
+          <h6 class="text-center mb-3">
+            Current contacts: $$$
+          </h6>
+          <h6 class="text-center mb-3">
+            From trading: $$$
+          </h6>
+          <h6 class="text-center mb-3">
+            Total so far: $$$
+          </h6>
+        </div>
+      </div>
   </div>
 
 </div>
