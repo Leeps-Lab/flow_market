@@ -6,7 +6,7 @@
 <style>
   :root {
     /* --cardSpacing: 24px; */
-    --cardSpacing: 18px;
+    --cardSpacing: 40px;
     /* --borderRadius: .7rem; */
     --borderRadius: 4px;
     /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
@@ -74,33 +74,15 @@
     min-width: 400px;
   }
 
-
+  .width23 {
+    width: 23%;
+  }
   .minWidth {
     min-width: 400px;
   }
-
+  
   .minWidth2 {
-    min-width: 400px;
-  }
-
-  .minWidth3 {
-    min-width: 500px;
-  }
-
-  .minWidth4 {
     min-width: 23%;
-  }
-
-  .width500 {
-    width: 300px;
-  }
-
-  .width15 {
-    width: 15%;
-  }
-
-  .maxWidth {
-    max-width: 400px;
   }
 
   .minHeight {
@@ -526,7 +508,8 @@
   #activeAndGraphs {
     display: flex !important;
     flex-direction: row !important;
-    justify-content: space-evenly !important;
+    /* justify-content: space-evenly !important; */
+    gap: 40px;
     align-items: center;
     flex-wrap: wrap-reverse !important;
   }
@@ -581,34 +564,11 @@
 
 
   <div class=" col-xl-3  col-12 text-center  roundFixMargin"
-    style="padding-left: 120px; padding-top: 2px;">
+    style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
     <h2 class="roundNum">{{subsession.round_number}}</h2>
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
-  <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
-    <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
-    <h2 id="" class=""
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Cash&nbsp;
-    </h2>
-    <h2 id="cashInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
-      {{ player.cash|floatformat:1 }}
-    </h2>
-  </div>
-  <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
-    style="margin-left: -30px; min-width: 300px;">
-    <h2 id="" class="mt-0"
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Inventory&nbsp;
-    </h2>
-    <h2 id="invInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
-      {{ player.inventory|floatformat:1 }}
-    </h2>
-  </div>
-
 
 </div>
 
@@ -640,10 +600,10 @@
 
   
         <!-- ACTIVE -->
-        <div class="h-100 minHeight cardSpacingBottomMore marginBottom">
+        <div class="h-100 minHeight cardSpacingBottomMore marginBottom width23">
           <div class="col">
             <div
-              class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth4 history  fixedHeight cardWrapper"
+              class="p-4 shadow d-flex flex-column justify-content-between align-items-center minWidth2 history  fixedHeight cardWrapper"
               id="HISTORY" style="height: 444px">
               <div class="row justify-content-center">
                 <div class="" id="BETS">
@@ -715,8 +675,8 @@
 
     <!-- INPUT -->
     <div
-      class="marginBottomFix  minWidth2 conditionalMargin2  graphs">
-      <div class=" shadow draggableMarket  minWidth2 cardWrapper"
+      class="marginBottomFix  minWidth conditionalMargin2  graphs">
+      <div class=" shadow draggableMarket  minWidth cardWrapper"
         id="DRAGGABLE_GRAPH_INPUT">
         <div class="pb-5 pl-2 pr-2 w-100 h-100"
           style="padding-top: 14px !important; padding-bottom: 14px !important">
@@ -730,7 +690,7 @@
             <div class="row">
 
               <!-- height -->
-              <div class="col-6">
+              <div class="graphs">
 
                 <div class="d-flex justify-content-center">
                   <input id="buyVolumeInput" type="number" value="50" min="1"
@@ -746,9 +706,31 @@
                 </div>
 
               </div>
-
-
-              <div class="col-6">
+              <div class="graphs">
+                <div class="d-flex justify-content-center">
+                  <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
+                  step="10" />
+                </div>
+                <div class="d-flex justify-content-center">
+                  <label for="expirationTimeInput" class="form-label">
+                    Expiration Time
+                  </label>
+                </div>
+              
+                <!-- <div class="d-flex justify-content-center">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input"
+                      id="algorithmicOrderToggle"
+                      onclick="DraggableGraphInput.handleAlgorithmicOrderToggle(event);">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <label class="custom-control-label" for="algorithmicOrderToggle">
+                    Submit as algorithmic orders 
+                  </label>
+                </div> -->
+              </div>
+              <div class="graphs">
 
                 <div class="d-flex justify-content-center">
                   <input id="sellVolumeInput" type="number" value="50" min="1"
@@ -772,7 +754,7 @@
 
     <!-- MARKET -->
     <div
-      class="marginBottomFix minWidth2 conditionalMargin2  graphs   marginRight">
+      class="marginBottomFix minWidth conditionalMargin2  graphs   marginRight">
       <div class="shadow market2 minWidth cardWrapper" id="MARKET">
         <div class="pb-5 pl-2 pr-3 w-100 h-100"
           style="padding-top: 14px !important; padding-bottom: 40px !important">
@@ -789,10 +771,10 @@
   <div class="row justify-content-center" id="activeAndGraphs">
 
     <!-- EXPIRED -->
-    <div class="h-100 minHeight cardSpacingBottomMore marginBottom">
+    <div class="h-100 minHeight cardSpacingBottomMore marginBottom width23">
       <div class="col">
         <div
-          class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth4 history  fixedHeight cardWrapper"
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center minWidth2 history fixedHeight cardWrapper"
           id="EXECUTED_HISTORY">
           <div class="row justify-content-center">
             <div class="" id="EXECUTEDBETS">
@@ -926,22 +908,73 @@
     class="h-100 cardSpacingBottomMore marginBottom"
     id="CASH" style="width: 92%;">
       <div class="p-4 shadow d-flex justify-content-between align-items-center history longBox" style="width: 100%;">
-        <div class="w-100 text-align-right">
-          <h5 class="text-center mb-3">
-            Earnings this period</h5>
-          <h6 class="text-center mb-3">
-            Past contracts: $$$
-          </h6>
-          <h6 class="text-center mb-3">
-            Current contacts: $$$
-          </h6>
-          <h6 class="text-center mb-3">
-            From trading: $$$
-          </h6>
-          <h6 class="text-center mb-3">
-            Total so far: $$$
-          </h6>
-        </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Cash&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              {{ player.cash|floatformat:1 }}
+            </h4>
+          </div>
+          <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
+            style="margin-left: -30px; min-width: 300px;">
+            <h4 id="" class="mt-0"
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Inventory&nbsp;
+            </h4>
+            <h4 id="invInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              {{ player.inventory|floatformat:1 }}
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Earnings:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              $$$
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Past contracts:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              $$$
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Current contacts:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              $$$
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
+              Trading:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              $$$
+            </h4>
+          </div>
+        
       </div>
   </div>
 
