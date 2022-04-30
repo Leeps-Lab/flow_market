@@ -1,5 +1,21 @@
 {% load otree %}
 
+<!-- prettier-ignore -->
+{% block constants %} {% include Constants.scripts_constants_template %}
+{% endblock %}
+<!-- prettier-ignore -->
+{% block imports %} {% include Constants.scripts_imports_template %}
+{% endblock %}
+<!-- prettier-ignore -->
+{% block init_graphs %} {% include Constants.scripts_init_graphs_template %}
+{% endblock %}
+<!-- pretter-ignore -->
+{% block init_sliders %} {% include Constants.scripts_init_sliders_template %}
+{% endblock %}
+<!-- prettier-ignore -->
+{% block InputDropdown %} {% include Constants.scripts_InputDropdown_template %}
+{% endblock %}
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" />
 
@@ -535,7 +551,8 @@
     box-sizing: border-box;
     position: relative;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    flex-wrap: wrap;
     word-wrap: break-word;
     background-color: #fff;
     background-clip: border-box;
@@ -544,6 +561,14 @@
     /* border: solid; */
     border: var(--border);
     box-shadow: var(--shadow);
+  }
+
+  .earnings {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    padding-bottom: 1%;
   }
 
 </style>
@@ -578,7 +603,7 @@
 <div class="container-fluid containerMargin hideDebug"
   style="margin-top: 45px;">
 
-  <div class="custom-control custom-switch">
+  <!-- <div class="custom-control custom-switch">
     <input type="checkbox" class="custom-control-input"
       id="algorithmicOrderToggle"
       onclick="DraggableGraphInput.handleAlgorithmicOrderToggle(event);">
@@ -592,7 +617,7 @@
   <label for="expirationTimeInput" class="form-label">(CDA only) Expiration
     Time</label>
   <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
-    step="10" />
+    step="10" /> -->
 
 
   <!-- ROW 1: INPUT AND MARKET -->
@@ -706,30 +731,38 @@
                 </div>
 
               </div>
-              <div class="graphs">
+<!-- 
+              <script type="text/javascript">
+                var head = document.getElementsByTagName('head')[0];
+                var script = document.createElement('script');
+                if (isCDA == true) {
+                    script.src = document.getElementsByTagName('CDAOnly');
+                }
+                head.appendChild(script);
+              </script> -->
+              
+              <div class="graphs" id="CDAOnly">
                 <div class="d-flex justify-content-center">
                   <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
                   step="10" />
                 </div>
                 <div class="d-flex justify-content-center">
-                  <label for="expirationTimeInput" class="form-label">
-                    Expiration Time
+                  <label for="algorithmicOrderToggle" style="margin-bottom: 0">
+                    As Algorithmic
                   </label>
                 </div>
-              
-                <!-- <div class="d-flex justify-content-center">
-                  <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input"
-                      id="algorithmicOrderToggle"
+                
+                <div class="d-flex justify-content-center">
+                    <div class="custom-control custom-switch" style="padding-left: 0;">
+                      <input type="checkbox" class="btn mr-3 btn-primary mt-2"
+                      id="algorithmicOrderToggle" style="margin-right: 0 !important; margin-top: 0 !important;"
                       onclick="DraggableGraphInput.handleAlgorithmicOrderToggle(event);">
                   </div>
                 </div>
-                <div class="d-flex justify-content-center">
-                  <label class="custom-control-label" for="algorithmicOrderToggle">
-                    Submit as algorithmic orders 
-                  </label>
-                </div> -->
               </div>
+
+
+
               <div class="graphs">
 
                 <div class="d-flex justify-content-center">
@@ -908,73 +941,76 @@
     class="h-100 cardSpacingBottomMore marginBottom"
     id="CASH" style="width: 92%;">
       <div class="p-4 shadow d-flex justify-content-between align-items-center history longBox" style="width: 100%;">
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+        <!-- original: float: right; width: 50%; -->
+        <div class="earnings">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="margin-left: -30px; min-width: 300px;">
             <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Cash&nbsp;
+              style="padding-top: 2px; width: 50%;  float: left; text-align: right;">
+              Cash:&nbsp;
             </h4>
             <h4 id="cashInfo" class=""
               style="float: right; width: 50%; text-align: left;">
               {{ player.cash|floatformat:1 }}
             </h4>
           </div>
-          <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
-            style="margin-left: -30px; min-width: 300px;">
+          <div class="col-xl-3  col-6 text-center fixHeaderAlignment" style="margin-left: -30px; min-width: 300px;">
             <h4 id="" class="mt-0"
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Inventory&nbsp;
+              style="padding-top: 2px; width: 50%; float: left; text-align: right;">
+              Inventory:&nbsp;
             </h4>
             <h4 id="invInfo" class=""
               style="float: right; width: 50%; text-align: left;">
               {{ player.inventory|floatformat:1 }}
             </h4>
           </div>
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+        </div>
+        <div class="earnings">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
             <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Earnings:&nbsp;
+              style="padding-top: 2px; float: left; text-align: right;">
+              Total earnings:&nbsp;
             </h4>
             <h4 id="cashInfo" class=""
-              style="float: right; width: 50%; text-align: left;">
+              style="text-align: left;">
               $$$
             </h4>
           </div>
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
             <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Past contracts:&nbsp;
+              style="padding-top: 2px; float: left; text-align: right;">
+              From past contracts:&nbsp;
             </h4>
             <h4 id="cashInfo" class=""
-              style="float: right; width: 50%; text-align: left;">
+              style="text-align: left;">
               $$$
             </h4>
           </div>
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
             <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Current contacts:&nbsp;
+              style="padding-top: 2px; float: left; text-align: right;">
+              From current contacts:&nbsp;
             </h4>
             <h4 id="cashInfo" class=""
-              style="float: right; width: 50%; text-align: left;">
+              style="text-align: left;">
               $$$
             </h4>
           </div>
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="min-width: 300px;">
             <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
-              style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-              Trading:&nbsp;
+              style="padding-top: 2px; float: left; text-align: right;">
+              From trading:&nbsp;
             </h4>
             <h4 id="cashInfo" class=""
-              style="float: right; width: 50%; text-align: left;">
+              style="text-align: left;">
               $$$
             </h4>
           </div>
-        
+        </div>
       </div>
   </div>
 
