@@ -1118,6 +1118,8 @@
     static buyVolInput = document.querySelector("#buyVolumeInput")
     static sellVolInput = document.querySelector("#sellVolumeInput")
 
+    static widgets = document.querySelectorAll(".notChecked")
+
     static turnBuyButtonCancel() {
       this.buyButton.innerText = "Cancel Buy"
       this.buyButton.classList.remove('btn-primary');
@@ -1155,11 +1157,15 @@
     static handleAlgorithmicOrderToggle(e) {
       this.algoToggle = e.target.checked
 
-      // Change x-axis
+      // Change x-axis and show the widgets
       if (this.algoToggle) {
         this.config.scales.x.title.text = "Units at a Time"
+        //for (let i = 0; i < widgets.length; i++) widgets[i].style.display = "initial"
       } else {
+        // no widgets
+        //for (let i = 0; i < widgets.length; i++) widgets[i].style.display = "none"
         this.config.scales.x.title.text = "Volume"
+
       }
 
       this.myLineChart.options = this.config
@@ -2125,6 +2131,17 @@
 
     // console.timeEnd(`timing`);
     // console.time(`timing`);
+    if (isFLO) {
+      // what appears if it's flo
+      document.querySelector(".isFLO").style.display = "initial"
+      document.querySelector(".isCDA").style.display = "none"
+    }
+
+    if (isCDA) {
+      // what appears if it's cda
+      document.querySelector(".isCDA").style.display = "initial"
+      document.querySelector(".isFLO").style.display = "none"
+    }
 
 
     if (data['type'] == 'begin') {
@@ -2157,6 +2174,7 @@
       const c = document.querySelectorAll(".c")
       for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
 
+      document.querySelector(".earningsInfo").innerText = d["payoff"] - d["endowment"]
       document.querySelector(".endowment").innerText = d["endowment"]
       document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
       document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]

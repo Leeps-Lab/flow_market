@@ -571,6 +571,11 @@
     padding-bottom: 1%;
   }
 
+  .notChecked {
+    display: none !important;
+  }
+
+
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
@@ -590,18 +595,18 @@
   <div class="col-xl-3 col-6 text-center fixHeaderAlignment"
     style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
-    <h2 class="roundNum">Round Number {{subsession.round_number}}</h2>
+    <h3 class="roundNum">Round Number: {{subsession.round_number}}</h3>
   </div>
 
   <div class=" col-xl-3 col-12 text-center fixHeaderAlignment"
     style="padding-top: 2px;">
-    <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
+    <h3 onclick="debug()">Player {{player.id_in_group}}</h3>
   </div>
 
   <div class=" col-xl-3 col-6 text-center fixHeaderAlignment"
     style="padding-top: 2px;">
-    <h2 class="CDA">Type CDA</h2>
-    <h2 class="FLO">Type FLO</h2>
+    <h3 class="isCDA" style="display:initial">Type CDA</h3>
+    <h3 class="isFLO" style="display:none">Type FLO</h3>
   </div>
 
 
@@ -727,7 +732,7 @@
               <!-- height -->
               <div class="graphs">
 
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center notChecked">
                   <input id="buyVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
@@ -752,10 +757,10 @@
               </script> -->
               
               <div class="graphs" id="CDAOnly">
-                <div class="d-flex justify-content-center">
+                <!-- <div class="d-flex justify-content-center">
                   <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
                   step="10" />
-                </div>
+                </div> -->
                 <div class="d-flex justify-content-center">
                   <label for="algorithmicOrderToggle" style="margin-bottom: 0">
                     As Algorithmic
@@ -775,7 +780,7 @@
 
               <div class="graphs">
 
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center notChecked">
                   <input id="sellVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
@@ -982,7 +987,7 @@
               style="padding-top: 2px; float: left; text-align: right;">
               Total earnings:&nbsp;
             </h4>
-            <h4 class="b"
+            <h4 class="earningsInfo"
               style="text-align: left;">
               0
             </h4>
