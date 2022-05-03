@@ -1118,7 +1118,10 @@
     static buyVolInput = document.querySelector("#buyVolumeInput")
     static sellVolInput = document.querySelector("#sellVolumeInput")
 
-    static widgets = document.querySelectorAll(".notChecked")
+    //static widgets =  document.querySelectorAll(".notChecked")
+
+    static buyWidget = document.querySelector("#buyWidget")
+    static sellWidget = document.querySelector("#sellWidget")
 
     static turnBuyButtonCancel() {
       this.buyButton.innerText = "Cancel Buy"
@@ -1160,12 +1163,17 @@
       // Change x-axis and show the widgets
       if (this.algoToggle) {
         this.config.scales.x.title.text = "Units at a Time"
-        //for (let i = 0; i < widgets.length; i++) widgets[i].style.display = "initial"
+        this.buyWidget.classList.remove("notChecked");
+        this.sellWidget.classList.remove("notChecked");
+        this.buyWidget.classList.add("checked");
+        this.sellWidget.classList.add("checked");
       } else {
         // no widgets
-        //for (let i = 0; i < widgets.length; i++) widgets[i].style.display = "none"
         this.config.scales.x.title.text = "Volume"
-
+        this.buyWidget.classList.add("notChecked");
+        this.sellWidget.classList.add("notChecked");
+        this.buyWidget.classList.remove("checked");
+        this.sellWidget.classList.remove("checked");
       }
 
       this.myLineChart.options = this.config

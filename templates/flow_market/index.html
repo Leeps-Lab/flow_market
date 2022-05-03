@@ -575,6 +575,10 @@
     display: none !important;
   }
 
+  .checked {
+    display: initial !important;
+  }
+
 
 </style>
 
@@ -732,7 +736,7 @@
               <!-- height -->
               <div class="graphs">
 
-                <div class="d-flex justify-content-center notChecked">
+                <div class="d-flex justify-content-center notChecked" id="buyWidget">
                   <input id="buyVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
@@ -780,7 +784,7 @@
 
               <div class="graphs">
 
-                <div class="d-flex justify-content-center notChecked">
+                <div class="d-flex justify-content-center notChecked" id="sellWidget">
                   <input id="sellVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
