@@ -2141,14 +2141,16 @@
     // console.time(`timing`);
     if (isFLO) {
       // what appears if it's flo
-      document.querySelector(".isFLO").style.display = "initial"
-      document.querySelector(".isCDA").style.display = "none"
+      document.querySelector("#isFLO").style.display = "initial"
+      document.querySelector("#isCDA").style.display = "none"
+      document.querySelector("#CDAOnly").style.visibility = "hidden"
     }
 
     if (isCDA) {
       // what appears if it's cda
-      document.querySelector(".isCDA").style.display = "initial"
-      document.querySelector(".isFLO").style.display = "none"
+      document.querySelector("#isCDA").style.display = "initial"
+      document.querySelector("#isFLO").style.display = "none"
+      document.querySelector("#CDAOnly").style.visibility = "visible"
     }
 
 
