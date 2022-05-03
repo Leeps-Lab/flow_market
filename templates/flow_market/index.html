@@ -518,7 +518,7 @@
   }
 
   .roundNum {
-    display: none;
+    display:contents;
   }
 
   #activeAndGraphs {
@@ -587,13 +587,23 @@
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
 
-
-  <div class=" col-xl-3  col-12 text-center  roundFixMargin"
+  <div class="col-xl-3 col-6 text-center fixHeaderAlignment"
     style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
-    <h2 class="roundNum">{{subsession.round_number}}</h2>
+    <h2 class="roundNum">Round Number {{subsession.round_number}}</h2>
+  </div>
+
+  <div class=" col-xl-3 col-12 text-center fixHeaderAlignment"
+    style="padding-top: 2px;">
     <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
   </div>
+
+  <div class=" col-xl-3 col-6 text-center fixHeaderAlignment"
+    style="padding-top: 2px;">
+    <h2 class="CDA">Type CDA</h2>
+    <h2 class="FLO">Type FLO</h2>
+  </div>
+
 
 </div>
 
@@ -972,13 +982,12 @@
               style="padding-top: 2px; float: left; text-align: right;">
               Total earnings:&nbsp;
             </h4>
-            <h4 id="cashInfo" class=""
+            <h4 class="b"
               style="text-align: left;">
-              $$$
+              0
             </h4>
           </div>
-          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
-            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+          <!-- <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
             <h4 id="" class=""
               style="padding-top: 2px; float: left; text-align: right;">
               From past contracts:&nbsp;
@@ -989,7 +998,6 @@
             </h4>
           </div>
           <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
-            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
               style="padding-top: 2px; float: left; text-align: right;">
               From current contacts:&nbsp;
@@ -1000,7 +1008,6 @@
             </h4>
           </div>
           <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="min-width: 300px;">
-            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
             <h4 id="" class=""
               style="padding-top: 2px; float: left; text-align: right;">
               From trading:&nbsp;
@@ -1009,7 +1016,7 @@
               style="text-align: left;">
               $$$
             </h4>
-          </div>
+          </div> -->
         </div>
       </div>
   </div>
