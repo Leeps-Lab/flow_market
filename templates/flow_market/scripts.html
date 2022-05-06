@@ -2144,6 +2144,10 @@
       document.querySelector("#isFLO").style.display = "initial"
       document.querySelector("#isCDA").style.display = "none"
       document.querySelector("#CDAOnly").style.visibility = "hidden"
+      document.querySelector("#buyWidget").classList.remove("notChecked");
+      document.querySelector("#sellWidget").classList.remove("notChecked");
+      document.querySelector("#buyWidget").classList.add("checked");
+      document.querySelector("#sellWidget").classList.add("checked");
     }
 
     if (isCDA) {
@@ -2265,6 +2269,7 @@
       const c = document.querySelectorAll(".c")
       for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
 
+      document.querySelector(".earningsInfo").innerText = d["payoff"] - d["endowment"]
       document.querySelector(".endowment").innerText = d["endowment"]
       document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
       document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]
