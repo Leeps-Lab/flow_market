@@ -880,10 +880,11 @@
       </div>
     </div>
 
+     <!-- Profit graph hidden for now -->
     <div class="col-4 minWidth marginBottomFix">
       <div class=" shadow market minWidth  cardWrapper" id="MARKET">
         <div class="pl-3 pr-3 w-100 h-100"
-          style="padding-top: 14px !important; padding-bottom: 40px !important">
+          style="padding-top: 14px !important; padding-bottom: 40px !important; visibility: hidden;">
           <h5 class="mb-2 text-center">
             Profit</h5>
           <canvas id="myChart" class="h-100 pb-2"></canvas>
@@ -1126,7 +1127,7 @@
 
   </div>
   <div class="row justify-content-center" id="reactInputSelector">
-    <div id="MANUAL_INPUT">
+    <div id="MANUAL_INPUT" style="display: none;">
       <div
         class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
         id="MANUAL">
