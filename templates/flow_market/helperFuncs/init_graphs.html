@@ -179,6 +179,10 @@
       },
     });
 
+    // original width is 366
+    cash_bar.setSize(null, 150);
+    inventory_bar.setSize(null, 150);
+
     Chart.defaults.font.family = "Lato"
     // Chart.defaults.animation.duration = parseFloat('{{update_freq}}') < 0.1 ? 0 : 500
     Chart.defaults.animation.duration = 0
@@ -300,7 +304,17 @@
     });
     invOdometer.render();
 
-    return [cashOdometer, invOdometer];
+    const earningsOdometer = new Odometer({
+      el: document.querySelector('#earningsInfo'),
+      value: 0,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      //theme: 'default',
+      theme: 'minimal',
+    });
+    earningsOdometer.render();
+
+    return [cashOdometer, invOdometer, earningsOdometer];
   }
   console.log('init graphs', isCDA);
 </script>

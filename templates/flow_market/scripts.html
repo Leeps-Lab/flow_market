@@ -1118,6 +1118,11 @@
     static buyVolInput = document.querySelector("#buyVolumeInput")
     static sellVolInput = document.querySelector("#sellVolumeInput")
 
+    //static widgets =  document.querySelectorAll(".notChecked")
+
+    static buyWidget = document.querySelector("#buyWidget")
+    static sellWidget = document.querySelector("#sellWidget")
+
     static turnBuyButtonCancel() {
       this.buyButton.innerText = "Cancel Buy"
       this.buyButton.classList.remove('btn-primary');
@@ -1155,11 +1160,20 @@
     static handleAlgorithmicOrderToggle(e) {
       this.algoToggle = e.target.checked
 
-      // Change x-axis
+      // Change x-axis and show the widgets
       if (this.algoToggle) {
         this.config.scales.x.title.text = "Units at a Time"
+        this.buyWidget.classList.remove("notChecked");
+        this.sellWidget.classList.remove("notChecked");
+        this.buyWidget.classList.add("checked");
+        this.sellWidget.classList.add("checked");
       } else {
+        // no widgets
         this.config.scales.x.title.text = "Volume"
+        this.buyWidget.classList.add("notChecked");
+        this.sellWidget.classList.add("notChecked");
+        this.buyWidget.classList.remove("checked");
+        this.sellWidget.classList.remove("checked");
       }
 
       this.myLineChart.options = this.config
@@ -1748,7 +1762,7 @@
   const noUiAlgoVolSlider = createnoUiAlgoVolSlider();
   const noUiAlgoRateSlider = createNoUiAlgoRateSlider();
 
-  const [cashOdometer, invOdometer] = intializeOdometers();
+  const [cashOdometer, invOdometer, earningsOdometer] = intializeOdometers();
 
   if ('{{treatment}}' != 'flo') {
     // Because cda and fba has a fixed u_max
@@ -2125,6 +2139,23 @@
 
     // console.timeEnd(`timing`);
     // console.time(`timing`);
+    if (isFLO) {
+      // what appears if it's flo
+      document.querySelector("#isFLO").style.display = "initial"
+      document.querySelector("#isCDA").style.display = "none"
+      document.querySelector("#CDAOnly").style.visibility = "hidden"
+      document.querySelector("#buyWidget").classList.remove("notChecked");
+      document.querySelector("#sellWidget").classList.remove("notChecked");
+      document.querySelector("#buyWidget").classList.add("checked");
+      document.querySelector("#sellWidget").classList.add("checked");
+    }
+
+    if (isCDA) {
+      // what appears if it's cda
+      document.querySelector("#isCDA").style.display = "initial"
+      document.querySelector("#isFLO").style.display = "none"
+      document.querySelector("#CDAOnly").style.visibility = "visible"
+    }
 
 
     if (data['type'] == 'begin') {
@@ -2134,8 +2165,10 @@
     if (data['type'] == 'clear') {
       // to continually move time in the cash and inv graphs, 
       // update cash and inventory bar regardless of changes to cash and inv
-      updateProfit(cash_bar, data['cash']);
-      updateVolume(inventory_bar, data['inventory']);
+
+      // commenting this two line out fixed the up and down bug??
+      // updateProfit(cash_bar, data['cash']);
+      // updateVolume(inventory_bar, data['inventory']);
 
       // clear book graph
       klf_line.data.datasets[2].data = [];
@@ -2210,6 +2243,9 @@
       cachedDataForOdometer = data;
       cash = data['cash']
       inventory = data['inventory']
+      const d = data["payoff_data"]
+      earnings = d["payoff"] - d["endowment"] + (20 * Math.min(0, data['inventory']))
+      document.querySelector("#earningsInfo").innerText = earnings
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
@@ -2222,9 +2258,12 @@
       cachedDataForOdometer = data;
       cash = data['cash']
       inventory = data['inventory']
-      // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
+      earnings = d["payoff"] - d["endowment"] + (20 * Math.min(0, data['inventory']))
+      document.querySelector("#earningsInfo").innerText = earnings
+      // updateCashAndInventoryDisplay(data);
+
       const payoff = document.querySelectorAll(".payoff")
       for (let i = 0; i < payoff.length; i++) payoff[i].innerText = d["payoff"]
 

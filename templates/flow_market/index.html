@@ -6,7 +6,7 @@
 <style>
   :root {
     /* --cardSpacing: 24px; */
-    --cardSpacing: 18px;
+    --cardSpacing: 40px;
     /* --borderRadius: .7rem; */
     --borderRadius: 4px;
     /* --shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important; */
@@ -56,6 +56,7 @@
     /* height: 700px; */
     /* height: 100%; */
     height: 444px;
+    /* width: 300px; */
   }
 
   .market {
@@ -73,17 +74,15 @@
     min-width: 400px;
   }
 
-
+  .width23 {
+    width: 23%;
+  }
   .minWidth {
     min-width: 400px;
   }
-
+  
   .minWidth2 {
-    min-width: 400px;
-  }
-
-  .maxWidth {
-    max-width: 400px;
+    min-width: 23%;
   }
 
   .minHeight {
@@ -102,6 +101,9 @@
     min-width: 280px;
   }
 
+  .pt-5 {
+    padding-top: 0.5rem !important;
+  }
   .shadow {
     box-shadow: var(--shadow);
   }
@@ -109,7 +111,7 @@
 
   #inv-bar,
   #cash-bar {
-    height: 328px;
+    height: 150px;
   }
 
 
@@ -500,8 +502,71 @@
   }
 
   .roundNum {
-    display: none;
+    display:contents;
   }
+
+  #activeAndGraphs {
+    display: flex !important;
+    flex-direction: row !important;
+    /* justify-content: space-evenly !important; */
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap-reverse !important;
+  }
+
+  .seperateContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 33.33333333%;
+  }
+
+  .graphs {
+  -webkit-box-flex: 0;
+  flex: 0 0 33.33333333%;
+  max-width: 33.33333333%;
+  }
+
+  .longBox {
+    font-family: Nunito;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: black;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: var(--borderRadius);
+
+    /* border: solid; */
+    border: var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .earnings {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    padding-bottom: 1%;
+  }
+
+  .notChecked {
+    visibility: hidden !important;
+  }
+
+  .checked {
+    visibility: visible !important;
+  }
+
+  #CDAOnly {
+    visibility: visible;
+  }
+
 </style>
 
 <!-- https://github.com/giangd/bootstrap-layout-for-flow-market -->
@@ -518,34 +583,21 @@
 <div class=" pt-2 mt-0 mb-2 header shadow row justify-content-center fixMargin "
   id="HEADER">
 
-
-  <div class=" col-xl-3  col-12 text-center  roundFixMargin"
-    style="padding-left: 120px; padding-top: 2px;">
+  <div class="col-xl-3 col-6 text-center fixHeaderAlignment"
+    style="padding-top: 2px;">
     <!-- <h2 onclick="debug()">Round {{subsession.round_number}}</h1> -->
-    <h2 class="roundNum">{{subsession.round_number}}</h2>
-    <h2 onclick="debug()">Player {{player.id_in_group}}</h1>
+    <h3 class="roundNum">Round Number: {{subsession.round_number}}</h3>
   </div>
-  <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="">
-    <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
-    <h2 id="" class=""
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Cash&nbsp;
-    </h2>
-    <h2 id="cashInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
-      {{ player.cash|floatformat:1 }}
-    </h2>
+
+  <div class=" col-xl-3 col-12 text-center fixHeaderAlignment"
+    style="padding-top: 2px;">
+    <h3 onclick="debug()">Player {{player.id_in_group}}</h3>
   </div>
-  <div class="col-xl-3  col-6 text-center fixHeaderAlignment"
-    style="margin-left: -30px; min-width: 300px;">
-    <h2 id="" class="mt-0"
-      style="padding-top: 2px; float: left; width: 50%; text-align: right;">
-      Inventory&nbsp;
-    </h2>
-    <h2 id="invInfo" class=""
-      style="float: right; width: 50%; text-align: left;">
-      {{ player.inventory|floatformat:1 }}
-    </h2>
+
+  <div class=" col-xl-3 col-6 text-center fixHeaderAlignment"
+    style="padding-top: 2px;">
+    <h3 id="isCDA" style="display:initial">Type CDA</h3>
+    <h3 id="isFLO" style="display:none">Type FLO</h3>
   </div>
 
 
@@ -557,7 +609,7 @@
 <div class="container-fluid containerMargin hideDebug"
   style="margin-top: 45px;">
 
-  <div class="custom-control custom-switch">
+  <!-- <div class="custom-control custom-switch">
     <input type="checkbox" class="custom-control-input"
       id="algorithmicOrderToggle"
       onclick="DraggableGraphInput.handleAlgorithmicOrderToggle(event);">
@@ -571,16 +623,91 @@
   <label for="expirationTimeInput" class="form-label">(CDA only) Expiration
     Time</label>
   <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
-    step="10" />
+    step="10" /> -->
 
 
   <!-- ROW 1: INPUT AND MARKET -->
-  <div class="row justify-content-center">
+  <div class="row justify-content-center" id="activeAndGraphs">
+
+  
+        <!-- ACTIVE -->
+        <div class="h-100 minHeight cardSpacingBottomMore marginBottom width23">
+          <div class="col">
+            <div
+              class="p-4 shadow d-flex flex-column justify-content-between align-items-center minWidth2 history  fixedHeight cardWrapper"
+              id="HISTORY" style="height: 444px">
+              <div class="row justify-content-center">
+                <div class="" id="BETS">
+                  <div class="" id="bets2">
+                    <div class="cardHeader w-100 text-align-right">
+                      <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Contracts
+                      </h5>
+                    </div>
+                    <table class="table mb-0">
+                      <thead class="thead-light">
+                        <tr>
+                          <th scope="col">Direction</th>
+                          <th scope="col">Price</th>
+                          <th scope="col">Quantity</th>
+                          <th scope="col">Deadline</th>
+                        </tr>
+                      </thead>
+                    </table>
+                    <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                      <table class="tableHeightFix table moveTableUp">
+                        <tbody id="activeBets">
+                          {% for bet in bets %}
+                          <tr id="a{{bet.bet_id}}">
+                            <td class="betDirection"
+                              style="width:91px; height:23px;">{{bet.direction}}
+                            </td>
+                            <td class="betPrice" style="width:61px;">
+                              {{bet.limit_price}}</td>
+                            <td class="betQuantity" style="width:88px;">
+                              {{bet.quantity}}</td>
+                            <td class="betDeadline">{{bet.deadline}} ms</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class=" row justify-content-center">
+                <div>
+                  <div class="cardHeader w-100 text-align-right">
+                    <h5 class="mb-2 text-center" id="ACTIVE_ORDERS">
+                      Active Orders
+                    </h5>
+                  </div>
+                  <table class="table mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col" id="activeOrdersDirection">Direction</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col" id="activeOrdersRate">Rate</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div id="activeOrdersTableWrapper" style="min-width: 242px;"
+                    class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="table moveTableUp">
+                      <tbody id="activeOrdersTable">
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
     <!-- INPUT -->
     <div
-      class="marginLeft marginBottomFix  minWidth2 conditionalMargin2  col-5 cardSpacingRight  marginRight">
-      <div class=" shadow draggableMarket  minWidth2 cardWrapper"
+      class="marginBottomFix  minWidth conditionalMargin2  graphs">
+      <div class=" shadow draggableMarket  minWidth cardWrapper"
         id="DRAGGABLE_GRAPH_INPUT">
         <div class="pb-5 pl-2 pr-2 w-100 h-100"
           style="padding-top: 14px !important; padding-bottom: 14px !important">
@@ -594,9 +721,9 @@
             <div class="row">
 
               <!-- height -->
-              <div class="col-6">
+              <div class="graphs">
 
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center notChecked" id="buyWidget">
                   <input id="buyVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
@@ -610,11 +737,41 @@
                 </div>
 
               </div>
-
-
-              <div class="col-6">
-
+<!-- 
+              <script type="text/javascript">
+                var head = document.getElementsByTagName('head')[0];
+                var script = document.createElement('script');
+                if (isCDA == true) {
+                    script.src = document.getElementsByTagName('CDAOnly');
+                }
+                head.appendChild(script);
+              </script> -->
+              
+              <div class="graphs" id="CDAOnly">
+                <div class="d-flex justify-content-center" style="visibility: hidden;">
+                  <input id="expirationTimeInput" type="number" value="50" min="1" max="200"
+                  step="10" />
+                </div>
                 <div class="d-flex justify-content-center">
+                  <label for="algorithmicOrderToggle" style="margin-bottom: 0">
+                    As Algorithmic
+                  </label>
+                </div>
+                
+                <div class="d-flex justify-content-center">
+                    <div class="custom-control custom-switch" style="padding-left: 0;">
+                      <input type="checkbox" class="btn mr-3 btn-primary mt-2"
+                      id="algorithmicOrderToggle" style="margin-right: 0 !important; margin-top: 0 !important;"
+                      onclick="DraggableGraphInput.handleAlgorithmicOrderToggle(event);">
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="graphs">
+
+                <div class="d-flex justify-content-center notChecked" id="sellWidget">
                   <input id="sellVolumeInput" type="number" value="50" min="1"
                     max="100" step="10" />
                 </div>
@@ -636,7 +793,7 @@
 
     <!-- MARKET -->
     <div
-      class="marginBottomFix minWidth2 conditionalMargin2  col-5   marginRight">
+      class="marginBottomFix minWidth conditionalMargin2  graphs   marginRight">
       <div class="shadow market2 minWidth cardWrapper" id="MARKET">
         <div class="pb-5 pl-2 pr-3 w-100 h-100"
           style="padding-top: 14px !important; padding-bottom: 40px !important">
@@ -650,199 +807,214 @@
   </div>
 
   <!-- ROW 2: CASH AND INVENTORY -->
-  <div class="row justify-content-center">
+  <div class="row justify-content-center" id="activeAndGraphs">
 
-    <!-- CASH -->
-    <div
-      class="marginLeft marginBottomFix minWidth conditionalMargin2  col-5 cardSpacingRight  marginRight"
-      id="CASH">
-      <div class="shadow minWidth cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3 ">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">
-              Cash</h5>
+    <!-- EXPIRED -->
+    <div class="h-100 minHeight cardSpacingBottomMore marginBottom width23">
+      <div class="col">
+        <div
+          class="p-4 shadow d-flex flex-column justify-content-between align-items-center minWidth2 history fixedHeight cardWrapper"
+          id="EXECUTED_HISTORY">
+          <div class="row justify-content-center">
+            <div class="" id="EXECUTEDBETS">
+              <div class="" id="bets2">
+                <div class="cardHeader w-100 text-align-right">
+                  <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
+                    Contracts
+                  </h5>
+                </div>
+                <table class="table mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Direction</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Deadline</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="tableHeightFix table moveTableUp">
+                    <tbody id="executedBetsTable">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="" id="cash-bar"></div>
+          <div class=" row justify-content-center">
+            <div>
+              <div class="cardHeader w-100 text-align-right">
+                <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
+                  Executed Orders
+                </h5>
+              </div>
+              <table class="table mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col" id="executedOrdersDirection">Direction
+                    </th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" id="executedOrdersRate">Rate</th>
+                  </tr>
+                </thead>
+              </table>
+              <div id="executedOrdersTableWrapper" style="min-width: 242px;"
+                class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table moveTableUp">
+                  <tbody id="executedOrdersTable">
+                    {% for bet in bets %}
+                    {% comment %} <tr>
+                      <td style="width:91px;">{{bet.direction}}</td>
+                      <td style="width:62px;">{{bet.limit_price}}</td>
+                      <td style="width:88px;">{{bet.quantity}}</td>
+                    </tr> {% endcomment %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- INVENTORY -->
-    <div
-      class="conditionalMarginLeft minWidth marginBottom col-5  borderRadiusFix conditionalMargin2"
-      id="INVENTORY">
-      <div class="shadow cardWrapper graph">
-        <div class="pt-4 pl-3 pb-2 pr-3">
-          <div class="w-100 text-align-right">
-            <h5 class="text-center mb-3">
-              Inventory</h5>
+     <!-- Profit graph hidden for now -->
+    <div class="col-4 minWidth marginBottomFix">
+      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
+        <div class="pl-3 pr-3 w-100 h-100"
+          style="padding-top: 14px !important; padding-bottom: 40px !important; visibility: hidden;">
+          <h5 class="mb-2 text-center">
+            Profit</h5>
+          <canvas id="myChart" class="h-100 pb-2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="seperateContainer ">
+      <!-- CASH -->
+      <div
+        class="conditionalMargin2 marginRight"
+        id="CASH">
+        <div class="shadow cardWrapper graph">
+          <div class="pt-5 pl-3 pr-3 ">
+            <div class="w-100 text-align-right">
+              <h5 class="text-center mb-3">
+                Cash</h5>
+            </div>
+            <div class="" id="cash-bar"></div>
           </div>
-          <div class="" id="inv-bar"></div>
+        </div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div
+        class="conditionalMarginLeft marginBottom borderRadiusFix conditionalMargin2"
+        id="INVENTORY">
+        <div class="shadow cardWrapper graph">
+          <div class="pt-5 pl-3 pr-3">
+            <div class="w-100 text-align-right">
+              <h5 class="text-center mb-3">
+                Inventory</h5>
+            </div>
+            <div class="" id="inv-bar"></div>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- ROW 3: ACTIVE AND EXPIRED -->
-  <div class="row justify-content-center">
+  <!-- ROW 3 -->
+  
 
-    <div class="col-4">
-
-      <!-- ACTIVE -->
-      <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
-        <div class="col">
-          <div
-            class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
-            id="HISTORY">
-            <div class="row justify-content-center">
-              <div class="" id="BETS">
-                <div class="" id="bets2">
-                  <div class="cardHeader w-100 text-align-right">
-                    <h5 class="mb-2 text-center" id="ACTIVE_BETS">Active Bets
-                    </h5>
-                  </div>
-                  <table class="table mb-0">
-                    <thead class="thead-light">
-                      <tr>
-                        <th scope="col">Direction</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Deadline</th>
-                      </tr>
-                    </thead>
-                  </table>
-                  <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                    <table class="tableHeightFix table moveTableUp">
-                      <tbody id="activeBets">
-                        {% for bet in bets %}
-                        <tr id="a{{bet.bet_id}}">
-                          <td class="betDirection"
-                            style="width:91px; height:23px;">{{bet.direction}}
-                          </td>
-                          <td class="betPrice" style="width:61px;">
-                            {{bet.limit_price}}</td>
-                          <td class="betQuantity" style="width:88px;">
-                            {{bet.quantity}}</td>
-                          <td class="betDeadline">{{bet.deadline}} ms</td>
-                        </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class=" row justify-content-center">
-              <div>
-                <div class="cardHeader w-100 text-align-right">
-                  <h5 class="mb-2 text-center" id="ACTIVE_ORDERS">
-                    Active Orders
-                  </h5>
-                </div>
-                <table class="table mb-0">
-                  <thead class="thead-light">
-                    <tr>
-                      <th scope="col" id="activeOrdersDirection">Direction</th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col" id="activeOrdersRate">Rate</th>
-                    </tr>
-                  </thead>
-                </table>
-                <div id="activeOrdersTableWrapper" style="min-width: 242px;"
-                  class="table-wrapper-scroll-y my-custom-scrollbar">
-                  <table class="table moveTableUp">
-                    <tbody id="activeOrdersTable">
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="col-1">
+    <!--<div class="col-1">
     </div>
 
     <div class="col-4">
 
-      <!-- EXPIRED -->
-      <div class="h-100 minWidth minHeight cardSpacingBottomMore marginBottom">
-        <div class="col">
-          <div
-            class="p-4 shadow d-flex flex-column justify-content-between align-items-center  minWidth history  fixedHeight cardWrapper"
-            id="EXECUTED_HISTORY">
-            <div class="row justify-content-center">
-              <div class="" id="EXECUTEDBETS">
-                <div class="" id="bets2">
-                  <div class="cardHeader w-100 text-align-right">
-                    <h5 class="mb-2 text-center" id="EXECUTED_BETS">Executed
-                      Bets
-                    </h5>
-                  </div>
-                  <table class="table mb-0">
-                    <thead class="thead-light">
-                      <tr>
-                        <th scope="col">Direction</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Deadline</th>
-                      </tr>
-                    </thead>
-                  </table>
-                  <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                    <table class="tableHeightFix table moveTableUp">
-                      <tbody id="executedBetsTable">
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class=" row justify-content-center">
-              <div>
-                <div class="cardHeader w-100 text-align-right">
-                  <h5 class="mb-2 text-center" id="EXECUTED_ORDERS">
-                    Executed Orders
-                  </h5>
-                </div>
-                <table class="table mb-0">
-                  <thead class="thead-light">
-                    <tr>
-                      <th scope="col" id="executedOrdersDirection">Direction
-                      </th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col" id="executedOrdersRate">Rate</th>
-                    </tr>
-                  </thead>
-                </table>
-                <div id="executedOrdersTableWrapper" style="min-width: 242px;"
-                  class="table-wrapper-scroll-y my-custom-scrollbar">
-                  <table class="table moveTableUp">
-                    <tbody id="executedOrdersTable">
-                      {% for bet in bets %}
-                      {% comment %} <tr>
-                        <td style="width:91px;">{{bet.direction}}</td>
-                        <td style="width:62px;">{{bet.limit_price}}</td>
-                        <td style="width:88px;">{{bet.quantity}}</td>
-                      </tr> {% endcomment %}
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
 
+  </div>
+
+</div>-->
+
+<div class="row justify-content-center">
+
+  <!-- EARNINGS -->
+  <div
+    class="h-100 cardSpacingBottomMore marginBottom"
+    id="CASH" style="width: 92%;">
+      <div class="p-4 shadow d-flex justify-content-between align-items-center history longBox" style="width: 100%;">
+        <!-- original: float: right; width: 50%; -->
+        <div class="earnings">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="margin-left: -30px; min-width: 300px;">
+            <!-- player.cash and player.inventory is only for the initial values, they don't get updated from here -->
+            <h4 id="" class=""
+              style="padding-top: 2px; width: 50%;  float: left; text-align: right;">
+              Cash:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              {{ player.cash|floatformat:1 }}
+            </h4>
+          </div>
+          <div class="col-xl-3  col-6 text-center fixHeaderAlignment" style="margin-left: -30px; min-width: 300px;">
+            <h4 id="" class="mt-0"
+              style="padding-top: 2px; width: 50%; float: left; text-align: right;">
+              Inventory:&nbsp;
+            </h4>
+            <h4 id="invInfo" class=""
+              style="float: right; width: 50%; text-align: left;">
+              {{ player.inventory|floatformat:1 }}
+            </h4>
+          </div>
+        </div>
+        <div class="earnings">
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; text-align: right;">
+              Total earnings:&nbsp;
+            </h4>
+            <h4 id="earningsInfo"
+              style="text-align: left;">
+              0
+            </h4>
+          </div>
+          <!-- <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; text-align: right;">
+              From past contracts:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="text-align: left;">
+              $$$
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style=" min-width: 300px;">
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; text-align: right;">
+              From current contacts:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="text-align: left;">
+              $$$
+            </h4>
+          </div>
+          <div class="col-xl-3 col-6 text-center fixHeaderAlignment" style="min-width: 300px;">
+            <h4 id="" class=""
+              style="padding-top: 2px; float: left; text-align: right;">
+              From trading:&nbsp;
+            </h4>
+            <h4 id="cashInfo" class=""
+              style="text-align: left;">
+              $$$
+            </h4>
+          </div> -->
+        </div>
+      </div>
   </div>
 
 </div>
@@ -939,16 +1111,7 @@
     </div> -->
 
 
-    <div class="col-4 minWidth marginBottomFix">
-      <div class=" shadow market minWidth  cardWrapper" id="MARKET">
-        <div class="pl-3 pr-3 w-100 h-100"
-          style="padding-top: 14px !important; padding-bottom: 40px !important">
-          <h5 class="mb-2 text-center">
-            Profit</h5>
-          <canvas id="myChart" class="h-100 pb-2"></canvas>
-        </div>
-      </div>
-    </div>
+
 
     <!-- <div
       class="col-4 mr-4 cardSpacingBottom cardWrapper marginLeft shadow minWidth justify-content-center"
@@ -964,7 +1127,7 @@
 
   </div>
   <div class="row justify-content-center" id="reactInputSelector">
-    <div id="MANUAL_INPUT">
+    <div id="MANUAL_INPUT" style="display: none;">
       <div
         class=" conditionalMarginBot cardWrapper d-flex align-items-center manual minWidth fixedHeightModified"
         id="MANUAL">
@@ -1280,16 +1443,16 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">[] = money_gained_from_buy_bets -
-          money_lost_from_sell_bets</th>
-        <th scope="col">money_gained_from_buy_bets</th>
-        <th scope="col">money_lost_from_sell_bets</th>
+        <th scope="col">[] = money_gained_from_buy_contracts -
+          money_lost_from_sell_contracts</th>
+        <th scope="col">money_gained_from_buy_contracts</th>
+        <th scope="col">money_lost_from_sell_contracts</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="b">b</td>
-        <td class="money_gained_from_buy_bets">money_gained_from_buy_bets</td>
+        <td class="money_gained_from_buy_bets">money_gained_from_buy_contracts</td>
         <td class="money_lost_from_sell_bets">money_gained_in_market</td>
       </tr>
     </tbody>
