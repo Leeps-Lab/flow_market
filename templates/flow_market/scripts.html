@@ -1762,7 +1762,7 @@
   const noUiAlgoVolSlider = createnoUiAlgoVolSlider();
   const noUiAlgoRateSlider = createNoUiAlgoRateSlider();
 
-  const [cashOdometer, invOdometer] = intializeOdometers();
+  const [cashOdometer, invOdometer, earningsOdometer] = intializeOdometers();
 
   if ('{{treatment}}' != 'flo') {
     // Because cda and fba has a fixed u_max
@@ -2165,8 +2165,10 @@
     if (data['type'] == 'clear') {
       // to continually move time in the cash and inv graphs, 
       // update cash and inventory bar regardless of changes to cash and inv
-      updateProfit(cash_bar, data['cash']);
-      updateVolume(inventory_bar, data['inventory']);
+
+      // commenting this two line out fixed the up and down bug??
+      // updateProfit(cash_bar, data['cash']);
+      // updateVolume(inventory_bar, data['inventory']);
 
       // clear book graph
       klf_line.data.datasets[2].data = [];
@@ -2188,7 +2190,6 @@
       const c = document.querySelectorAll(".c")
       for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
 
-      document.querySelector(".earningsInfo").innerText = d["payoff"] - d["endowment"]
       document.querySelector(".endowment").innerText = d["endowment"]
       document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
       document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]
@@ -2242,6 +2243,9 @@
       cachedDataForOdometer = data;
       cash = data['cash']
       inventory = data['inventory']
+      const d = data["payoff_data"]
+      earnings = d["payoff"] - d["endowment"] + (20 * Math.min(0, data['inventory']))
+      document.querySelector("#earningsInfo").innerText = earnings
       BetsUI.moveExpiredBet(data['bet']);
       // updateCashAndInventoryDisplay(data);
     }
@@ -2254,9 +2258,12 @@
       cachedDataForOdometer = data;
       cash = data['cash']
       inventory = data['inventory']
-      // updateCashAndInventoryDisplay(data);
 
       const d = data["payoff_data"]
+      earnings = d["payoff"] - d["endowment"] + (20 * Math.min(0, data['inventory']))
+      document.querySelector("#earningsInfo").innerText = earnings
+      // updateCashAndInventoryDisplay(data);
+
       const payoff = document.querySelectorAll(".payoff")
       for (let i = 0; i < payoff.length; i++) payoff[i].innerText = d["payoff"]
 
@@ -2269,7 +2276,6 @@
       const c = document.querySelectorAll(".c")
       for (let i = 0; i < c.length; i++) c[i].innerText = d["c_bar"] * -d["negative_inventory"]
 
-      document.querySelector(".earningsInfo").innerText = d["payoff"] - d["endowment"]
       document.querySelector(".endowment").innerText = d["endowment"]
       document.querySelector(".money_gained_in_market").innerText = d["money_gained_in_market"]
       document.querySelector(".money_lost_in_market").innerText = d["money_lost_in_market"]

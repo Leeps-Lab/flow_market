@@ -304,7 +304,17 @@
     });
     invOdometer.render();
 
-    return [cashOdometer, invOdometer];
+    const earningsOdometer = new Odometer({
+      el: document.querySelector('#earningsInfo'),
+      value: 0,
+      duration: 1 * 1000,
+      format: '(,ddd)',
+      //theme: 'default',
+      theme: 'minimal',
+    });
+    earningsOdometer.render();
+
+    return [cashOdometer, invOdometer, earningsOdometer];
   }
   console.log('init graphs', isCDA);
 </script>
