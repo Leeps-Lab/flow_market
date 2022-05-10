@@ -1,7 +1,7 @@
-"trader_id","direction","limit_price","quantity","deadline"
-"1","sell","13","50","111000"
-"2","sell","10","50","112000"
-"3","sell","7","50","114000"
-"4","buy","10","50","116000"
-"5","buy","12","50","117000"
-"6","buy","14","50","119000"
+trader_id,direction,limit_price,quantity,deadline
+1,sell,13,50,111000
+2,sell,10,50,112000
+3,sell,7,60,114000
+4,buy,11,50,116000
+5,buy,12,50,117000
+6,buy,14,50,119000

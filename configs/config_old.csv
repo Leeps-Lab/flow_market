@@ -1,0 +1,4 @@
+round,bet_file,order_file,treatment,num_players,update_freq,max_price,max_u_max,max_q_max,round_length,start_inv,start_cash
+1,bets1.csv,orders.csv,cda,6,2,20,1000000,100,120,0,5000
+2,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+3,bets3.csv,orders.csv,flo,6,0.02,20,5,100,120,0,5000
