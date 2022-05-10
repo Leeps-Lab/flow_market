@@ -37,7 +37,7 @@ times = []
 class Constants(BaseConstants):
     name_in_url = 'flow_market'
     players_per_group = None
-    num_rounds = 2
+    num_rounds = 20
 
     index_template = 'flow_market/index.html'
 
