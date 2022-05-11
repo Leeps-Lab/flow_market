@@ -1,0 +1,11 @@
+round,bet_file,order_file,treatment,num_players,update_freq,max_price,max_u_max,max_q_max,round_length,start_inv,start_cash
+1,bets1.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+2,bets1.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+3,bets1.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+4,bets1.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+5,bets1.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+6,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+7,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+8,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+9,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000
+10,bets2.csv,orders.csv,flo,6,2,20,1000000,100,120,0,5000

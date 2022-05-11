@@ -1,6 +1,7 @@
 {% load otree %}
 <script>
   // seems to bug out when using this variable in a ternary expression
+  // let update_freq = parseFloat('{{update_freq}}')
   let update_freq = parseFloat('{{update_freq}}')
   // console.log("* update_freq", update_freq)
   // console.error("got speed:", typeof (update_freq < 0.1 ? 0 : 500), typeof (parseFloat('{{update_freq}}') < 0.1 ? 0 : 500))
@@ -45,7 +46,7 @@
         },
         min: 0,
         // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
-        max: (1 / update_freq * 180), // f = seconds per tick, 1/f = ticks per second
+        max: (1 / update_freq * 120), // f = seconds per tick, 1/f = ticks per second
         labels: {
           formatter: function () { // fix time tick values
             const seconds = (this.value) * (update_freq) // t:ticks, s:seconds----[t] * [s/t] = [s]
@@ -132,7 +133,7 @@
         },
         min: 0,
         // max: (1 / parseFloat('{{update_freq}}')) * 180, // f = seconds per tick, 1/f = ticks per second
-        max: (1 / update_freq * 180), // f = seconds per tick, 1/f = ticks per second
+        max: (1 / update_freq * 120), // f = seconds per tick, 1/f = ticks per second
         labels: {
           formatter: function () { // fix time tick values
             const seconds = (this.value) * (update_freq) // t:ticks, s:seconds----[t] * [s/t] = [s]

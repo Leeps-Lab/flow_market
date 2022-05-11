@@ -9,10 +9,12 @@
     <p>This is round {{subsession.round_number}}</p>
     <p>Your earnings are {{ player.cash | floatformat:1 }} </p>
     <br> <br>
-    {% if player.inventory < 0 %}
-    <p>Your ending inventory is {{ player.inventory | floatformat:1 }} and has been filled at a price of 20 per share.</p>
-    {% else %}
+    {% if player.inventory == 0 %}
+    <p>Your ending inventory is {{ player.inventory | floatformat:1 }}.</p>
+    {% elif player.inventory > 0 %}
     <p>Your ending inventory is {{ player.inventory | floatformat:1 }} and has been liquidated at price 0.</p>
+    {% else %}
+    <p>Your ending inventory is {{ player.inventory | floatformat:1 }} and has been filled at a price of 20 per share.</p>
     {% endif %}
     {% next_button %}
 {% endblock %}

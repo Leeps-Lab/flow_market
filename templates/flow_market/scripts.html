@@ -2167,8 +2167,8 @@
       // update cash and inventory bar regardless of changes to cash and inv
 
       // commenting this two line out fixed the up and down bug??
-      // updateProfit(cash_bar, data['cash']);
-      // updateVolume(inventory_bar, data['inventory']);
+      updateProfit(cash_bar, data['cash']);
+      updateVolume(inventory_bar, data['inventory']);
 
       // clear book graph
       klf_line.data.datasets[2].data = [];
