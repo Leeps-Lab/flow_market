@@ -156,7 +156,7 @@ class Group(BaseGroup):
         self.begin_time = time.time()
 
     def get_remaining_time(self):
-        self.begin_time + self.round_length - time.time()
+        self.begin_time + self.round_length() - time.time()
 
     def set_should_pause_after_bet(self, should_pause=False):
         if should_pause:
