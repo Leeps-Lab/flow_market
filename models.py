@@ -155,6 +155,9 @@ class Group(BaseGroup):
     def set_begin_time(self):
         self.begin_time = time.time()
 
+    def get_remaining_time(self):
+        self.begin_time + self.round_length - time.time()
+
     def set_should_pause_after_bet(self, should_pause=False):
         if should_pause:
             self.should_pause_after_bet = True
@@ -233,7 +236,7 @@ class Group(BaseGroup):
             player.record_state('begin bet')
             player.activate_bet(
                 data['quantity'], data['limit_price'], data['deadline'])
-            call_with_delay((int(row['deadline'])/1000),
+            call_with_delay((int(row['deadline'])/1000), self.get_remaining_time(),
                             self.execute_bet, data)
             rowNum += 1
         return
@@ -323,10 +326,6 @@ class Group(BaseGroup):
         self.order_copies = cache
         self.save()
 
-        print("Algo: will call addToCancellationQueue")
-        call_with_delay(order['expiration_time'], self.addToCancellationQueue,
-                        cache[str(playerID)][str(currentID)])
-
     def new_order(self, order, playerID, currentID):
         cache = self.order_copies
         cache[str(playerID)][str(currentID)] = {
@@ -346,9 +345,6 @@ class Group(BaseGroup):
         self.order_num += 1
         self.order_copies = cache
         self.save()
-
-        call_with_delay(order['expiration_time'], self.addToCancellationQueue,
-                        cache[str(playerID)][str(currentID)])
 
     def buys(self):
         buys_list = []
@@ -596,8 +592,6 @@ class Group(BaseGroup):
 
         condition = None
         print("\n\n")
-        print("buys:", buys)
-        print("sells:", sells)
 
         # change condition to true if there is an algo order in list
         if (self.treatment_val == "cda"):
@@ -1179,12 +1173,14 @@ class Player(BasePlayer):
                 # Setup Bets and File input
                 self.group.init_order_copies()
                 # # ENABLE reenable set_bets
-                call_with_delay(0, self.group.set_bets)
-                call_with_delay(0, self.group.input_order_file)
+                call_with_delay(
+                    0, self.group.get_remaining_time(), self.group.set_bets)
+                call_with_delay(0, self.group.get_remaining_time(),
+                                self.group.input_order_file)
 
                 # Begin Continuously Updating function
                 call_with_delay_infinite(
-                    self.group.update_freq(), self.group.update)
+                    self.group.update_freq(), self.group.get_remaining_time(), self.group.update)
             return {0: {'type': 'begin'}}
 
         data['trader_id'] = self.id_in_group
@@ -1374,7 +1370,7 @@ class State(ExtraModel):
 
 
 def custom_export(players):
-    yield ['session_code', 'subsession_id', 'id_in_subsession','participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
+    yield ['session_code', 'subsession_id', 'id_in_subsession', 'participant', 'cash', 'inventory', 'trading', 'trading_sign', 'trading_price', 'trading_rate', 'bet', 'bet_quantity', 'bet_price', 'bet_deadline', 'time', 'event']
 
     groups = set()
 

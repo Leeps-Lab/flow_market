@@ -1,8 +1,8 @@
-from .infiniteTimer import InfiniteTimer
-import threading
-from otree.db import idmap # type: ignore
+from .safeThread import SafeThread
+from otree.db import idmap  # type: ignore
 
-def call_with_delay_infinite(delay: float, callback, *args, **kwargs):
+
+def call_with_delay_infinite(delay, deadline, callback, *args, **kwargs):
     """Calls a model method with a specified delay
 
     Uses Timer to create a delay, then starts a new database session, rebinds the
@@ -21,10 +21,11 @@ def call_with_delay_infinite(delay: float, callback, *args, **kwargs):
             new_model = cls.objects.get(id=self.id)
             callback.__func__.__get__(new_model, cls)(*args, **kwargs)
 
-    t = InfiniteTimer(delay, query_and_call)
+    t = SafeThread(query_and_call, delay, deadline, infinite=True)
     t.start()
 
-def call_with_delay(delay: float, callback, *args, **kwargs):
+
+def call_with_delay(delay, deadline, callback, *args, **kwargs):
     """Calls a model method with a specified delay
 
     Uses Timer to create a delay, then starts a new database session, rebinds the
@@ -43,5 +44,5 @@ def call_with_delay(delay: float, callback, *args, **kwargs):
             new_model = cls.objects.get(id=self.id)
             callback.__func__.__get__(new_model, cls)(*args, **kwargs)
 
-    t = threading.Timer(delay, query_and_call)
+    t = SafeThread(query_and_call, delay, deadline, infinite=False)
     t.start()
