@@ -21,11 +21,11 @@ class Decision(Page):
 
         return group.round_length()
 
-
     def is_displayed(self):
         return True
 
     def vars_for_template(self):
+        self.group.set_begin_time()
         bet_file = self.group.bet_file()
         with open('flow_market/bets/' + bet_file) as f:
             rows = list(csv.DictReader(f))

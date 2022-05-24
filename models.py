@@ -75,12 +75,6 @@ def parse_config(config_file):
 
 
 class Subsession(BaseSubsession):
-    # def creating_session(self):
-    #     # ENABLE
-    #     # self.group_randomly()
-    #     for p in self.get_players():
-    #         p.init_cash_inv()
-
     def creating_session(self):
         config = self.config
         if not config:
@@ -119,9 +113,6 @@ class Subsession(BaseSubsession):
         # print(silo_matrix)
         # print(group_matrix)
         self.set_group_matrix(group_matrix)
-
-        for g in self.get_groups():
-            g.set_begin_time()
 
         for p in self.get_players():
             p.init_cash_inv()
@@ -533,56 +524,8 @@ class Group(BaseGroup):
 
         self.cancellationQueue = cache
         self.save()
-        # print("new", self.cancellationQueue)
-
-        # for p in self.get_players():
-        #     for value in self.order_copies[str(p.id_in_group)].values():
-        #         if (self.treatment_val == "cda"):
-        #             if value['direction'] == 'buy' and not "expired_by_cda_sell" in value:
-        #                 buys_list.append(value)
-        #         else:
-        #             if value['direction'] == 'buy' and value['status'] == 'active':
-        #                 buys_list.append(value)
-        # return buys_list
-
-        # **cont
-        # cache[str(seller.id_in_group)][str(
-        #     sell['orderID'])]['status'] = 'expired'
-        # self.order_copies = cache
-        # self.save()
-        # sell['status'] = 'expired'
-        # # ReGraph KLF market since order expired
-        # # should_update_market_graph = True  # BUG think this is causing a bug
-        # for player in self.get_players():
-        #     payloads[player.participant.code] = {
-        #         "type": 'regraph', "buys": buys, "sells": sells, 'round': self.round_number}
-
-        # live._live_send_back(self.get_players()[0].participant._session_code, self.get_players()[
-        #                         0].participant._index_in_pages, payloads)
-
-    # def update(self):
-    #     global time_last
-    #     current_time = time.perf_counter()
-    #     global times
-    #     if len(times) > 50:
-    #         # pass
-    #         del times[0:48]
-    #     times.append(current_time-time_last)
-    #     print("avg time elapsed:", statistics.median(times))
-    #     time_last = current_time
 
     def update(self):
-        # TEST does this update function follow frequency in config?
-        # global time_last
-        # current_time = time.perf_counter()
-        # global times
-        # if len(times) > 50:
-        #     # pass
-        #     del times[0:48]
-        # times.append(current_time-time_last)
-        # print("avg time elapsed:", statistics.median(times))
-        # time_last = current_time
-
         self.carryOutCancellations()
 
         buys = self.buys()
@@ -591,7 +534,6 @@ class Group(BaseGroup):
         should_update_market_graph = False
 
         condition = None
-        print("\n\n")
 
         # change condition to true if there is an algo order in list
         if (self.treatment_val == "cda"):
