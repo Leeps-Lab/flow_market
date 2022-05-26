@@ -6,15 +6,17 @@
 {% endblock %}
 
 {% block content %}
+
+    <p>Cash: {{ player.cash | floatformat:3 }} </p>
     <p>This is round {{subsession.round_number}}</p>
     <p>Your earnings are {{ player.cash | floatformat:1 }} </p>
     <br> <br>
+    <p>Inventory: {{ player.inventory | floatformat:3 }}</p>
     {% if player.inventory < 0 %}
     <p>Your ending inventory is {{ player.inventory | floatformat:1 }} and has been filled at a price of 20 per share.</p>
     {% else %}
     <p>Your ending inventory is {{ player.inventory | floatformat:1 }} and has been liquidated at price 0.</p>
     {% endif %}
     {% next_button %}
+
 {% endblock %}
-
-
