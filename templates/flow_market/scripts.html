@@ -2130,15 +2130,7 @@
   function liveRecv(data) {
     // This was a hack for preventing previous update()'s from affecting the current round
     // A better solution would be to just find a way to get a reference to the interval in the backend and delete it before moving on to the next round
-    // if (ROUND_NUMBER !== data['round']) {
-    //   // console.log("wrong round")
-    //   console.log("data", data)
-    //   return;
-    // }
 
-
-    // console.timeEnd(`timing`);
-    // console.time(`timing`);
     if (isFLO) {
       // what appears if it's flo
       document.querySelector("#isFLO").style.display = "initial"
@@ -2487,10 +2479,6 @@
     }
 
     const order = {
-      // p_min: minPrice,
-      // p_max: maxPrice,
-      // q_max: volume,
-      // u_max: uMax,
       p_min: 10,
       p_max: 10,
       u_max: uMax,
@@ -2502,7 +2490,6 @@
       q_max: 6, // this is units at a time
       q_total: 50,
       executed_units: 10,
-      // expiration_time: 4 // in SECONDS
       expiration_time: 20 // in SECONDS
     };
 
@@ -2511,38 +2498,6 @@
     liveSend(order);
 
     console.log("**sending algo_sell:", order)
-
-    // const valueToBeat = isNewOrderValid(order); // undefined means order is valid
-
-    // if (valueToBeat === undefined) {
-
-    //   orderHistory.push(order);
-    //   appendActiveOrdersTable(order);
-    //   liveSend(order);
-
-    // } else {
-
-    //   let errorText;
-    //   if (isCDA || isFBA) {
-    //     // cda/fba: can only buy when buy's p_max < sell's p_max
-    //     // cda/fba: can only sell when sell's p_max > buy's p_max
-    //     errorText = `Your buy order will cross with one of your sell orders. Try decreasing the price below ${valueToBeat}.`;
-    //   } else if (isFLO) {
-    //     // flo: can only sell when p_min is > buy's p_max
-    //     // flo: can only buy when p_max < sell's p_min
-    //     errorText = `Your buy order will cross with one of your sell orders. Try decreasing the maximum price below ${valueToBeat}.`;
-    //   }
-
-    //   Swal.fire({
-    //     title: 'Cannot Trade With Yourself',
-    //     icon: 'warning',
-    //     text: errorText,
-    //     showClass: {
-    //       popup: 'animate__animated animate__fadeIn',
-    //     },
-    //   });
-
-    // }
   }
 
   function new_buy(isAutomated = false, tempMinPrice = null, tempMaxPrice = null, tempVolume = null, tempUMax = null) {
